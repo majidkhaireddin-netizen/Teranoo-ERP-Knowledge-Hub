@@ -13,6 +13,7 @@ import {
   deriveDashboardMetrics,
   getProjectIdentity,
   getReferenceCounts,
+  getSnapshotProvenance,
 } from '@/content/repositories/projectRepository';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -21,6 +22,7 @@ import { SectionHeader } from '@/components/layout/SectionHeader';
 import { StatusIndicator } from '@/components/ui/StatusIndicator';
 import { ContentClassification } from '@/components/documentation/ContentClassification';
 import { InformationCallout } from '@/components/documentation/InformationCallout';
+import { MetadataPanel } from '@/components/documentation/MetadataPanel';
 import { MetricCard } from '@/components/visualization/MetricCard';
 import { Phase5CapabilitiesSection } from '@/features/platform/Phase5CapabilitiesSection';
 import { ArchitectureOverviewDiagram } from '@/features/architecture/ArchitectureOverviewDiagram';
@@ -41,6 +43,7 @@ export function DashboardView() {
   const identity = useMemo(() => getProjectIdentity(), []);
   const metrics = useMemo(() => deriveDashboardMetrics(), []);
   const counts = useMemo(() => getReferenceCounts(), []);
+  const provenance = useMemo(() => getSnapshotProvenance(), []);
 
   const quickNavItems = useMemo(
     () =>
@@ -254,6 +257,54 @@ export function DashboardView() {
             ))}
           </div>
         </div>
+      </section>
+      {/* 6. Reference Snapshot Provenance */}
+      <section aria-label={t('provenance.title')}>
+        <MetadataPanel
+          title={t('provenance.title')}
+          entries={[
+            {
+              label: t('provenance.sourceRepository'),
+              value: (
+                <code className="font-mono text-xs bidi-ltr break-all">
+                  {provenance.sourceRepository}
+                </code>
+              ),
+            },
+            {
+              label: t('provenance.reviewedTreeSha'),
+              value: (
+                <code className="font-mono text-xs bidi-ltr break-all">
+                  {provenance.reviewedTreeSha}
+                </code>
+              ),
+            },
+            {
+              label: t('provenance.referenceReviewDate'),
+              value: (
+                <div className="space-y-0.5">
+                  <code className="font-mono text-xs bidi-ltr">
+                    {provenance.referenceReviewDate}
+                  </code>
+                  <p className="text-xs text-text-secondary">
+                    {resolveLocalizedText(provenance.reviewDateNote, locale)}
+                  </p>
+                </div>
+              ),
+            },
+            {
+              label: t('provenance.snapshotMode'),
+              value: (
+                <div className="space-y-0.5">
+                  <span>{t('provenance.staticSnapshotValue')}</span>
+                  <p className="text-xs text-text-secondary">
+                    {resolveLocalizedText(provenance.metricsOriginNote, locale)}
+                  </p>
+                </div>
+              ),
+            },
+          ]}
+        />
       </section>
     </PageContainer>
   );

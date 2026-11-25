@@ -1,14 +1,37 @@
 import type { ProjectReferenceSnapshot } from '@/content/models/types';
 
 /**
- * Authoritative TASK-001 Reference Snapshot.
- * Contains exclusively verified reference facts authorized in TASK-001 Section 13.
- * Do NOT fabricate additional decision IDs, dates, evaluations, or research outcomes.
+ * Authoritative Reference Snapshot for Teranoo ERP Knowledge Hub.
+ * Contains exclusively verified reference facts authorized in TASK-001 and
+ * provenance metadata verified in TASK-001-FIX-01 Section H.
+ * Do NOT fabricate decision IDs, approval dates, evaluations, or research outcomes.
  */
 export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
+  provenance: {
+    sourceRepository: 'https://github.com/Alabasi1980/TeranooErp',
+    officialSources: [
+      'teranoo-erp-planning/00-project-foundation/PROJECT_WORK_PLAN.md',
+      'teranoo-erp-planning/00-project-foundation/DECISION_REGISTER.md',
+    ],
+    reviewedTreeSha: 'a922a69b54bc0cc611ae46d8e7434907cde0046a',
+    referenceReviewDate: '2026-11-25',
+    isLiveSynced: false,
+    snapshotNatureNote: {
+      ar: 'هذه البيانات تمثل لقطة مرجعية محلية ثابتة وليست مزامنة مباشرة مع مستودع المصدر.',
+      en: 'This dataset is a static local reference snapshot and is not live-synced with the source repository.',
+    },
+    reviewDateNote: {
+      ar: 'تاريخ 2026-11-25 هو تاريخ المراجعة المرجعية المستقلة للقطة، وليس تاريخ اعتماد كل وثيقة مصدرية على حدة.',
+      en: '2026-11-25 is the independent reference review date of this snapshot, not the individual approval date of each source document.',
+    },
+    metricsOriginNote: {
+      ar: 'التمييز المصدري: 120 قرارًا معتمدًا وتقدم المرحلة الخامسة (7 من 13 بندًا) مشتقة من المصادر الرسمية، بينما 57 ملاحظة مراجعة مستقلة و24 اعتبارًا مستقبليًا هي إحصاءات مراجعة استشارية مستقلة منفصلة عن القرارات المعتمدة.',
+      en: 'Source distinction: 120 approved decisions and Phase 5 progress (7 of 13 planning items) derive from official planning sources, whereas 57 independent review notes and 24 future considerations are separate independent review statistics.',
+    },
+  },
   snapshotScopeNote: {
-    ar: 'لقطة مرجعية لحالة التخطيط والتوثيق والاعتماد المعماري في مشروع Teranoo ERP، وليست اتصالًا مباشرًا بالمستودع الرسمي ولا تمثل نسبة إنجاز البرمجة الفعلية لنظام ERP.',
-    en: 'Reference snapshot of planning, documentation, and architectural approval status for Teranoo ERP. It is not a live connection to the official repository and does not represent ERP software implementation completion.',
+    ar: 'لقطة مرجعية ثابتة لحالة التخطيط والتوثيق والاعتماد المعماري في مشروع Teranoo ERP، وليست اتصالًا مباشرًا بمستودع المصدر ولا تمثل نسبة إنجاز البرمجة الفعلية لنظام ERP.',
+    en: 'Static reference snapshot of planning, documentation, and architectural approval status for Teranoo ERP. It is not live-synced with the source repository and does not represent ERP software implementation completion.',
   },
   identity: {
     productName: 'Teranoo ERP',
@@ -38,7 +61,6 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
     {
       id: 'finance',
       order: 1,
-      code: 'MOD-FIN',
       name: {
         ar: 'المالية',
         en: 'Finance',
@@ -48,7 +70,6 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
     {
       id: 'inventory-warehouse',
       order: 2,
-      code: 'MOD-INV',
       name: {
         ar: 'المخزون وإدارة المستودعات',
         en: 'Inventory & Warehouse Management',
@@ -58,7 +79,6 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
     {
       id: 'procurement',
       order: 3,
-      code: 'MOD-PROC',
       name: {
         ar: 'المشتريات',
         en: 'Procurement',
@@ -68,7 +88,6 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
     {
       id: 'sales-order-management',
       order: 4,
-      code: 'MOD-SLS',
       name: {
         ar: 'المبيعات وإدارة الطلبات',
         en: 'Sales & Order Management',
@@ -120,6 +139,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Identity & Access Framework',
       },
       status: 'approved',
+      kind: 'runtime_capability',
       decisionId: 'D-PLAT-01',
     },
     {
@@ -130,6 +150,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Workflow & Approvals Framework',
       },
       status: 'approved',
+      kind: 'runtime_capability',
       decisionId: 'D-PLAT-02',
     },
     {
@@ -140,6 +161,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Audit Trail Framework',
       },
       status: 'approved',
+      kind: 'runtime_capability',
       decisionId: 'D-PLAT-03',
     },
     {
@@ -150,6 +172,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Shared Master Data Framework',
       },
       status: 'approved',
+      kind: 'runtime_capability',
       decisionId: 'D-PLAT-04',
     },
     {
@@ -160,6 +183,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Localization Framework',
       },
       status: 'approved',
+      kind: 'runtime_capability',
       decisionId: 'D-PLAT-05',
     },
     {
@@ -170,6 +194,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Tax / Currency / Calendar Foundations',
       },
       status: 'approved',
+      kind: 'runtime_capability',
       decisionId: 'D-PLAT-06',
     },
     {
@@ -180,6 +205,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Document & Attachment Framework',
       },
       status: 'approved',
+      kind: 'runtime_capability',
       decisionId: 'D-PLAT-07',
     },
     {
@@ -190,6 +216,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Notification Framework',
       },
       status: 'pending',
+      kind: 'runtime_capability',
       decisionId: null,
     },
     {
@@ -200,6 +227,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Integration / API Framework',
       },
       status: 'pending',
+      kind: 'runtime_capability',
       decisionId: null,
     },
     {
@@ -210,6 +238,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Reporting & Analytics Framework',
       },
       status: 'pending',
+      kind: 'runtime_capability',
       decisionId: null,
     },
     {
@@ -220,6 +249,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Configuration & Feature Management',
       },
       status: 'pending',
+      kind: 'runtime_capability',
       decisionId: null,
     },
     {
@@ -230,6 +260,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Extension Framework / Compatibility Contracts',
       },
       status: 'pending',
+      kind: 'runtime_capability',
       decisionId: null,
     },
     {
@@ -240,6 +271,7 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
         en: 'Platform Foundation Adoption',
       },
       status: 'pending',
+      kind: 'planning_gate',
       decisionId: null,
     },
   ],

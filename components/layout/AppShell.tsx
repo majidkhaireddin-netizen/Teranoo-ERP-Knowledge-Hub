@@ -6,6 +6,8 @@ import { AppSidebar } from '@/components/layout/AppSidebar';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { GlobalSearchModal } from '@/components/layout/GlobalSearchModal';
 
+import { APP_SHELL_ROOT_ID } from '@/components/ui/Modal';
+
 export interface AppShellProps {
   children: React.ReactNode;
 }
@@ -26,7 +28,7 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex bg-app text-text-primary">
+    <div id={APP_SHELL_ROOT_ID} className="min-h-screen flex bg-app text-text-primary">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-xs focus:font-medium focus:text-primary-foreground"

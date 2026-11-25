@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { getReferenceCounts } from '@/content/repositories/projectRepository';
-import { useAppLocale } from '@/providers/LocaleProvider';
 import { PlannedSectionView } from '@/components/documentation/PlannedSectionView';
 import { MetricCard } from '@/components/visualization/MetricCard';
 
 export function IndependentReviewsView() {
-  const { locale } = useAppLocale();
+  const t = useTranslations();
   const counts = useMemo(() => getReferenceCounts(), []);
-  const isAr = locale === 'ar';
 
   return (
     <PlannedSectionView
@@ -23,18 +22,10 @@ export function IndependentReviewsView() {
       verifiedAnchor={
         <div className="rounded-lg border border-border bg-surface">
           <MetricCard
-            label={
-              isAr
-                ? 'ملاحظات المراجعات المستقلة (ضمن المراجعات الاستشارية السابقة)'
-                : 'Independent Review Notes (Prior Advisory Reviews)'
-            }
+            label={t('sections.reviews.metricLabel')}
             value={counts.independentReviewNotes}
             emphasis="accent"
-            note={
-              isAr
-                ? 'التوصيات والملاحظات الاستشارية لا تمثل قرارات رسمية معتمدة ما لم تُعتمد في سجل القرارات.'
-                : 'Advisory observations do not represent official decisions unless formally approved in the Decision Register.'
-            }
+            note={t('sections.reviews.metricNote')}
           />
         </div>
       }

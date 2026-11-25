@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { getReferenceCounts } from '@/content/repositories/projectRepository';
-import { useAppLocale } from '@/providers/LocaleProvider';
 import { PlannedSectionView } from '@/components/documentation/PlannedSectionView';
 import { MetricCard } from '@/components/visualization/MetricCard';
 
 export function ResearchCenterView() {
-  const { locale } = useAppLocale();
+  const t = useTranslations();
   const counts = useMemo(() => getReferenceCounts(), []);
-  const isAr = locale === 'ar';
 
   return (
     <PlannedSectionView
@@ -23,17 +22,9 @@ export function ResearchCenterView() {
       verifiedAnchor={
         <div className="rounded-lg border border-border bg-surface">
           <MetricCard
-            label={
-              isAr
-                ? 'حزم الأبحاث المعمارية (اللقطة المرجعية)'
-                : 'Architectural Research Packages (Reference Snapshot)'
-            }
+            label={t('sections.research.metricLabel')}
             value={counts.architecturalResearchPackages}
-            note={
-              isAr
-                ? 'ستُضاف تفاصيل الحزم البحثية ومصادرها ونتائجها المعتمدة في مهمة لاحقة.'
-                : 'Individual research packages, citations, and verified findings will be added in a subsequent task.'
-            }
+            note={t('sections.research.metricNote')}
           />
         </div>
       }

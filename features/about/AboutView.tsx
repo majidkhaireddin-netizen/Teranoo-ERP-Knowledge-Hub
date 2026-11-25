@@ -1,16 +1,21 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import type { ContentClassificationType } from '@/content/models/types';
+import {
+  resolveLocalizedText,
+  type ContentClassificationType,
+} from '@/content/models/types';
+import { getSnapshotProvenance } from '@/content/repositories/projectRepository';
+import { useAppLocale } from '@/providers/LocaleProvider';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { DocumentationArticle } from '@/components/documentation/DocumentationArticle';
 import { DocumentationSection } from '@/components/documentation/DocumentationSection';
 import { ContentClassification } from '@/components/documentation/ContentClassification';
-import { WarningCallout } from '@/components/documentation/WarningCallout';
+import { InformationCallout } from '@/components/documentation/InformationCallout';
+import { MetadataPanel } from '@/components/documentation/MetadataPanel';
 import { ComparisonTable } from '@/components/documentation/ComparisonTable';
-import { useAppLocale } from '@/providers/LocaleProvider';
 
 const CLASSIFICATIONS: readonly ContentClassificationType[] = [
   'official',
@@ -22,7 +27,7 @@ const CLASSIFICATIONS: readonly ContentClassificationType[] = [
 export function AboutView() {
   const t = useTranslations();
   const { locale } = useAppLocale();
-  const isAr = locale === 'ar';
+  const provenance = useMemo(() => getSnapshotProvenance(), []);
 
   return (
     <PageContainer>
@@ -49,34 +54,11 @@ export function AboutView() {
           <p className="text-text-secondary">{t('about.purposeBody')}</p>
           <ComparisonTable
             caption={t('about.purposeTitle')}
-            headers={
-              isAr
-                ? ['ما تمثله المنصة', 'ما لا تمثله المنصة']
-                : ['What This Platform Is', 'What This Platform Is Not']
-            }
+            headers={[t('about.purposeHeaders.is'), t('about.purposeHeaders.isNot')]}
             rows={[
-              [
-                isAr
-                  ? 'مرجع توثيقي ومعماري منظم لمشروع Teranoo ERP'
-                  : 'Structured documentation and architecture hub for Teranoo ERP',
-                isAr
-                  ? 'ليس نظام ERP تشغيليًا'
-                  : 'Not an operational ERP system',
-              ],
-              [
-                isAr
-                  ? 'بيئة تحليلية لمتابعة القرارات والأبحاث والمراجعات المستقلة'
-                  : 'Analytical workspace for decisions, research, and independent reviews',
-                isAr ? 'ليس موقعًا تسويقيًا' : 'Not a marketing website',
-              ],
-              [
-                isAr
-                  ? 'أساس برمجي معياري قابل للتوسع عبر مهام محكومة'
-                  : 'Modular enterprise foundation built incrementally via governed tasks',
-                isAr
-                  ? 'ليس مجرد عارض لملفات Markdown أو نموذجًا مؤقتًا'
-                  : 'Not a plain Markdown viewer or disposable prototype',
-              ],
+              [t('about.purposeRows.r1Is'), t('about.purposeRows.r1IsNot')],
+              [t('about.purposeRows.r2Is'), t('about.purposeRows.r2IsNot')],
+              [t('about.purposeRows.r3Is'), t('about.purposeRows.r3IsNot')],
             ]}
           />
         </DocumentationSection>
@@ -99,10 +81,85 @@ export function AboutView() {
           </div>
         </DocumentationSection>
 
-        <DocumentationSection id="security" title={t('about.securityTitle')}>
-          <WarningCallout title={t('about.securityTitle')}>
-            {t('about.securityBody')}
-          </WarningCallout>
+        <DocumentationSection
+          id="public-knowledge-direction"
+          title={t('about.publicAccessTitle')}
+        >
+          <InformationCallout title={t('about.publicAccessCalloutTitle')}>
+            {t('about.publicAccessBody')}
+          </InformationCallout>
+          <ul className="list-disc ps-5 space-y-2 text-sm text-text-secondary">
+            <li>{t('about.publicAccessGuardrails.authorization')}</li>
+            <li>{t('about.publicAccessGuardrails.noSecrets')}</li>
+            <li>{t('about.publicAccessGuardrails.attribution')}</li>
+            <li>{t('about.publicAccessGuardrails.separation')}</li>
+          </ul>
+        </DocumentationSection>
+
+        <DocumentationSection id="provenance" title={t('provenance.title')}>
+          <MetadataPanel
+            title={t('provenance.title')}
+            entries={[
+              {
+                label: t('provenance.sourceRepository'),
+                value: (
+                  <code className="font-mono text-xs bidi-ltr break-all">
+                    {provenance.sourceRepository}
+                  </code>
+                ),
+              },
+              {
+                label: t('provenance.officialSources'),
+                value: (
+                  <div className="space-y-1">
+                    {provenance.officialSources.map((src) => (
+                      <code
+                        key={src}
+                        className="block font-mono text-xs bidi-ltr break-all"
+                      >
+                        {src}
+                      </code>
+                    ))}
+                  </div>
+                ),
+              },
+              {
+                label: t('provenance.reviewedTreeSha'),
+                value: (
+                  <code className="font-mono text-xs bidi-ltr break-all">
+                    {provenance.reviewedTreeSha}
+                  </code>
+                ),
+              },
+              {
+                label: t('provenance.referenceReviewDate'),
+                value: (
+                  <div className="space-y-0.5">
+                    <code className="font-mono text-xs bidi-ltr">
+                      {provenance.referenceReviewDate}
+                    </code>
+                    <p className="text-xs text-text-secondary">
+                      {resolveLocalizedText(provenance.reviewDateNote, locale)}
+                    </p>
+                  </div>
+                ),
+              },
+              {
+                label: t('provenance.snapshotMode'),
+                value: resolveLocalizedText(
+                  provenance.snapshotNatureNote,
+                  locale
+                ),
+              },
+              {
+                label: t('provenance.metricsOrigin'),
+                value: resolveLocalizedText(
+                  provenance.metricsOriginNote,
+                  locale
+                ),
+              },
+            ]}
+          />
         </DocumentationSection>
       </DocumentationArticle>
     </PageContainer>

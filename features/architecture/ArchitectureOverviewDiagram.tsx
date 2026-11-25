@@ -4,10 +4,10 @@ import React, { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { resolveLocalizedText } from '@/content/models/types';
 import {
-  derivePhase5Progress,
+  deriveRuntimeCapabilitiesSummary,
   getCoreBusinessModules,
-  getPhase5Capabilities,
   getProjectIdentity,
+  getRuntimePlatformCapabilities,
 } from '@/content/repositories/projectRepository';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { DiagramContainer } from '@/components/visualization/DiagramContainer';
@@ -21,16 +21,16 @@ export function ArchitectureOverviewDiagram() {
 
   const identity = useMemo(() => getProjectIdentity(), []);
   const modules = useMemo(() => getCoreBusinessModules(), []);
-  const capabilities = useMemo(() => getPhase5Capabilities(), []);
-  const phase5Progress = useMemo(
-    () => derivePhase5Progress(capabilities),
-    [capabilities]
+  const runtimeCapabilities = useMemo(() => getRuntimePlatformCapabilities(), []);
+  const runtimeSummary = useMemo(
+    () => deriveRuntimeCapabilitiesSummary(runtimeCapabilities),
+    [runtimeCapabilities]
   );
 
-  const approvedCapabilities = capabilities.filter(
+  const approvedCapabilities = runtimeCapabilities.filter(
     (c) => c.status === 'approved'
   );
-  const pendingCapabilities = capabilities.filter(
+  const pendingCapabilities = runtimeCapabilities.filter(
     (c) => c.status === 'pending'
   );
 
@@ -38,11 +38,7 @@ export function ArchitectureOverviewDiagram() {
 
   return (
     <DiagramContainer
-      title={
-        isAr
-          ? 'مخطط الطبقات المعمارية — Teranoo ERP'
-          : 'Teranoo ERP — Layered Architecture Blueprint'
-      }
+      title={t('dashboard.architectureOverview.diagramTitle')}
       caption={t('dashboard.architectureOverview.diagramCaption')}
       classificationSlot={
         <ContentClassification
@@ -63,7 +59,6 @@ export function ArchitectureOverviewDiagram() {
               <ArchitectureNode
                 key={mod.id}
                 tone="primary"
-                code={mod.code}
                 title={resolveLocalizedText(mod.name, locale)}
                 subtitle={isAr ? mod.name.en : undefined}
               />
@@ -77,21 +72,18 @@ export function ArchitectureOverviewDiagram() {
           aria-hidden="true"
         >
           <span className="h-px flex-1 bg-border" />
-          <span>
-            {isAr
-              ? 'العقود المشتركة وخدمات المنصة'
-              : 'Shared Contracts & Platform Services'}
-          </span>
+          <span>{t('dashboard.architectureOverview.sharedContractsLabel')}</span>
           <span className="h-px flex-1 bg-border" />
         </div>
 
-        {/* Layer 2: Shared Platform Foundation */}
+        {/* Layer 2: Shared Platform Runtime Capabilities (12 capabilities; excludes Phase 5 planning gate #13) */}
         <ArchitectureGroup
           tone="platform"
           title={t('dashboard.architectureOverview.platformLayerTitle')}
           meta={t('dashboard.architectureOverview.platformLayerMeta', {
-            completed: phase5Progress.completedCount,
-            pending: phase5Progress.pendingCount,
+            approved: runtimeSummary.approvedCount,
+            pending: runtimeSummary.pendingCount,
+            total: runtimeSummary.totalCount,
           })}
         >
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -112,7 +104,6 @@ export function ArchitectureOverviewDiagram() {
               <ArchitectureNode
                 key={cap.id}
                 tone="pending"
-                code={`P5-${String(cap.itemNumber).padStart(2, '0')}`}
                 title={resolveLocalizedText(cap.name, locale)}
                 subtitle={
                   isAr

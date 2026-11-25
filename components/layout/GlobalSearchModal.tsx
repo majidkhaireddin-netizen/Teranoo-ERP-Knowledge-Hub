@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -25,22 +25,12 @@ export function GlobalSearchModal({ open, onClose }: GlobalSearchModalProps) {
   const router = useRouter();
   const t = useTranslations();
   const { locale } = useAppLocale();
-  const inputWrapperRef = useRef<HTMLDivElement>(null);
 
   const searchIndex = useMemo(() => buildSearchIndex(), []);
   const results = useMemo(
     () => searchKnowledgeHub(query, searchIndex),
     [query, searchIndex]
   );
-
-  useEffect(() => {
-    if (!open) return;
-    const timer = window.setTimeout(() => {
-      const input = inputWrapperRef.current?.querySelector('input');
-      input?.focus();
-    }, 30);
-    return () => window.clearTimeout(timer);
-  }, [open]);
 
   const handleClose = () => {
     setQuery('');
@@ -62,15 +52,14 @@ export function GlobalSearchModal({ open, onClose }: GlobalSearchModalProps) {
       className="max-w-2xl"
     >
       <div className="p-4 space-y-3">
-        <div ref={inputWrapperRef}>
-          <SearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder={t('controls.searchPlaceholder')}
-            aria-label={t('controls.searchModalTitle')}
-            clearLabel={t('controls.close')}
-          />
-        </div>
+        <SearchInput
+          data-autofocus
+          value={query}
+          onChange={setQuery}
+          placeholder={t('controls.searchPlaceholder')}
+          aria-label={t('controls.searchModalTitle')}
+          clearLabel={t('controls.clearSearch')}
+        />
 
         <div className="flex items-center justify-between text-xs text-text-muted px-1">
           <span>{t('controls.searchResultsCount', { count: results.length })}</span>

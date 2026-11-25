@@ -5,17 +5,25 @@ import type {
   DerivedDashboardMetrics,
   DerivedPhase5Progress,
   DerivedPlanningSummary,
+  DerivedRuntimeCapabilitiesSummary,
   PlanningPhase,
   PlatformCapability,
   ProjectIdentity,
   ProjectReferenceSnapshot,
   SearchableItem,
+  SnapshotProvenance,
   SnapshotReferenceCounts,
 } from '@/content/models/types';
 import { PROJECT_REFERENCE_SNAPSHOT } from '@/content/seed/projectSnapshot';
 
 export function getProjectSnapshot(): ProjectReferenceSnapshot {
   return PROJECT_REFERENCE_SNAPSHOT;
+}
+
+export function getSnapshotProvenance(
+  snapshot: ProjectReferenceSnapshot = PROJECT_REFERENCE_SNAPSHOT
+): SnapshotProvenance {
+  return snapshot.provenance;
 }
 
 export function getProjectIdentity(
@@ -36,10 +44,26 @@ export function getPlanningPhases(
   return snapshot.planningPhases;
 }
 
+/**
+ * Returns all 13 Phase 5 planning items (12 runtime platform capabilities +
+ * item 13 Platform Foundation Adoption planning review/approval gate).
+ */
 export function getPhase5Capabilities(
   snapshot: ProjectReferenceSnapshot = PROJECT_REFERENCE_SNAPSHOT
 ): readonly PlatformCapability[] {
   return snapshot.phase5Capabilities;
+}
+
+/**
+ * Returns only the 12 runtime platform capabilities for architectural diagrams,
+ * excluding planning review/approval gates such as Platform Foundation Adoption.
+ */
+export function getRuntimePlatformCapabilities(
+  snapshot: ProjectReferenceSnapshot = PROJECT_REFERENCE_SNAPSHOT
+): readonly PlatformCapability[] {
+  return snapshot.phase5Capabilities.filter(
+    (item) => item.kind === 'runtime_capability'
+  );
 }
 
 export function getReferenceCounts(
@@ -62,6 +86,20 @@ export function derivePhase5Progress(
     pendingCount,
     totalCount,
     completionPercentage,
+  };
+}
+
+export function deriveRuntimeCapabilitiesSummary(
+  capabilities: readonly PlatformCapability[] = getRuntimePlatformCapabilities()
+): DerivedRuntimeCapabilitiesSummary {
+  const runtimeOnly = capabilities.filter((c) => c.kind === 'runtime_capability');
+  const approvedCount = runtimeOnly.filter((c) => c.status === 'approved').length;
+  const pendingCount = runtimeOnly.filter((c) => c.status === 'pending').length;
+
+  return {
+    approvedCount,
+    pendingCount,
+    totalCount: runtimeOnly.length,
   };
 }
 
@@ -125,7 +163,6 @@ export function buildSearchIndex(
     },
     category: 'module',
     classification: mod.classification,
-    code: mod.code,
   }));
 
   const capabilityEntries: SearchableItem[] = snapshot.phase5Capabilities.map((cap) => ({
@@ -137,13 +174,18 @@ export function buildSearchIndex(
           ar: `المرحلة 5 — قدرة منصة معتمدة (${cap.decisionId})`,
           en: `Phase 5 — Approved platform capability (${cap.decisionId})`,
         }
-      : {
-          ar: 'المرحلة 5 — قدرة منصة قيد الاستكمال',
-          en: 'Phase 5 — Pending platform capability',
-        },
+      : cap.kind === 'planning_gate'
+        ? {
+            ar: 'المرحلة 5 — بوابة مراجعة واعتماد تخطيطية',
+            en: 'Phase 5 — Planning review & approval gate',
+          }
+        : {
+            ar: 'المرحلة 5 — قدرة منصة قيد الاستكمال',
+            en: 'Phase 5 — Pending platform capability',
+          },
     category: cap.decisionId ? 'decision' : 'capability',
     classification: 'official',
-    code: cap.decisionId ?? `P5-${String(cap.itemNumber).padStart(2, '0')}`,
+    code: cap.decisionId ?? undefined,
   }));
 
   return [...navEntries, ...moduleEntries, ...capabilityEntries];

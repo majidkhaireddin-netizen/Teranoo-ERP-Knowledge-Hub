@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { getReferenceCounts } from '@/content/repositories/projectRepository';
-import { useAppLocale } from '@/providers/LocaleProvider';
 import { PlannedSectionView } from '@/components/documentation/PlannedSectionView';
 import { MetricCard } from '@/components/visualization/MetricCard';
 
 export function FutureConsiderationsView() {
-  const { locale } = useAppLocale();
+  const t = useTranslations();
   const counts = useMemo(() => getReferenceCounts(), []);
-  const isAr = locale === 'ar';
 
   return (
     <PlannedSectionView
@@ -23,17 +22,9 @@ export function FutureConsiderationsView() {
       verifiedAnchor={
         <div className="rounded-lg border border-border bg-surface">
           <MetricCard
-            label={
-              isAr
-                ? 'الاعتبارات المعمارية المستقبلية (ضمن اللقطة المرجعية السابقة)'
-                : 'Future Architecture Considerations (Prior Reference Snapshot)'
-            }
+            label={t('sections.future.metricLabel')}
             value={counts.futureArchitectureConsiderations}
-            note={
-              isAr
-                ? 'لا تُعد هذه البنود قرارات معتمدة؛ ستُعرض قائمتها الموثقة في مهمة لاحقة.'
-                : 'These items are not approved decisions; verified records will be populated in a later task.'
-            }
+            note={t('sections.future.metricNote')}
           />
         </div>
       }

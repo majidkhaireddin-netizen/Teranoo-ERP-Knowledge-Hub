@@ -1,6 +1,8 @@
 node_modules/
 .next/
 coverage/
+*.tsbuildinfo
+.playwright-cli/
 .DS_Store
 *.log
 .env*

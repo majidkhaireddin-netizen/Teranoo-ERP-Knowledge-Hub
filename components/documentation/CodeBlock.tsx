@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export interface CodeBlockProps {
@@ -17,11 +18,14 @@ export function CodeBlock({
   code,
   language,
   title,
-  copyLabel = 'Copy',
-  copiedLabel = 'Copied',
+  copyLabel,
+  copiedLabel,
   className,
 }: CodeBlockProps) {
+  const t = useTranslations();
   const [copied, setCopied] = useState(false);
+  const resolvedCopyLabel = copyLabel ?? t('controls.copy');
+  const resolvedCopiedLabel = copiedLabel ?? t('controls.copied');
 
   const handleCopy = async () => {
     try {
@@ -52,12 +56,12 @@ export function CodeBlock({
           {copied ? (
             <>
               <Check className="h-3.5 w-3.5 text-success" aria-hidden="true" />
-              <span>{copiedLabel}</span>
+              <span>{resolvedCopiedLabel}</span>
             </>
           ) : (
             <>
               <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>{copyLabel}</span>
+              <span>{resolvedCopyLabel}</span>
             </>
           )}
         </button>

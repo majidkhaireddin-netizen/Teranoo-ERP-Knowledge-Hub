@@ -71,7 +71,7 @@ Every status and classification indicator pairs color with an explicit icon and 
 Loaded via `next/font/google` in `app/layout.tsx`:
 - **Arabic Primary:** `IBM Plex Sans Arabic` (`400`, `500`, `600`, `700`) — active first when `html[lang="ar"]`.
 - **English Primary:** `Inter` (`400`, `500`, `600`, `700`) — active first when `html[lang="en"]`.
-- **Technical Monospace:** `IBM Plex Mono` (`400`, `500`, `600`) — used for decision IDs (`D-PLAT-01`), module codes (`MOD-FIN`), metrics, and code blocks.
+- **Technical Monospace:** `IBM Plex Mono` (`400`, `500`, `600`) — used for official decision IDs (`D-PLAT-01`..`D-PLAT-07`), provenance SHAs, metrics, and code blocks.
 
 Typography standards:
 - Body copy: `15px` with `1.65`–`1.75` line-height and `780px` max reading measure in `DocumentationArticle`.
@@ -87,4 +87,9 @@ Typography standards:
 - Skip-to-main-content link in `AppShell`.
 - Visible `2px solid var(--color-focus-ring)` focus indicators via `:focus-visible`.
 - Reduced-motion media query (`@media (prefers-reduced-motion: reduce)`) disables transitions cleanly.
-- Keyboard shortcuts: `Ctrl+K` / `Cmd+K` opens Global Search; `Escape` closes modals and dropdowns.
+- Keyboard shortcuts: `Ctrl+K` / `Cmd+K` opens Global Search; `Escape` closes modals and drawers.
+- **Hardened Modal & Drawer Accessibility (`/components/ui/Modal.tsx`, `/lib/focusTrap.ts`):**
+  - Rendered via `createPortal` into `document.body` while marking `#app-shell-root` with `inert` and `aria-hidden="true"` so background elements cannot receive keyboard focus or assistive-technology interaction.
+  - Places initial focus onto `[data-autofocus]` (e.g., Global Search input) or the first focusable element inside the dialog.
+  - Traps `Tab` and `Shift+Tab` cyclically strictly within the open modal/drawer.
+  - Restores focus to the triggering element upon close, preserves `aria-labelledby` dialog naming, and supports both `dialog` and `drawer` variants across RTL and LTR.

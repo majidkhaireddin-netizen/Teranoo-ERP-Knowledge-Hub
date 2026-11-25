@@ -67,6 +67,11 @@ export function Phase5CapabilitiesSection({
               {row.name.en}
             </span>
           ) : null}
+          {row.kind === 'planning_gate' ? (
+            <span className="text-[11px] font-medium text-warning">
+              {t('dashboard.currentPhase.planningGateBadge')}
+            </span>
+          ) : null}
         </div>
       ),
     },

@@ -11,6 +11,7 @@ import {
   getPlanningPhases,
   getProjectIdentity,
   getReferenceCounts,
+  getSnapshotProvenance,
 } from '@/content/repositories/projectRepository';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -43,6 +44,7 @@ export function ProductVisionView() {
     [capabilities]
   );
   const counts = useMemo(() => getReferenceCounts(), []);
+  const provenance = useMemo(() => getSnapshotProvenance(), []);
 
   const approvedCapabilities = useMemo(
     () => capabilities.filter((cap) => cap.status === 'approved'),
@@ -73,8 +75,6 @@ export function ProductVisionView() {
     [locale, t]
   );
 
-  const isAr = locale === 'ar';
-
   return (
     <PageContainer>
       <PageHeader
@@ -99,6 +99,10 @@ export function ProductVisionView() {
               {PRODUCT_VISION_DOC.metadata.documentId}
             </code>
             <span aria-hidden="true">·</span>
+            <code className="font-mono bidi-ltr text-text-secondary">
+              {provenance.reviewedTreeSha.slice(0, 12)}
+            </code>
+            <span aria-hidden="true">·</span>
             <span>
               {resolveLocalizedText(
                 PRODUCT_VISION_DOC.metadata.sourceReference,
@@ -118,7 +122,7 @@ export function ProductVisionView() {
         }
       >
         <DocumentationArticle>
-          {/* Document Metadata Panel */}
+          {/* Document Metadata & Provenance Panel */}
           <MetadataPanel
             title={t('documentation.metadataTitle')}
             entries={[
@@ -149,10 +153,11 @@ export function ProductVisionView() {
                 ),
               },
               {
-                label: t('documentation.sourceReference'),
-                value: resolveLocalizedText(
-                  PRODUCT_VISION_DOC.metadata.sourceReference,
-                  locale
+                label: t('provenance.referenceReviewDate'),
+                value: (
+                  <code className="font-mono text-xs bidi-ltr">
+                    {provenance.referenceReviewDate}
+                  </code>
                 ),
               },
             ]}
@@ -171,21 +176,18 @@ export function ProductVisionView() {
             title={t('productVision.toc.identity')}
           >
             <p className="text-text-secondary">
-              {isAr
-                ? 'يمثل Teranoo ERP منتجًا تجاريًا لبناء نظام تخطيط موارد مؤسسات (Enterprise-Grade Modular ERP) موجّهًا للمؤسسات المتوسطة والكبيرة، ومصمّمًا بهيكلة معيارية قابلة للتهيئة.'
-                : 'Teranoo ERP is a commercial product initiative to build an Enterprise-Grade Modular ERP tailored for Medium & Large Enterprises, architected as a configurable modular platform.'}
+              {t('productVision.identityIntro')}
             </p>
 
             <ComparisonTable
               caption={t('productVision.toc.identity')}
-              headers={
-                isAr
-                  ? ['السمة المرجعية', 'القيمة المعتمدة في اللقطة المرجعية']
-                  : ['Reference Attribute', 'Authorized Snapshot Value']
-              }
+              headers={[
+                t('productVision.identityHeaders.attribute'),
+                t('productVision.identityHeaders.value'),
+              ]}
               rows={[
                 [
-                  isAr ? 'اسم المنتج' : 'Product',
+                  t('productVision.productNameLabel'),
                   <span key="p" className="font-mono bidi-ltr text-text-primary">
                     {identity.productName}
                   </span>,
@@ -213,7 +215,7 @@ export function ProductVisionView() {
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <DefinitionBlock
-                term={isAr ? 'استراتيجية المنتج' : 'Product Strategy'}
+                term={t('productVision.strategyTerm')}
                 englishTerm="Commercial · Modular · Configurable"
                 definition={resolveLocalizedText(
                   identity.productStrategy,
@@ -221,7 +223,7 @@ export function ProductVisionView() {
                 )}
               />
               <DefinitionBlock
-                term={isAr ? 'الفئة المستهدفة' : 'Target Customers'}
+                term={t('productVision.targetCustomersTerm')}
                 englishTerm="Enterprise Segment"
                 definition={resolveLocalizedText(
                   identity.targetCustomers,
@@ -237,29 +239,24 @@ export function ProductVisionView() {
             title={t('productVision.toc.modules')}
           >
             <p className="text-text-secondary">
-              {isAr
-                ? 'يتركز النطاق التجاري الأساسي للمنتج على أربعة أنظمة رئيسية تعمل فوق طبقة المنصة المشتركة (Shared Platform Foundation):'
-                : 'The core commercial scope centers on four foundational business modules operating atop the Shared Platform Foundation:'}
+              {t('productVision.modulesIntro')}
             </p>
 
             <ComparisonTable
               caption={t('productVision.toc.modules')}
-              headers={
-                isAr
-                  ? ['#', 'الرمز', 'النظام التجاري الأساسي']
-                  : ['#', 'Code', 'Business Core Module']
-              }
+              headers={[
+                t('productVision.modulesHeaders.order'),
+                t('productVision.modulesHeaders.module'),
+                t('productVision.modulesHeaders.englishName'),
+              ]}
               rows={modules.map((mod) => [
                 <span key={`o-${mod.id}`} className="font-mono tabular-nums">
                   {String(mod.order).padStart(2, '0')}
                 </span>,
-                <code
-                  key={`c-${mod.id}`}
-                  className="font-mono text-xs bidi-ltr text-primary"
-                >
-                  {mod.code}
-                </code>,
                 resolveLocalizedText(mod.name, locale),
+                <span key={`en-${mod.id}`} className="bidi-ltr text-text-secondary">
+                  {mod.name.en}
+                </span>,
               ])}
             />
           </DocumentationSection>
@@ -271,20 +268,18 @@ export function ProductVisionView() {
           >
             <ComparisonTable
               caption={t('productVision.toc.deployment')}
-              headers={
-                isAr
-                  ? ['البُعد التقني', 'النموذج المعتمد', 'ملاحظة النطاق']
-                  : ['Technical Dimension', 'Authorized Model', 'Scope Note']
-              }
+              headers={[
+                t('productVision.deploymentHeaders.dimension'),
+                t('productVision.deploymentHeaders.model'),
+                t('productVision.deploymentHeaders.note'),
+              ]}
               rows={[
                 [
                   t('dashboard.identityStrip.deployment'),
                   <code key="saas" className="font-mono text-xs bidi-ltr text-text-primary">
                     {resolveLocalizedText(identity.deploymentStrategy, locale)}
                   </code>,
-                  isAr
-                    ? 'استراتيجية التشغيل الأساسية للمنتج'
-                    : 'Primary deployment strategy for Teranoo ERP',
+                  t('productVision.deploymentNotes.primary'),
                 ],
                 [
                   t('dashboard.identityStrip.futureProfile'),
@@ -294,18 +289,14 @@ export function ProductVisionView() {
                       locale
                     )}
                   </code>,
-                  isAr
-                    ? 'ملف استضافة مستقبلي مخطط ضمن الرؤية المعمارية'
-                    : 'Future deployment profile recognized in architecture',
+                  t('productVision.deploymentNotes.future'),
                 ],
                 [
                   t('dashboard.identityStrip.database'),
                   <code key="pg" className="font-mono text-xs bidi-ltr text-text-primary">
                     {identity.databaseEngine}
                   </code>,
-                  isAr
-                    ? 'محرك قاعدة البيانات المعتمد للمنتج'
-                    : 'Authorized relational database engine',
+                  t('productVision.deploymentNotes.database'),
                 ],
               ]}
             />
@@ -317,9 +308,11 @@ export function ProductVisionView() {
             title={t('productVision.toc.governance')}
           >
             <p className="text-text-secondary">
-              {isAr
-                ? `يُوثَّق تقدم المشروع وفق مراحل تخطيط واعتماد معماري متتابعة. أُنجزت المراحل من 1 إلى 4، فيما يجري حاليًا استكمال المرحلة الخامسة (قدرات المنصة المشتركة) بنسبة اعتماد ${phase5Progress.completedCount} من ${phase5Progress.totalCount} بندًا، ضمن إجمالي ${counts.approvedArchitecturalDecisions} قرارًا معماريًا معتمدًا في اللقطة المرجعية.`
-                : `Project progression follows structured architectural planning and approval phases. Phases 1 through 4 are completed, while Phase 5 (Shared Platform Capabilities) is in progress with ${phase5Progress.completedCount} of ${phase5Progress.totalCount} items approved within a reference snapshot of ${counts.approvedArchitecturalDecisions} approved architectural decisions.`}
+              {t('productVision.governanceSummary', {
+                completed: phase5Progress.completedCount,
+                total: phase5Progress.totalCount,
+                decisions: counts.approvedArchitecturalDecisions,
+              })}
             </p>
 
             <Timeline
@@ -334,9 +327,7 @@ export function ProductVisionView() {
 
             <div className="space-y-2 pt-2">
               <p className="text-xs font-semibold text-text-secondary">
-                {isAr
-                  ? 'معرفات القرارات المعتمدة في المرحلة الخامسة:'
-                  : 'Approved Phase 5 Decision Identifiers:'}
+                {t('productVision.approvedDecisionsHeading')}
               </p>
               <div className="flex flex-wrap gap-2">
                 {approvedCapabilities.map((cap) =>
@@ -354,10 +345,7 @@ export function ProductVisionView() {
 
             <SourceReference
               label={t('documentation.sourceRefPrefix')}
-              source={resolveLocalizedText(
-                PRODUCT_VISION_DOC.metadata.sourceReference,
-                locale
-              )}
+              source={`${provenance.officialSources.join(' · ')} (${provenance.reviewedTreeSha.slice(0, 12)})`}
               identifier={PRODUCT_VISION_DOC.metadata.documentId}
             />
           </DocumentationSection>

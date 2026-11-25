@@ -10,6 +10,8 @@ export type PlanningPhaseStatus = 'completed' | 'in_progress';
 
 export type CapabilityStatus = 'approved' | 'pending';
 
+export type Phase5ItemKind = 'runtime_capability' | 'planning_gate';
+
 export type DocumentApprovalStatus =
   | 'approved'
   | 'reference_snapshot'
@@ -18,6 +20,17 @@ export type DocumentApprovalStatus =
 export interface LocalizedText {
   ar: string;
   en: string;
+}
+
+export interface SnapshotProvenance {
+  sourceRepository: string;
+  officialSources: readonly string[];
+  reviewedTreeSha: string;
+  referenceReviewDate: string;
+  isLiveSynced: false;
+  snapshotNatureNote: LocalizedText;
+  reviewDateNote: LocalizedText;
+  metricsOriginNote: LocalizedText;
 }
 
 export interface ProjectIdentity {
@@ -33,7 +46,6 @@ export interface ProjectIdentity {
 export interface CoreBusinessModule {
   id: string;
   order: number;
-  code: string;
   name: LocalizedText;
   classification: ContentClassificationType;
 }
@@ -50,6 +62,7 @@ export interface PlatformCapability {
   id: string;
   name: LocalizedText;
   status: CapabilityStatus;
+  kind: Phase5ItemKind;
   decisionId: string | null;
 }
 
@@ -61,6 +74,7 @@ export interface SnapshotReferenceCounts {
 }
 
 export interface ProjectReferenceSnapshot {
+  provenance: SnapshotProvenance;
   snapshotScopeNote: LocalizedText;
   identity: ProjectIdentity;
   coreBusinessModules: readonly CoreBusinessModule[];
@@ -74,6 +88,12 @@ export interface DerivedPhase5Progress {
   pendingCount: number;
   totalCount: number;
   completionPercentage: number;
+}
+
+export interface DerivedRuntimeCapabilitiesSummary {
+  approvedCount: number;
+  pendingCount: number;
+  totalCount: number;
 }
 
 export interface DerivedPlanningSummary {

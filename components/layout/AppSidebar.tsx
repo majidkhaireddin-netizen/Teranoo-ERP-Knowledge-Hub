@@ -32,6 +32,7 @@ import {
 } from '@/config/navigation';
 import { useSidebar } from '@/providers/SidebarProvider';
 import { IconButton } from '@/components/ui/IconButton';
+import { Modal } from '@/components/ui/Modal';
 import { cn } from '@/lib/utils';
 
 const NAV_ICONS: Record<NavIconKey, React.ComponentType<{ className?: string }>> = {
@@ -217,23 +218,19 @@ export function AppSidebar() {
         {renderSidebarInner(false)}
       </aside>
 
-      {/* Mobile Drawer Overlay */}
-      {mobileOpen ? (
-        <div
-          className="fixed inset-0 z-50 lg:hidden bg-black/50"
-          role="presentation"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) closeMobile();
-          }}
-        >
-          <aside
-            aria-label={t('nav.mainNavigation')}
-            className="fixed inset-y-0 start-0 w-[280px] max-w-[85vw] border-e border-border shadow-lg"
-          >
-            {renderSidebarInner(true)}
-          </aside>
-        </div>
-      ) : null}
+      {/* Mobile Drawer Overlay (reuses hardened accessible Modal drawer) */}
+      <Modal
+        open={mobileOpen}
+        onClose={closeMobile}
+        title={t('nav.mainNavigation')}
+        closeLabel={t('nav.closeMenu')}
+        variant="drawer"
+        hideHeader
+        overlayClassName="lg:hidden"
+        className="w-[280px] max-w-[85vw] p-0"
+      >
+        {renderSidebarInner(true)}
+      </Modal>
     </>
   );
 }

@@ -51,6 +51,7 @@
     "searchEmptyDescription": "Try searching for a section title, business module, platform capability, or decision ID such as D-PLAT-01.",
     "searchModalTitle": "Search Knowledge Hub",
     "searchResultsCount": "{count} results",
+    "clearSearch": "Clear search",
     "switchLanguage": "Switch language to Arabic",
     "languageShort": "العربية",
     "themeLight": "Light theme",
@@ -99,27 +100,38 @@
     "planned": "Scheduled for later task",
     "reference_snapshot": "Reference Snapshot"
   },
+  "provenance": {
+    "title": "Reference Snapshot Provenance",
+    "sourceRepository": "Source Repository",
+    "officialSources": "Official Planning Sources",
+    "reviewedTreeSha": "Reviewed Source Tree SHA",
+    "referenceReviewDate": "Independent Reference Review Date",
+    "snapshotMode": "Snapshot Nature",
+    "staticSnapshotValue": "Static local reference snapshot (not live-synced)",
+    "metricsOrigin": "Metrics Source Distinction"
+  },
   "dashboard": {
     "title": "Architecture & Knowledge Dashboard",
     "subtitle": "Structured overview of Teranoo ERP product identity, architectural planning progress, and the shared platform foundation.",
-    "snapshotBanner": "Reference snapshot of planning and architectural documentation status (local foundation — not connected to the official repository).",
+    "snapshotBanner": "Static reference snapshot of planning and architectural documentation status (not live-synced with the source repository).",
     "metrics": {
       "approvedDecisions": "Approved Decisions",
-      "approvedDecisionsNote": "Official architectural decisions",
+      "approvedDecisionsNote": "Derived from official DECISION_REGISTER.md",
       "completedPhases": "Completed Planning Phases",
       "completedPhasesNote": "Phase 5 currently in progress",
       "coreModules": "Core Business Modules",
       "coreModulesNote": "Finance, Inventory, Procurement, Sales",
       "currentPhaseProgress": "Phase 5 Progress",
-      "currentPhaseProgressNote": "{completed} of {total} items approved"
+      "currentPhaseProgressNote": "{completed} of {total} planning items approved"
     },
     "currentPhase": {
-      "sectionTitle": "Current Phase — Shared Platform Capabilities",
-      "sectionSubtitle": "Phase 5 architectural approval progress derived directly from structured capability records.",
+      "sectionTitle": "Current Phase — Shared Platform Capabilities Plan",
+      "sectionSubtitle": "Phase 5 planning tracker covering all 13 items (12 runtime platform capabilities plus item 13, Platform Foundation Adoption approval gate).",
       "progressLabel": "Phase 5 Architectural Approval Completion",
+      "planningGateBadge": "Planning review & approval gate — not a runtime capability",
       "columns": {
         "index": "#",
-        "capability": "Shared Platform Capability",
+        "capability": "Phase 5 Planning Item",
         "status": "Status",
         "decision": "Decision ID"
       },
@@ -130,12 +142,14 @@
     },
     "architectureOverview": {
       "sectionTitle": "Layered Architecture Overview",
-      "sectionSubtitle": "Four core business modules built on top of the Shared Platform Foundation.",
-      "diagramCaption": "Foundational reference diagram — shows the four core business modules positioned above the shared platform capabilities and deployment profile.",
+      "sectionSubtitle": "Architectural view of runtime layers and capabilities (distinct from the 13-item Phase 5 planning tracker).",
+      "diagramTitle": "Teranoo ERP — Layered Architecture Blueprint",
+      "diagramCaption": "Foundational architectural capability view: positions the four core business modules above the 12 runtime shared platform capabilities (7 approved, 5 pending). Phase 5 item 13 (Platform Foundation Adoption) is excluded here because it is a planning approval gate rather than a runtime capability.",
+      "sharedContractsLabel": "Shared Contracts & Platform Services",
       "businessLayerTitle": "Business Core Modules",
       "businessLayerMeta": "4 core modules defined",
-      "platformLayerTitle": "Shared Platform Foundation",
-      "platformLayerMeta": "{completed} approved capabilities · {pending} pending",
+      "platformLayerTitle": "Shared Platform Runtime Capabilities",
+      "platformLayerMeta": "{approved} approved · {pending} pending ({total} runtime capabilities)",
       "infrastructureLayerTitle": "Deployment & Database Profile",
       "infrastructureLayerMeta": "SaaS-first with future Connected On-Premises profile"
     },
@@ -146,7 +160,7 @@
     },
     "snapshotLedger": {
       "sectionTitle": "Reference Snapshot by Classification",
-      "sectionSubtitle": "Explicit separation between official approved decisions, research packages, independent reviews, and future considerations.",
+      "sectionSubtitle": "Explicit separation between official source-derived metrics and independent advisory review statistics or future considerations.",
       "items": {
         "decisions": "Approved Architectural Decisions",
         "research": "Architectural Research Packages",
@@ -154,10 +168,10 @@
         "future": "Future Architecture Considerations"
       },
       "notes": {
-        "decisions": "Official approved architecture decisions",
+        "decisions": "Official metric from DECISION_REGISTER.md",
         "research": "Reference research & benchmark packages",
-        "reviews": "From prior independent advisory reviews",
-        "future": "From prior reference snapshot"
+        "reviews": "Independent advisory review statistic — not an approved decision",
+        "future": "Forward-looking considerations not yet approved as decisions"
       }
     },
     "identityStrip": {
@@ -195,6 +209,59 @@
       "modules": "Business Core Modules",
       "deployment": "Deployment & Database Profile",
       "governance": "Documentation & Planning Governance"
+    },
+    "identityIntro": "Teranoo ERP is a commercial product initiative to build an Enterprise-Grade Modular ERP tailored for Medium & Large Enterprises, architected as a configurable modular platform.",
+    "identityHeaders": {
+      "attribute": "Reference Attribute",
+      "value": "Authorized Snapshot Value"
+    },
+    "productNameLabel": "Product",
+    "strategyTerm": "Product Strategy",
+    "targetCustomersTerm": "Target Customers",
+    "modulesIntro": "The core commercial scope centers on four foundational business modules operating atop the Shared Platform Foundation:",
+    "modulesHeaders": {
+      "order": "#",
+      "module": "Business Core Module",
+      "englishName": "Canonical Name"
+    },
+    "deploymentHeaders": {
+      "dimension": "Technical Dimension",
+      "model": "Authorized Model",
+      "note": "Scope Note"
+    },
+    "deploymentNotes": {
+      "primary": "Primary deployment strategy for Teranoo ERP",
+      "future": "Future deployment profile recognized in architecture",
+      "database": "Authorized relational database engine"
+    },
+    "governanceSummary": "Project progression follows structured architectural planning and approval phases. Phases 1 through 4 are completed, while Phase 5 (Shared Platform Capabilities) is in progress with {completed} of {total} planning items approved within a reference snapshot of {decisions} approved architectural decisions.",
+    "approvedDecisionsHeading": "Approved Phase 5 Decision Identifiers:"
+  },
+  "sections": {
+    "modules": {
+      "cardSubtitle": "Core Module #{order} — Detailed documentation scheduled for a later task"
+    },
+    "deployment": {
+      "headers": {
+        "dimension": "Dimension",
+        "value": "Authorized Reference Value"
+      }
+    },
+    "decisions": {
+      "metricLabel": "Approved Architectural Decisions (Reference Snapshot)",
+      "metricNote": "Only the Phase 5 decision IDs explicitly included in the reference snapshot are listed below; no other IDs have been fabricated."
+    },
+    "research": {
+      "metricLabel": "Architectural Research Packages (Reference Snapshot)",
+      "metricNote": "Individual research packages, citations, and verified findings will be added in a subsequent task."
+    },
+    "future": {
+      "metricLabel": "Future Architecture Considerations (Independent Review Snapshot Statistic)",
+      "metricNote": "These items are not approved decisions; verified records will be populated in a later task."
+    },
+    "reviews": {
+      "metricLabel": "Independent Review Notes (Independent Advisory Review Statistic)",
+      "metricNote": "Advisory observations do not represent official decisions unless formally approved in the Decision Register."
     }
   },
   "about": {
@@ -202,10 +269,29 @@
     "subtitle": "A dedicated documentation, architecture, and knowledge management workspace for Teranoo ERP.",
     "purposeTitle": "Platform Purpose & Boundaries",
     "purposeBody": "This application serves as an authoritative, structured workspace for understanding Teranoo ERP's vision, architecture, approved decisions, research evidence, and independent reviews. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.",
+    "purposeHeaders": {
+      "is": "What This Platform Is",
+      "isNot": "What This Platform Is Not"
+    },
+    "purposeRows": {
+      "r1Is": "Structured documentation and architecture hub for Teranoo ERP",
+      "r1IsNot": "Not an operational ERP system",
+      "r2Is": "Analytical workspace for decisions, research, and independent reviews",
+      "r2IsNot": "Not a marketing website",
+      "r3Is": "Public read-only knowledge platform built incrementally via governed tasks",
+      "r3IsNot": "Not a plain Markdown viewer or disposable prototype"
+    },
     "classificationTitle": "Content Classification & Integrity Governance",
     "classificationBody": "The platform enforces an explicit visual and semantic distinction across four knowledge classifications so advisory recommendations, research evidence, and future considerations are never presented as approved decisions.",
-    "securityTitle": "Privacy & Operational Boundary (TASK-001)",
-    "securityBody": "In this foundational phase (TASK-001), the application runs exclusively on local structured reference data with no external APIs, private repository connections, credentials, analytics, or tracking. It is not approved for public deployment with confidential project documentation until server-side access protection is introduced in a subsequent task."
+    "publicAccessTitle": "Approved Product Direction — Public Read-Only Knowledge Platform & Publishing Governance",
+    "publicAccessCalloutTitle": "Public Read-Only Knowledge Platform",
+    "publicAccessBody": "By explicit approval of the project owner, Teranoo ERP Knowledge Hub operates as a publicly accessible read-only knowledge-sharing platform for authorized architectural documentation. User authentication is not required for public read-only access, and the application repository may remain public.",
+    "publicAccessGuardrails": {
+      "authorization": "Publishing any project document still requires explicit authorization and scope verification.",
+      "noSecrets": "Secrets, API keys, credentials, access tokens, customer data, and sensitive operational information must never be published.",
+      "attribution": "Source attribution and intellectual property notices must be preserved; public repository visibility does not automatically grant an open-source software license.",
+      "separation": "Source repository visibility and deployed application access control are distinct security boundaries."
+    }
   },
   "states": {
     "loadingTitle": "Loading content...",

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { resolveLocalizedText } from '@/content/models/types';
 import { getCoreBusinessModules } from '@/content/repositories/projectRepository';
 import { useAppLocale } from '@/providers/LocaleProvider';
@@ -8,6 +9,7 @@ import { PlannedSectionView } from '@/components/documentation/PlannedSectionVie
 import { ArchitectureNode } from '@/components/visualization/ArchitectureNode';
 
 export function BusinessModulesView() {
+  const t = useTranslations();
   const { locale } = useAppLocale();
   const modules = useMemo(() => getCoreBusinessModules(), []);
 
@@ -26,13 +28,8 @@ export function BusinessModulesView() {
             <ArchitectureNode
               key={mod.id}
               tone="primary"
-              code={mod.code}
               title={resolveLocalizedText(mod.name, locale)}
-              subtitle={
-                locale === 'ar'
-                  ? `النظام الأساسي #${mod.order} — التوثيق التفصيلي مجدول لمهمة لاحقة`
-                  : `Core Module #${mod.order} — Detailed documentation scheduled for a later task`
-              }
+              subtitle={t('sections.modules.cardSubtitle', { order: mod.order })}
             />
           ))}
         </div>
