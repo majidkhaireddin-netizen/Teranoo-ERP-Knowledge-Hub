@@ -1,0 +1,218 @@
+{
+  "app": {
+    "name": "Teranoo ERP Knowledge Hub",
+    "shortName": "Teranoo ERP",
+    "subtitle": "Documentation & Architecture",
+    "subtitleEn": "Product Documentation & Architecture Center",
+    "skipToContent": "Skip to main content",
+    "currentPhaseBadge": "Phase 5 — In Progress",
+    "planningProgressNotice": "Indicators reflect planning, documentation, and architectural approval progress — not ERP software implementation completion."
+  },
+  "nav": {
+    "groups": {
+      "overview": "Overview",
+      "architecture": "Architecture",
+      "knowledgeDecisions": "Knowledge & Decisions",
+      "exploration": "Exploration",
+      "project": "Project"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "productVision": "Product Vision",
+      "roadmap": "Roadmap",
+      "architectureOverview": "Architecture Overview",
+      "businessModules": "Business Modules",
+      "dependencies": "Dependencies & Integration",
+      "platformFoundation": "Platform Foundation",
+      "platformTenancy": "Platform & Tenancy",
+      "deploymentDatabase": "Deployment & Database",
+      "decisionRegister": "Decision Register",
+      "researchCenter": "Research Center",
+      "futureConsiderations": "Future Considerations",
+      "independentReviews": "Independent Reviews",
+      "businessScenarios": "Business Scenarios",
+      "interactiveDiagrams": "Interactive Diagrams",
+      "glossary": "Glossary",
+      "changeHistory": "Change History",
+      "about": "About"
+    },
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
+    "mainNavigation": "Main navigation",
+    "breadcrumbLabel": "Breadcrumb"
+  },
+  "controls": {
+    "searchPlaceholder": "Search sections, modules, capabilities, or decision IDs...",
+    "searchTrigger": "Quick search",
+    "searchShortcut": "Ctrl+K",
+    "searchEmptyTitle": "No matching records",
+    "searchEmptyDescription": "Try searching for a section title, business module, platform capability, or decision ID such as D-PLAT-01.",
+    "searchModalTitle": "Search Knowledge Hub",
+    "searchResultsCount": "{count} results",
+    "switchLanguage": "Switch language to Arabic",
+    "languageShort": "العربية",
+    "themeLight": "Light theme",
+    "themeDark": "Dark theme",
+    "switchToDark": "Switch to dark theme",
+    "switchToLight": "Switch to light theme",
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied",
+    "backToDashboard": "Back to Dashboard",
+    "retry": "Try again",
+    "all": "All",
+    "approved": "Approved",
+    "pending": "Pending",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "filterByStatus": "Filter by status"
+  },
+  "classification": {
+    "official": {
+      "label": "Official Documentation",
+      "shortLabel": "Official",
+      "description": "Approved official documentation and architectural decisions of Teranoo ERP."
+    },
+    "research": {
+      "label": "Research & Evidence",
+      "shortLabel": "Research",
+      "description": "Research packages, benchmark comparisons, and reference evidence — not approved decisions on their own."
+    },
+    "independent": {
+      "label": "Independent Analysis",
+      "shortLabel": "Independent",
+      "description": "Independent advisory reviews, assessments, and review notes — distinct from approved decisions."
+    },
+    "future": {
+      "label": "Future Considerations",
+      "shortLabel": "Future",
+      "description": "Forward-looking architectural topics that have not necessarily become approved decisions."
+    }
+  },
+  "status": {
+    "approved": "Approved",
+    "pending": "Pending",
+    "completed": "Completed",
+    "in_progress": "In Progress",
+    "planned": "Scheduled for later task",
+    "reference_snapshot": "Reference Snapshot"
+  },
+  "dashboard": {
+    "title": "Architecture & Knowledge Dashboard",
+    "subtitle": "Structured overview of Teranoo ERP product identity, architectural planning progress, and the shared platform foundation.",
+    "snapshotBanner": "Reference snapshot of planning and architectural documentation status (local foundation — not connected to the official repository).",
+    "metrics": {
+      "approvedDecisions": "Approved Decisions",
+      "approvedDecisionsNote": "Official architectural decisions",
+      "completedPhases": "Completed Planning Phases",
+      "completedPhasesNote": "Phase 5 currently in progress",
+      "coreModules": "Core Business Modules",
+      "coreModulesNote": "Finance, Inventory, Procurement, Sales",
+      "currentPhaseProgress": "Phase 5 Progress",
+      "currentPhaseProgressNote": "{completed} of {total} items approved"
+    },
+    "currentPhase": {
+      "sectionTitle": "Current Phase — Shared Platform Capabilities",
+      "sectionSubtitle": "Phase 5 architectural approval progress derived directly from structured capability records.",
+      "progressLabel": "Phase 5 Architectural Approval Completion",
+      "columns": {
+        "index": "#",
+        "capability": "Shared Platform Capability",
+        "status": "Status",
+        "decision": "Decision ID"
+      },
+      "filterAll": "All ({count})",
+      "filterApproved": "Approved ({count})",
+      "filterPending": "Pending ({count})",
+      "noDecision": "—"
+    },
+    "architectureOverview": {
+      "sectionTitle": "Layered Architecture Overview",
+      "sectionSubtitle": "Four core business modules built on top of the Shared Platform Foundation.",
+      "diagramCaption": "Foundational reference diagram — shows the four core business modules positioned above the shared platform capabilities and deployment profile.",
+      "businessLayerTitle": "Business Core Modules",
+      "businessLayerMeta": "4 core modules defined",
+      "platformLayerTitle": "Shared Platform Foundation",
+      "platformLayerMeta": "{completed} approved capabilities · {pending} pending",
+      "infrastructureLayerTitle": "Deployment & Database Profile",
+      "infrastructureLayerMeta": "SaaS-first with future Connected On-Premises profile"
+    },
+    "knowledgeNavigation": {
+      "sectionTitle": "Knowledge Navigation",
+      "sectionSubtitle": "Direct access to primary architectural and analytical centers with clear content classification.",
+      "openSection": "Open section"
+    },
+    "snapshotLedger": {
+      "sectionTitle": "Reference Snapshot by Classification",
+      "sectionSubtitle": "Explicit separation between official approved decisions, research packages, independent reviews, and future considerations.",
+      "items": {
+        "decisions": "Approved Architectural Decisions",
+        "research": "Architectural Research Packages",
+        "reviews": "Independent Review Notes",
+        "future": "Future Architecture Considerations"
+      },
+      "notes": {
+        "decisions": "Official approved architecture decisions",
+        "research": "Reference research & benchmark packages",
+        "reviews": "From prior independent advisory reviews",
+        "future": "From prior reference snapshot"
+      }
+    },
+    "identityStrip": {
+      "productType": "Product Type",
+      "targetCustomers": "Target Customers",
+      "strategy": "Product Strategy",
+      "deployment": "Deployment Strategy",
+      "futureProfile": "Future Profile",
+      "database": "Database Engine"
+    }
+  },
+  "documentation": {
+    "tocTitle": "On this page",
+    "metadataTitle": "Document Metadata",
+    "documentId": "Document ID",
+    "classificationLabel": "Classification",
+    "approvalStatus": "Approval Status",
+    "sourceReference": "Source Reference",
+    "scopeLabel": "Scope",
+    "relatedContentTitle": "Related Knowledge Sections",
+    "decisionRefPrefix": "Decision",
+    "requirementRefPrefix": "Requirement",
+    "sourceRefPrefix": "Source",
+    "plannedBannerTitle": "Foundational Template — Detailed Content Scheduled for a Later Task",
+    "plannedBannerDescription": "This section route and structural shell were established in TASK-001 without fabricating documentation content. Detailed verified records will be added in an authorized follow-up task.",
+    "plannedAnchorTitle": "Verified Snapshot Facts Currently Available",
+    "plannedNextTaskNote": "Current status: awaiting structured ingestion of verified documentation in a subsequent task."
+  },
+  "productVision": {
+    "title": "Product Vision & Strategy",
+    "subtitle": "Foundational document presenting the verified identity, strategic positioning, core modules, and deployment profile of Teranoo ERP.",
+    "toc": {
+      "identity": "Product Identity",
+      "strategy": "Product Strategy & Target Segment",
+      "modules": "Business Core Modules",
+      "deployment": "Deployment & Database Profile",
+      "governance": "Documentation & Planning Governance"
+    }
+  },
+  "about": {
+    "title": "About Teranoo ERP Knowledge Hub",
+    "subtitle": "A dedicated documentation, architecture, and knowledge management workspace for Teranoo ERP.",
+    "purposeTitle": "Platform Purpose & Boundaries",
+    "purposeBody": "This application serves as an authoritative, structured workspace for understanding Teranoo ERP's vision, architecture, approved decisions, research evidence, and independent reviews. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.",
+    "classificationTitle": "Content Classification & Integrity Governance",
+    "classificationBody": "The platform enforces an explicit visual and semantic distinction across four knowledge classifications so advisory recommendations, research evidence, and future considerations are never presented as approved decisions.",
+    "securityTitle": "Privacy & Operational Boundary (TASK-001)",
+    "securityBody": "In this foundational phase (TASK-001), the application runs exclusively on local structured reference data with no external APIs, private repository connections, credentials, analytics, or tracking. It is not approved for public deployment with confidential project documentation until server-side access protection is introduced in a subsequent task."
+  },
+  "states": {
+    "loadingTitle": "Loading content...",
+    "loadingDescription": "Please wait while this workspace view is prepared.",
+    "errorTitle": "Unable to render view",
+    "errorDescription": "An unexpected error occurred while rendering this page. You can retry or return to the dashboard.",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The requested route is not registered in the Teranoo ERP Knowledge Hub information architecture."
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "app": {
+    "name": "Teranoo ERP Knowledge Hub",
+    "shortName": "Teranoo ERP",
+    "subtitle": "مركز التوثيق والمعمارية",
+    "subtitleEn": "Product Documentation & Architecture Center",
+    "skipToContent": "انتقل إلى المحتوى الرئيسي",
+    "currentPhaseBadge": "المرحلة 5 — قيد التنفيذ",
+    "planningProgressNotice": "تعكس المؤشرات تقدم التخطيط والتوثيق والاعتماد المعماري، وليس نسبة إنجاز البرمجة الفعلية لنظام ERP."
+  },
+  "nav": {
+    "groups": {
+      "overview": "نظرة عامة",
+      "architecture": "المعمارية",
+      "knowledgeDecisions": "المعرفة والقرارات",
+      "exploration": "الاستكشاف",
+      "project": "المشروع"
+    },
+    "items": {
+      "dashboard": "لوحة المعلومات",
+      "productVision": "رؤية المنتج",
+      "roadmap": "خارطة الطريق",
+      "architectureOverview": "المعمارية العامة",
+      "businessModules": "الأنظمة الفرعية",
+      "dependencies": "الاعتماديات والتكامل",
+      "platformFoundation": "المنصة المشتركة",
+      "platformTenancy": "الهيكل المؤسسي والعملاء",
+      "deploymentDatabase": "الاستضافة وقواعد البيانات",
+      "decisionRegister": "سجل القرارات",
+      "researchCenter": "مركز الأبحاث",
+      "futureConsiderations": "الاعتبارات المستقبلية",
+      "independentReviews": "المراجعات المستقلة",
+      "businessScenarios": "سيناريوهات الأعمال",
+      "interactiveDiagrams": "المخططات والمحاكاة",
+      "glossary": "قاموس المصطلحات",
+      "changeHistory": "سجل التحديثات",
+      "about": "حول التطبيق"
+    },
+    "collapseSidebar": "طي القائمة الجانبية",
+    "expandSidebar": "توسيع القائمة الجانبية",
+    "openMenu": "فتح قائمة التنقل",
+    "closeMenu": "إغلاق قائمة التنقل",
+    "mainNavigation": "التنقل الرئيسي",
+    "breadcrumbLabel": "مسار التنقل"
+  },
+  "controls": {
+    "searchPlaceholder": "بحث في الأقسام، الأنظمة، ومعرفات القرارات...",
+    "searchTrigger": "بحث سريع",
+    "searchShortcut": "Ctrl+K",
+    "searchEmptyTitle": "لا توجد نتائج مطابقة",
+    "searchEmptyDescription": "جرّب البحث باسم قسم، نظام فرعي، قدرة منصة، أو معرف قرار مثل D-PLAT-01.",
+    "searchModalTitle": "البحث في مركز المعرفة",
+    "searchResultsCount": "{count} نتيجة",
+    "switchLanguage": "تبديل اللغة إلى الإنجليزية",
+    "languageShort": "EN",
+    "themeLight": "الوضع الفاتح",
+    "themeDark": "الوضع الداكن",
+    "switchToDark": "التبديل إلى الوضع الداكن",
+    "switchToLight": "التبديل إلى الوضع الفاتح",
+    "close": "إغلاق",
+    "copy": "نسخ",
+    "copied": "تم النسخ",
+    "backToDashboard": "العودة إلى لوحة المعلومات",
+    "retry": "إعادة المحاولة",
+    "all": "الكل",
+    "approved": "معتمد",
+    "pending": "قيد الاستكمال",
+    "completed": "مكتمل",
+    "inProgress": "قيد التنفيذ",
+    "filterByStatus": "تصفية حسب الحالة"
+  },
+  "classification": {
+    "official": {
+      "label": "وثيقة رسمية معتمدة",
+      "shortLabel": "رسمي معتمد",
+      "description": "الوثائق والقرارات الرسمية المعتمدة في مشروع Teranoo ERP."
+    },
+    "research": {
+      "label": "أبحاث وأدلة مرجعية",
+      "shortLabel": "أبحاث وأدلة",
+      "description": "الأبحاث والمقارنات والنتائج والمصادر المرجعية — لا تُعد قرارًا معتمدًا بحد ذاتها."
+    },
+    "independent": {
+      "label": "تحليل استشاري مستقل",
+      "shortLabel": "تحليل مستقل",
+      "description": "التحليلات والملاحظات والتقييمات الاستشارية المستقلة — تُميز عن القرارات الرسمية المعتمدة."
+    },
+    "future": {
+      "label": "اعتبارات معمارية مستقبلية",
+      "shortLabel": "اعتبار مستقبلي",
+      "description": "الأفكار والموضوعات المستقبلية التي لم تتحول بالضرورة إلى قرارات معتمدة."
+    }
+  },
+  "status": {
+    "approved": "معتمد",
+    "pending": "قيد الاستكمال",
+    "completed": "مكتمل",
+    "in_progress": "قيد التنفيذ",
+    "planned": "مخطط لمهمة لاحقة",
+    "reference_snapshot": "لقطة مرجعية"
+  },
+  "dashboard": {
+    "title": "لوحة المعلومات المعمارية",
+    "subtitle": "نظرة منظمة على هوية منتج Teranoo ERP، تقدم مراحل التخطيط والاعتماد المعماري، وبنية المنصة المشتركة.",
+    "snapshotBanner": "لقطة مرجعية لحالة التخطيط والتوثيق المعماري (تأسيسي محلي — غير متصل بالمستودع الرسمي).",
+    "metrics": {
+      "approvedDecisions": "القرارات المعمارية المعتمدة",
+      "approvedDecisionsNote": "وثائق وقرارات رسمية معتمدة",
+      "completedPhases": "مراحل التخطيط المكتملة",
+      "completedPhasesNote": "المرحلة الخامسة قيد التنفيذ",
+      "coreModules": "الأنظمة الأساسية للمنتج",
+      "coreModulesNote": "المالية، المخزون، المشتريات، المبيعات",
+      "currentPhaseProgress": "تقدم المرحلة الخامسة",
+      "currentPhaseProgressNote": "{completed} من {total} بندًا معتمدًا"
+    },
+    "currentPhase": {
+      "sectionTitle": "المرحلة الحالية — قدرات المنصة المشتركة",
+      "sectionSubtitle": "Phase 5: Shared Platform Capabilities — نسبة الإنجاز مشتقة مباشرة من البنود المعتمدة.",
+      "progressLabel": "نسبة الاعتماد المعماري للمرحلة الخامسة",
+      "columns": {
+        "index": "#",
+        "capability": "القدرة المشتركة للمنصة",
+        "status": "الحالة",
+        "decision": "معرف القرار"
+      },
+      "filterAll": "الكل ({count})",
+      "filterApproved": "معتمد ({count})",
+      "filterPending": "متبقي ({count})",
+      "noDecision": "—"
+    },
+    "architectureOverview": {
+      "sectionTitle": "نظرة عامة على المعمارية الطبقية",
+      "sectionSubtitle": "الأنظمة التجارية الأساسية الأربعة مبنية فوق طبقة المنصة المشتركة (Shared Platform Foundation).",
+      "diagramCaption": "مخطط مرجعي تأسيسي — يوضح تموضع الأنظمة الأساسية الأربعة فوق المنصة المشتركة وملف الاستضافة وقاعدة البيانات.",
+      "businessLayerTitle": "الأنظمة التجارية الأساسية (Business Core Modules)",
+      "businessLayerMeta": "4 أنظمة أساسية معتمدة",
+      "platformLayerTitle": "المنصة المشتركة (Shared Platform Foundation)",
+      "platformLayerMeta": "{completed} قدرات معتمدة · {pending} قيد الاستكمال",
+      "infrastructureLayerTitle": "ملف التشغيل وقاعدة البيانات",
+      "infrastructureLayerMeta": "نموذج استضافة SaaS-first مع ملف مستقبلي Connected On-Premises"
+    },
+    "knowledgeNavigation": {
+      "sectionTitle": "بوابة المعرفة والتنقل السريع",
+      "sectionSubtitle": "وصول مباشر إلى الأقسام المرجعية الرئيسية مع التمييز الصريح بين التصنيفات المعرفية.",
+      "openSection": "فتح القسم"
+    },
+    "snapshotLedger": {
+      "sectionTitle": "ملخص اللقطة المرجعية حسب التصنيف",
+      "sectionSubtitle": "فصل صريح بين القرارات الرسمية المعتمدة والأبحاث والمراجعات المستقلة والاعتبارات المستقبلية.",
+      "items": {
+        "decisions": "القرارات المعمارية المعتمدة",
+        "research": "حزم الأبحاث المعمارية",
+        "reviews": "ملاحظات المراجعات الاستشارية المستقلة",
+        "future": "الاعتبارات المعمارية المستقبلية"
+      },
+      "notes": {
+        "decisions": "الوثائق والقرارات المعتمدة رسميًا",
+        "research": "حزم الأبحاث والمقارنات المرجعية",
+        "reviews": "ضمن المراجعات الاستشارية السابقة",
+        "future": "ضمن اللقطة المرجعية السابقة"
+      }
+    },
+    "identityStrip": {
+      "productType": "نوع المنتج",
+      "targetCustomers": "الفئة المستهدفة",
+      "strategy": "استراتيجية المنتج",
+      "deployment": "استراتيجية الاستضافة",
+      "futureProfile": "الملف المستقبلي",
+      "database": "محرك قاعدة البيانات"
+    }
+  },
+  "documentation": {
+    "tocTitle": "محتويات الصفحة",
+    "metadataTitle": "بيانات الوثيقة",
+    "documentId": "معرف الوثيقة",
+    "classificationLabel": "تصنيف المحتوى",
+    "approvalStatus": "حالة الاعتماد",
+    "sourceReference": "المرجع والمصدر",
+    "scopeLabel": "النطاق",
+    "relatedContentTitle": "محتوى وأقسام ذات صلة",
+    "decisionRefPrefix": "قرار",
+    "requirementRefPrefix": "متطلب",
+    "sourceRefPrefix": "المصدر",
+    "plannedBannerTitle": "قالب تأسيسي — المحتوى التفصيلي قيد الجدولة لمهمة لاحقة",
+    "plannedBannerDescription": "تم إنشاء المسار والبنية المعمارية لهذا القسم ضمن TASK-001 دون اختلاق محتوى توثيقي. سيُضاف المحتوى المعتمد والمفصّل في مهمة لاحقة مخصصة.",
+    "plannedAnchorTitle": "البيانات المرجعية المتاحة في اللقطة الحالية",
+    "plannedNextTaskNote": "الحالة الحالية: قيد الانتظار لاستيراد وتوثيق المحتوى التفصيلي المعتمد."
+  },
+  "productVision": {
+    "title": "رؤية المنتج واستراتيجيته",
+    "subtitle": "وثيقة تأسيسية تعرض الهوية المعتمدة لمنتج Teranoo ERP واستراتيجية الاستضافة والأنظمة الأساسية ضمن حدود اللقطة المرجعية.",
+    "toc": {
+      "identity": "الهوية المؤسسية للمنتج",
+      "strategy": "استراتيجية المنتج والنطاق التجاري",
+      "modules": "الأنظمة التجارية الأساسية",
+      "deployment": "استراتيجية الاستضافة وقاعدة البيانات",
+      "governance": "حوكمة التوثيق ومراحل التخطيط"
+    }
+  },
+  "about": {
+    "title": "حول Teranoo ERP Knowledge Hub",
+    "subtitle": "منصة توثيقية ومعرفية متخصصة في توثيق وتحليل ومتابعة تطور مشروع Teranoo ERP.",
+    "purposeTitle": "الغرض من المنصة وحدودها",
+    "purposeBody": "تُعد هذه المنصة مرجعًا مؤسسيًا منظمًا لفهم رؤية Teranoo ERP ومعماريته وقراراته المعتمدة وأبحاثه ومراجعاته المستقلة. المنصة ليست نظام ERP تشغيليًا، وليست موقعًا تسويقيًا، وليست مجرد عارض لملفات Markdown.",
+    "classificationTitle": "نموذج تصنيف المحتوى وحوكمة الدقة",
+    "classificationBody": "تلتزم المنصة بالفصل البصري والدلالي الصريح بين أربعة تصنيفات معرفية لمنع الخلط بين القرارات الرسمية المعتمدة والمواد البحثية أو التوصيات الاستشارية أو الاعتبارات المستقبلية.",
+    "securityTitle": "الخصوصية والنطاق التشغيلي للمرحلة الحالية",
+    "securityBody": "تعمل المنصة في المرحلة التأسيسية الحالية (TASK-001) ببيانات محلية منظمة دون اتصال بمستودعات خاصة أو خدمات خارجية أو قواعد بيانات أو أنظمة تتبع. لا يُعد التطبيق مؤهلًا للنشر العام بمحتوى المشروع الخاص قبل اعتماد آلية الحماية والمصادقة في مهمة لاحقة."
+  },
+  "states": {
+    "loadingTitle": "جارٍ تحميل المحتوى...",
+    "loadingDescription": "يُرجى الانتظار ريثما يتم تجهيز عرض الصفحة.",
+    "errorTitle": "تعذر عرض المحتوى",
+    "errorDescription": "حدث خطأ غير متوقع أثناء عرض هذه الصفحة. يمكنك إعادة المحاولة أو العودة إلى لوحة المعلومات.",
+    "notFoundTitle": "الصفحة غير موجودة",
+    "notFoundDescription": "المسار المطلوب غير مسجل ضمن خريطة المعرفة الحالية في Teranoo ERP Knowledge Hub."
+  }
+}

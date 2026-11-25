@@ -1,0 +1,174 @@
+/* ==========================================================================
+   Teranoo ERP Knowledge Hub — Centralized Semantic Design Tokens
+   Single source of truth for Light & Dark themes, typography, layout, radii,
+   elevation, and content classification semantics.
+   ========================================================================== */
+
+:root {
+  /* Brand & Structural Palette — Light Theme */
+  --color-primary: #244b73;
+  --color-primary-hover: #1d3e60;
+  --color-primary-deep: #14283e;
+  --color-primary-subtle: #eaf0f6;
+  --color-primary-foreground: #ffffff;
+
+  --color-accent: #c5a46d;
+  --color-accent-strong: #8f6e33;
+  --color-accent-subtle: #f7f2e7;
+
+  /* Canvas & Surfaces */
+  --color-bg-app: #f3f5f8;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #e9eef4;
+  --color-surface-hover: #f1f4f8;
+
+  /* Borders & Hairlines */
+  --color-border: #dce3eb;
+  --color-border-strong: #c5d0dc;
+
+  /* Typography Ink */
+  --color-text-primary: #182636;
+  --color-text-secondary: #516173;
+  --color-text-muted: #64748b;
+
+  /* Status Semantics (WCAG AA contrast-verified on Light surfaces) */
+  --color-success: #217351;
+  --color-success-bg: #ebf6f1;
+  --color-success-border: #c2e3d4;
+
+  --color-warning: #946a22;
+  --color-warning-bg: #fbf6ec;
+  --color-warning-border: #e9d7b0;
+
+  --color-danger: #b53d3d;
+  --color-danger-bg: #fdf1f1;
+  --color-danger-border: #ecc8c8;
+
+  --color-info: #316493;
+  --color-info-bg: #eef4fa;
+  --color-info-border: #c8dced;
+
+  /* Content Classification Tokens */
+  --color-class-official: #1f4469;
+  --color-class-official-bg: #edf2f8;
+  --color-class-official-border: #c5d4e4;
+
+  --color-class-research: #2c6190;
+  --color-class-research-bg: #eef5fb;
+  --color-class-research-border: #c2d9ee;
+
+  --color-class-independent: #8a6320;
+  --color-class-independent-bg: #f9f4e9;
+  --color-class-independent-border: #e5d4af;
+
+  --color-class-future: #4b5a70;
+  --color-class-future-bg: #f0f2f6;
+  --color-class-future-border: #d0d7e2;
+
+  /* Focus Ring */
+  --color-focus-ring: #244b73;
+
+  /* Radii (Enterprise restraint — crisp, architectural) */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Elevation (Subtle, single-level) */
+  --shadow-xs: 0 1px 2px rgba(20, 40, 62, 0.04);
+  --shadow-sm: 0 2px 6px rgba(20, 40, 62, 0.06);
+  --shadow-overlay: 0 16px 40px rgba(20, 40, 62, 0.14);
+
+  /* Layout Dimensions */
+  --sidebar-width: 268px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 56px;
+  --toc-width: 224px;
+  --content-max-width: 1200px;
+  --article-max-width: 780px;
+
+  /* Typography Defaults */
+  --font-sans: var(--font-arabic), var(--font-latin), system-ui, -apple-system, sans-serif;
+  --font-code: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  color-scheme: light;
+}
+
+.dark {
+  /* Brand & Structural Palette — Dark Theme */
+  --color-primary: #7fa8d3;
+  --color-primary-hover: #96bae0;
+  --color-primary-deep: #b6d0ec;
+  --color-primary-subtle: #1b2d42;
+  --color-primary-foreground: #0d1622;
+
+  --color-accent: #d7b577;
+  --color-accent-strong: #e2c58d;
+  --color-accent-subtle: #28231a;
+
+  /* Canvas & Surfaces */
+  --color-bg-app: #0d1622;
+  --color-surface: #142233;
+  --color-surface-secondary: #1b2b3f;
+  --color-surface-hover: #21344c;
+
+  /* Borders & Hairlines */
+  --color-border: #293b50;
+  --color-border-strong: #374e68;
+
+  /* Typography Ink */
+  --color-text-primary: #e5ecf5;
+  --color-text-secondary: #99acc1;
+  --color-text-muted: #7f94ab;
+
+  /* Status Semantics (WCAG AA contrast-verified on Dark surfaces) */
+  --color-success: #54ba8d;
+  --color-success-bg: #122922;
+  --color-success-border: #224c3e;
+
+  --color-warning: #ddb66c;
+  --color-warning-bg: #292214;
+  --color-warning-border: #4d3e21;
+
+  --color-danger: #ef7777;
+  --color-danger-bg: #2c161b;
+  --color-danger-border: #552831;
+
+  --color-info: #78afe4;
+  --color-info-bg: #132539;
+  --color-info-border: #244465;
+
+  /* Content Classification Tokens */
+  --color-class-official: #8fb8e2;
+  --color-class-official-bg: #16283c;
+  --color-class-official-border: #294563;
+
+  --color-class-research: #78afe4;
+  --color-class-research-bg: #132539;
+  --color-class-research-border: #244465;
+
+  --color-class-independent: #ddb66c;
+  --color-class-independent-bg: #292214;
+  --color-class-independent-border: #4d3e21;
+
+  --color-class-future: #a7b8cc;
+  --color-class-future-bg: #1a2738;
+  --color-class-future-border: #304258;
+
+  /* Focus Ring */
+  --color-focus-ring: #7fa8d3;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.32);
+  --shadow-overlay: 0 20px 48px rgba(0, 0, 0, 0.55);
+
+  color-scheme: dark;
+}
+
+html[lang="ar"] {
+  --font-sans: var(--font-arabic), var(--font-latin), system-ui, -apple-system, sans-serif;
+}
+
+html[lang="en"] {
+  --font-sans: var(--font-latin), var(--font-arabic), system-ui, -apple-system, sans-serif;
+}
