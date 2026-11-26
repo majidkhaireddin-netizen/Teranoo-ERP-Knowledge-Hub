@@ -62,6 +62,16 @@ export function GlobalSearchModal({
         return 'knowledge.searchDocBadge';
       case 'decision':
         return 'knowledge.searchDecisionBadge';
+      case 'module':
+        return 'knowledge.searchModuleBadge';
+      case 'contract':
+        return 'knowledge.searchContractBadge';
+      case 'dependency':
+        return 'knowledge.searchDependencyBadge';
+      case 'lifecycle':
+        return 'knowledge.searchLifecycleBadge';
+      case 'ownership':
+        return 'knowledge.searchOwnershipBadge';
       case 'fac':
         return 'knowledge.searchFacBadge';
       case 'phase':

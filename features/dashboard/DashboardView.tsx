@@ -31,6 +31,8 @@ import type { SourceManifestSummary } from '@/content/models/knowledge';
 
 const QUICK_NAV_IDS = [
   'knowledge-library',
+  'business-modules',
+  'dependencies',
   'product-vision',
   'roadmap',
   'architecture-overview',
@@ -42,6 +44,8 @@ const QUICK_NAV_IDS = [
 export interface DashboardExtractedSummary {
   readonly indexedArchitecturalDecisionsCount: number;
   readonly importedOwningDecisionDocsCount: number;
+  readonly phase2SourceLocalDecisionsCount?: number;
+  readonly coreCicsCount?: number;
   readonly facRecordsCount: number;
   readonly completedOfficialPhasesCount: number;
   readonly totalOfficialPhasesCount: number;
@@ -220,7 +224,13 @@ export function DashboardView({
           <MetricCard
             label={t('dashboard.metrics.coreModules')}
             value={metrics.coreModulesCount}
-            note={t('dashboard.metrics.coreModulesNote')}
+            note={
+              extractedSummary?.phase2SourceLocalDecisionsCount
+                ? locale === 'ar'
+                  ? `${extractedSummary.phase2SourceLocalDecisionsCount} قرار مرحلة 2 محلي · 0 HBMD · ${extractedSummary.coreCicsCount ?? 6} عقود CIC`
+                  : `${extractedSummary.phase2SourceLocalDecisionsCount} Phase 2 local decisions · 0 HBMD · ${extractedSummary.coreCicsCount ?? 6} Core CICs`
+                : t('dashboard.metrics.coreModulesNote')
+            }
             className="bg-surface"
           />
           <MetricCard

@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "content:validate": "tsx content/validators/validateCli.ts",
-    "test": "tsx --test content/repositories/projectRepository.test.ts lib/focusTrap.test.ts content/knowledgeArchitecture.test.ts content/ingestionAndFoundations.test.ts content/batch001Ingestion.test.ts",
+    "test": "tsx --test content/repositories/projectRepository.test.ts lib/focusTrap.test.ts content/knowledgeArchitecture.test.ts content/ingestionAndFoundations.test.ts content/batch001Ingestion.test.ts content/batch002ModulesAndDependencies.test.ts",
     "verify": "npm run typecheck && npm run lint && npm run content:validate && npm run test && npm run build",
     "clean": "next clean"
   },

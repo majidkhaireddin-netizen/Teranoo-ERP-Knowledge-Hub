@@ -228,6 +228,7 @@ export type SourceCompletenessStatus =
 
 export interface SourceManifestEntry {
   readonly sourceRefId: string;
+  readonly batchId?: string;
   readonly repository: string;
   readonly sourcePath: string;
   readonly title: LocalizedText;

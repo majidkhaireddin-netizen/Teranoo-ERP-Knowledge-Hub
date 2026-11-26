@@ -1,13 +1,11 @@
 import { validateApprovedCollections } from '@/content/validators/contentValidator';
 import {
-  PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
+  OFFICIAL_SOURCE_MANIFEST,
   deriveSourceManifestSummary,
 } from '@/content/manifest/sourceManifest';
 
 const report = validateApprovedCollections();
-const manifestSummary = deriveSourceManifestSummary(
-  PROJECT_FOUNDATIONS_SOURCE_MANIFEST
-);
+const manifestSummary = deriveSourceManifestSummary(OFFICIAL_SOURCE_MANIFEST);
 
 console.log('Teranoo ERP Knowledge Hub — Content & Source Integrity Validation');
 console.log(`Files scanned:              ${report.totalFilesScanned}`);

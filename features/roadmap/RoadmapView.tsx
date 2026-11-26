@@ -208,7 +208,7 @@ export function RoadmapView({
         {
           tier: 'C',
           name: 'اعتبار معماري مستقبلي (FAC)',
-          action: 'يُسجّل في FUTURE_ARCHITECTURAL_CONSIDERATIONS.md للمراقبة أو البحث لاحقًا دون اعتباره قرارًا معتمدًا.',
+          action: 'يُسجّل في FUTURE_ARCHITECTURE_CONSIDERATIONS.md للمراقبة أو البحث لاحقًا دون اعتباره قرارًا معتمدًا.',
         },
         {
           tier: 'D',
@@ -230,7 +230,7 @@ export function RoadmapView({
         {
           tier: 'C',
           name: 'Future Architectural Consideration (FAC)',
-          action: 'Log in FUTURE_ARCHITECTURAL_CONSIDERATIONS.md for research/watch — strictly non-approved.',
+          action: 'Log in FUTURE_ARCHITECTURE_CONSIDERATIONS.md for research/watch — strictly non-approved.',
         },
         {
           tier: 'D',
@@ -329,6 +329,54 @@ export function RoadmapView({
           ))}
         </div>
       </section>
+
+      {/* KH-025 Curated Projection Provenance & Freshness Notice */}
+      <InformationCallout
+        className={
+          extractedRoadmap.projectionMetadata.mappingFreshnessStatus ===
+          'verified-current'
+            ? 'border-info-border bg-info-bg/50'
+            : 'border-danger-border bg-danger-bg'
+        }
+        title={
+          isAr
+            ? `إسقاط منظم مُراجع (Curated Projection · ${
+                extractedRoadmap.projectionMetadata.mappingFreshnessStatus ===
+                'verified-current'
+                  ? 'متطابق مع مراجعة المصدر'
+                  : 'يلزم مراجعة تغير المصدر'
+              })`
+            : `Curated Roadmap Projection (${
+                extractedRoadmap.projectionMetadata.mappingFreshnessStatus ===
+                'verified-current'
+                  ? 'Verified Current Against Pinned Source'
+                  : 'Mapping Review Required — Source Changed'
+              })`
+        }
+      >
+        <div className="space-y-1.5">
+          <p>
+            {resolveLocalizedText(
+              extractedRoadmap.projectionMetadata.projectionDisclosure,
+              locale
+            )}
+          </p>
+          {extractedRoadmap.projectionMetadata.reviewWarning ? (
+            <p className="font-semibold text-danger">
+              {resolveLocalizedText(
+                extractedRoadmap.projectionMetadata.reviewWarning,
+                locale
+              )}
+            </p>
+          ) : null}
+          <p className="font-mono text-[11px] text-text-muted bidi-ltr text-start">
+            pinned-revision:{' '}
+            {extractedRoadmap.projectionMetadata.mappedSourceRevision.slice(0, 12)}{' '}
+            · body-sha256:{' '}
+            {extractedRoadmap.projectionMetadata.actualSourceBodySha256.slice(0, 16)}
+          </p>
+        </div>
+      </InformationCallout>
 
       {/* Verbatim Source Discrepancy Notice */}
       {extractedRoadmap.hasStalePhase5CurrentLine ? (
@@ -613,6 +661,43 @@ export function RoadmapView({
               </div>
             </div>
           </div>
+
+          {/* Direct Published Evidence Links (e.g., BATCH-002 Phase 2 Evidence) */}
+          {selectedStage.relatedEvidenceLinks &&
+          selectedStage.relatedEvidenceLinks.length > 0 ? (
+            <div className="border-t border-border pt-4 space-y-2.5">
+              <h4 className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
+                <ShieldCheck
+                  className="h-3.5 w-3.5 text-success"
+                  aria-hidden="true"
+                />
+                <span>
+                  {isAr
+                    ? 'الأدلة والوثائق الرسمية المنشورة محليًا لهذه المرحلة'
+                    : 'Published Official Evidence & Explorers for This Stage'}
+                </span>
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {selectedStage.relatedEvidenceLinks.map((ev) => (
+                  <Link
+                    key={ev.href}
+                    href={ev.href}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors',
+                      ev.kind === 'explorer'
+                        ? 'border-primary/30 bg-primary-subtle/60 text-primary hover:bg-primary/15'
+                        : ev.kind === 'review-gate'
+                          ? 'border-success-border bg-success-bg/60 text-success hover:bg-success-bg'
+                          : 'border-border bg-surface-secondary/60 text-text-primary hover:border-primary/40 hover:bg-surface-hover'
+                    )}
+                  >
+                    <span>{resolveLocalizedText(ev.label, locale)}</span>
+                    <DirectionArrow className="h-3 w-3 shrink-0" aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </article>
 
         {/* Continuous Market Evidence Collection — Explicitly NOT an Independent Planning Phase */}

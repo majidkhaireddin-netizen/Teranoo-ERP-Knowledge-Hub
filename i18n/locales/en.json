@@ -6,7 +6,7 @@
     "subtitleEn": "The Complete Journey of Building an Enterprise ERP System",
     "skipToContent": "Skip to main content",
     "currentPhaseBadge": "Phase 5 Completed · Phase 6 Awaiting Authorization",
-    "planningProgressNotice": "Indicators reflect verified architectural planning and approval status from BATCH-001 — not ERP software implementation completion."
+    "planningProgressNotice": "Indicators reflect verified architectural planning and approval status from BATCH-001 & BATCH-002 — not ERP software implementation completion."
   },
   "nav": {
     "groups": {
@@ -46,11 +46,11 @@
     "breadcrumbLabel": "Breadcrumb"
   },
   "controls": {
-    "searchPlaceholder": "Search docs, 126 decisions (D-PLAT-08 / D-MKT-01), 24 FACs (FAC-024), phases (Phase 6.5), or guardrails...",
+    "searchPlaceholder": "Search docs (20), 126 decisions (D-PLAT-08), 34 Phase 2 decisions (D-FIN-01), CICs (CIC-CORE-INV-FIN-001), HBMD, or FAC-024...",
     "searchTrigger": "Quick search",
     "searchShortcut": "Ctrl+K",
     "searchEmptyTitle": "No matching records",
-    "searchEmptyDescription": "Try searching a decision ID (D-PLAT-08 or D-MKT-01), future consideration (FAC-024), phase (Phase 6.5), or product guardrail.",
+    "searchEmptyDescription": "Try searching a decision ID (D-PLAT-08, D-FIN-01, D-MKT-01), contract (CIC-CORE-INV-FIN-001), dependency type (HBMD), or guardrail (G-ASSUMP-01).",
     "searchModalTitle": "Search Knowledge Hub",
     "searchResultsCount": "{count} results",
     "clearSearch": "Clear search",
@@ -197,8 +197,8 @@
       }
     },
     "publishedLibrary": {
-      "bannerTitle": "Knowledge Library Status — BATCH-001 Fully Published",
-      "bannerBody": "The local Knowledge Library now holds {count} authorized published records, including all 6/6 official Project Foundations source files verified by Git blob SHA, while individual owning decision documents, research packages, and independent reviews remain scheduled for later authorized batches.",
+      "bannerTitle": "Knowledge Library Status — BATCH-001 & BATCH-002 Fully Published (16/16 Official Sources)",
+      "bannerBody": "The local Knowledge Library now holds {count} authorized published records, including all 6/6 official Project Foundations files (BATCH-001) and all 10/10 Core Module Architecture & Dependencies files (BATCH-002) verified by Git blob SHA.",
       "openLibrary": "Browse Knowledge Library",
       "openJournal": "Open Engineering Journal"
     },
@@ -347,6 +347,11 @@
   "knowledge": {
     "searchDocBadge": "Doc",
     "searchDecisionBadge": "Decision",
+    "searchModuleBadge": "Module",
+    "searchContractBadge": "CIC",
+    "searchDependencyBadge": "Dependency",
+    "searchLifecycleBadge": "Lifecycle",
+    "searchOwnershipBadge": "Ownership",
     "searchFacBadge": "FAC",
     "searchPhaseBadge": "Phase",
     "searchGuardrailBadge": "Guardrail",
@@ -354,8 +359,8 @@
     "fullSourceBadge": "Full Official Source",
     "libraryTitle": "Knowledge Library",
     "librarySubtitle": "Unified catalog of authorized, published knowledge records with multi-dimensional filtering, source provenance, and typed relationships.",
-    "snapshotVsPublishedTitle": "Locally Published Records (BATCH-001) vs. Future Authorized Batches",
-    "snapshotVsPublishedBody": "This library currently publishes {published} authorized local records (including all 6/6 full official Project Foundations files verified by Git blob SHA). The indexed register covers all {decisions} architectural decisions (D-*) and {future} FAC considerations, while individual owning decision documents, {research} research packages, and {reviews} independent review notes await future authorized batches.",
+    "snapshotVsPublishedTitle": "Locally Published Records (BATCH-001 + BATCH-002) vs. Future Authorized Batches",
+    "snapshotVsPublishedBody": "This library currently publishes {published} authorized local records (including 16/16 full official source files verified by Git blob SHA across BATCH-001 and BATCH-002). Structured views cover all {decisions} centralized decisions (D-*), 34 Phase 2 source-local module decisions, and {future} FAC considerations, while Phase 3–5 owning docs, {research} research packages, and {reviews} independent review notes await later authorized batches.",
     "searchPlaceholder": "Search by title, description, topic, or official ID such as D-PLAT-01...",
     "filters": {
       "type": "Content Type",
@@ -506,7 +511,7 @@
     "emptyStatusTitle": "No Teranoo ERP Engineering Entries Yet",
     "emptyStatusBody": "Active software implementation of the Teranoo ERP product has not begun yet; Phases 1–5 are completed and Phase 6 awaits explicit authorization. To uphold content integrity, zero fabricated tasks, commits, bugs, or test results are displayed here. Entries will be published once real ERP engineering begins.",
     "distinctionTitle": "Critical Project Distinction: Teranoo ERP vs. Teranoo ERP Knowledge Hub",
-    "distinctionBody": "Development tasks for this documentation platform (TASK-001 through TASK-004) are strictly distinct from engineering work on the Teranoo ERP software product itself.",
+    "distinctionBody": "Development tasks for this documentation platform (TASK-001 through TASK-005) are strictly distinct from engineering work on the Teranoo ERP software product itself.",
     "distinctionHeaders": {
       "dimension": "Dimension",
       "erpProduct": "Teranoo ERP Product",
@@ -518,7 +523,7 @@
       "r1Hub": "Public read-only documentation & knowledge platform chronicling the ERP journey",
       "r2Dim": "Current State",
       "r2Erp": "Phases 1–5 & conditional Decision Gate A closed; Phase 6 awaiting authorization — software coding not started",
-      "r2Hub": "Incremental platform implementation (TASK-001..003 completed, TASK-004 BATCH-001 in progress)",
+      "r2Hub": "Incremental platform implementation (TASK-001..004 completed, TASK-005 BATCH-002 under review)",
       "r3Dim": "Where Work Is Recorded",
       "r3Erp": "In this Engineering Journal (/engineering-journal) once real ERP engineering starts",
       "r3Hub": "In Knowledge Hub task completion reports (docs/TASK-*-COMPLETION_REPORT.md)"
@@ -538,10 +543,10 @@
   },
   "foundations": {
     "sourceManifest": {
-      "sectionTitle": "Official Project Foundations Source Inventory (BATCH-001)",
-      "sectionSubtitle": "All six official Project Foundations source files (6/6) are imported, published, and verified by Git blob SHA against the reference commit.",
-      "boundaryNoticeTitle": "BATCH-001 Completion & Downstream Source Availability Boundary",
-      "boundaryNoticeBody": "All six official Project Foundations Markdown files (00-project-foundation) have been imported verbatim and verified against their exact Git blob SHA-1 digests. Detailed owning decision documents, Decision Gate A, separate FAC-019..024 files, research packages, and independent reviews remain scheduled for later authorized batches.",
+      "sectionTitle": "Official Published Source Inventory (BATCH-001 + BATCH-002 — 16/16)",
+      "sectionSubtitle": "All 6 Project Foundations files (BATCH-001) and all 10 Core Module Architecture & Dependencies files (BATCH-002) are published and verified by Git blob SHA.",
+      "boundaryNoticeTitle": "BATCH-001 & BATCH-002 Completion & Downstream Source Availability Boundary",
+      "boundaryNoticeBody": "All 16 authorized official Markdown files (6 in BATCH-001 + 10 in BATCH-002) have been imported verbatim and verified against exact Git blob SHA-1 digests. Phase 3–5 owning decision documents, Decision Gate A, separate FAC-019..024 files, research packages, and independent advisory reviews remain scheduled for later authorized batches.",
       "summaryStrip": "{total} expected official sources · {received} received · {imported} imported · {published} publicly available · {awaiting} awaiting delivery",
       "openPublishedDoc": "Read full document",
       "headers": {
@@ -613,7 +618,7 @@
         "erpEngineeringValue": "Not Started",
         "erpEngineeringNote": "Active ERP software coding has not begun; tracked separately from architectural planning.",
         "hubDevelopment": "3. Knowledge Hub Platform Development",
-        "hubDevelopmentValue": "TASK-004 (BATCH-001 — Project Foundations)",
+        "hubDevelopmentValue": "TASK-005 (BATCH-002 — Core Modules & Dependencies)",
         "hubDevelopmentNote": "Documentation platform milestones — never represents ERP product implementation progress.",
         "operationalReadiness": "4. ERP Operational Readiness",
         "operationalReadinessValue": "Not Started",
@@ -637,10 +642,10 @@
       "title": "Architectural Decision Register",
       "subtitle": "Complete official index deterministically extracted from DECISION_REGISTER.md: all 126 approved architectural D-* decisions plus separate conditional Decision Gate A (D-MKT-01) and Governing Artifacts.",
       "indexNoticeTitle": "Authority Boundary: Official Index vs. Owning Authoritative Document",
-      "indexNoticeBody": "This register indexes all 126 approved architectural D-* decisions from DECISION_REGISTER.md (Phase 3: 103, Phase 4: 10, Phase 5: 13) plus conditional market decision D-MKT-01 separately. Complete authoritative decision texts and full rationales reside in their owning planning documents not yet imported in BATCH-001 — zero rationale or full decision prose has been fabricated.",
+      "indexNoticeBody": "This register indexes all 126 approved architectural D-* decisions from DECISION_REGISTER.md (Phase 3: 103, Phase 4: 10, Phase 5: 13) plus conditional market decision D-MKT-01 separately, alongside a separate section for the 34 Phase 2 source-local module decisions (BATCH-002). Complete authoritative texts and rationales for Phases 3–5 reside in their owning documents scheduled for later batches — zero rationale or prose has been fabricated.",
       "sourceDeclaredLabel": "Indexed Architectural Decisions (D-*)",
-      "locallyAvailableLabel": "Owning Decision Docs Imported",
-      "locallyAvailableNote": "0 individual owning decision documents imported in BATCH-001 — all 126 official index records are extracted from DECISION_REGISTER.md awaiting later batches.",
+      "locallyAvailableLabel": "Phase 3–5 Owning Decision Docs",
+      "locallyAvailableNote": "0 individual Phase 3–5 owning decision documents imported through BATCH-002 — all 126 official index records are extracted from DECISION_REGISTER.md alongside 34 full Phase 2 module decisions awaiting later batches.",
       "searchPlaceholder": "Search by Decision ID (e.g. D-PLAT-08, D-TEN-01, D-MKT-01), summary, or owning source...",
       "phaseFilterAll": "All Phases",
       "familyFilterAll": "All Families (11)",
@@ -671,7 +676,7 @@
       "searchPlaceholder": "Search by FAC ID (e.g. FAC-024), title, or owning phase...",
       "statusAll": "All Statuses ({count})",
       "resultsCount": "Showing {shown} of {total} future considerations",
-      "detailedDocUnavailable": "Separate detailed FAC file not yet imported in BATCH-001:",
+      "detailedDocUnavailable": "Separate detailed FAC file not yet imported in current batches (BATCH-001 / BATCH-002):",
       "promotedTitle": "Ideas Already Promoted to Official Product Guardrails (7 Items)",
       "promotedSubtitle": "These former future considerations were formally promoted into CROSS_PHASE_PRODUCT_GUARDRAILS.md.",
       "reviewRulesTitle": "Official Review Rules (from FUTURE_ARCHITECTURE_CONSIDERATIONS.md)",
@@ -693,18 +698,18 @@
       "diagramsSubtitle": "Educational visual models grounded in the approved guardrails — explicitly illustrative and not implemented runtime components."
     },
     "dashboardHubMetrics": {
-      "erpStatusHeading": "ERP Project Status (Updated from Official BATCH-001 Sources)",
+      "erpStatusHeading": "ERP Project Status (Updated from Official BATCH-001 & BATCH-002 Sources)",
       "hubStatusHeading": "Knowledge Hub Content & Ingestion Status (Derived from Registry & Manifest)",
       "hubStatusSubtitle": "Strictly separated from ERP product planning counts; distinguishes active full sources, superseded historical summaries, and unimported owning docs.",
       "publishedVariants": "Published Local Records",
-      "publishedVariantsNote": "{ar} Arabic · {en} English (includes 6 full official sources + 2 historical summaries)",
+      "publishedVariantsNote": "{ar} Arabic · {en} English (includes 16 full official sources + 2 historical summaries)",
       "conceptualTopics": "Unique Conceptual Topics",
       "conceptualTopicsNote": "Linked Arabic/English translations counted once as a single topic across {collections} active collections",
-      "importedOfficialSources": "BATCH-001 Official Full Sources",
-      "importedOfficialSourcesNote": "{published} published / {total} Project Foundations sources Git-blob verified",
-      "ingestionReadiness": "Individual Owning Decision Docs",
+      "importedOfficialSources": "Official Full Sources (BATCH-001+002)",
+      "importedOfficialSourcesNote": "{published} published / {total} official sources Git-blob verified",
+      "ingestionReadiness": "Phase 3–5 Owning Decision Docs",
       "ingestionReadinessValue": "0 / 126 (Index Complete)",
-      "ingestionReadinessNote": "All 126 decisions & 24 FACs indexed from BATCH-001; owning decision docs await later batches"
+      "ingestionReadinessNote": "All 126 centralized decisions indexed + 34 Phase 2 decisions published verbatim; Phase 3–5 owning docs await later batches"
     }
   },
   "states": {

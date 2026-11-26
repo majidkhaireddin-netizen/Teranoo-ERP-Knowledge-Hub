@@ -19,6 +19,8 @@ import { getExtractedDecisionRegister } from '@/content/extractors/decisionRegis
 import { getExtractedFacRegister } from '@/content/extractors/facRegisterExtractor';
 import { getExtractedGuardrails } from '@/content/extractors/guardrailsExtractor';
 import { getExtractedRoadmap } from '@/content/extractors/roadmapExtractor';
+import { getExtractedCoreModulesCatalog } from '@/content/extractors/moduleModelsExtractor';
+import { getExtractedDependencyArchitecture } from '@/content/extractors/dependencyArchitectureExtractor';
 import { buildUnifiedSearchIndex } from '@/content/search/knowledgeSearch';
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
@@ -83,6 +85,8 @@ export default async function RootLayout({
       facRegister: getExtractedFacRegister(),
       guardrails: getExtractedGuardrails(),
       roadmap: getExtractedRoadmap(),
+      coreModulesCatalog: getExtractedCoreModulesCatalog(),
+      dependencyArchitecture: getExtractedDependencyArchitecture(),
     }
   );
 

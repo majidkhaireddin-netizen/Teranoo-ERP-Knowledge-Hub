@@ -31,7 +31,7 @@ Each entry is validated by Zod (`sourceManifestEntrySchema`):
 | `classification` | 8-value `ContentClassificationType` | Authoritative classification (`official`, `future`, etc.). |
 | `expectedContentType` | 35-value `ContentTypeId` | Target Knowledge Hub content type upon ingestion. |
 | `phaseRef` | `phase-N` or `phase-N.M` (supports `phase-6.5`) | Owning official planning phase. |
-| `importStatus` | `SourceImportStatus` | Current ingestion lifecycle state (`published` for all 6 BATCH-001 files). |
+| `importStatus` | `SourceImportStatus` | Current ingestion lifecycle state (`published` for all 16 BATCH-001 + BATCH-002 files). |
 | `publicationAuthorizationStatus` | `pending` \| `authorized` \| `restricted` | Explicit public display authorization state. |
 | `publishedContentId` | string or `null` | Canonical Knowledge Hub record ID (must be `null` until `importStatus === "published"`). |
 | `referenceSummaryContentId` | string or `null` (optional) | Optional link to superseded historical snapshot-derived reference summary. |
@@ -58,9 +58,30 @@ Reference Tree SHA: `db531de6b2ab452578a550e07c5fd80e4bfe6b64`
 
 ---
 
-## 4. Automated Manifest Validation Rules (`validateSourceManifest`)
+## 4. Registered Core Module Architecture Inventory (`CORE_MODULE_ARCHITECTURE_SOURCE_MANIFEST` — BATCH-002)
 
-`validateSourceManifest()` enforces the following fatal checks during `npm run content:validate` and `npm run build`:
+Reference Commit SHA: `397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f`  
+Reference Tree SHA: `db531de6b2ab452578a550e07c5fd80e4bfe6b64`  
+Combined Authoritative Manifest: `OFFICIAL_SOURCE_MANIFEST` (`16 / 16` verified official sources = `6` BATCH-001 + `10` BATCH-002)
+
+| `sourceRefId` | Verified Official `sourcePath` | Classification | `importStatus` | `publishedContentId` | Verified Git Blob SHA-1 | `sourceVerificationStatus` |
+| --- | --- | --- | --- | --- | --- | --- |
+| `src-cm-01-finance-module-model` | `teranoo-erp-planning/03-modules/finance/FINANCE_MODULE_MODEL.md` | `official` | `published` | `kh-doc-finance-module-model-ar` | `6b76307065d851377b8e4e08cf2c2e18fc6e909e` | `git-blob-verified-lf-normalized` |
+| `src-cm-02-inventory-module-model` | `teranoo-erp-planning/03-modules/inventory/INVENTORY_MODULE_MODEL.md` | `official` | `published` | `kh-doc-inventory-module-model-ar` | `f440331ab3867da3cece30b55dcac2e5194a4b0a` | `git-blob-verified-lf-normalized` |
+| `src-cm-03-procurement-module-model` | `teranoo-erp-planning/03-modules/procurement/PROCUREMENT_MODULE_MODEL.md` | `official` | `published` | `kh-doc-procurement-module-model-ar` | `2b45dbccfc654ccacc148a98da6bb49c838cdc50` | `git-blob-verified-lf-normalized` |
+| `src-cm-04-sales-order-management-module-model` | `teranoo-erp-planning/03-modules/sales/SALES_ORDER_MANAGEMENT_MODULE_MODEL.md` | `official` | `published` | `kh-doc-sales-order-management-module-model-ar` | `ee1a312cc856d593fe13959e9e97e3a9abfa2123` | `git-blob-verified-lf-normalized` |
+| `src-cm-05-dependency-model` | `teranoo-erp-planning/03-modules/DEPENDENCY_MODEL.md` | `official` | `published` | `kh-doc-dependency-model-ar` | `0c61cc300c7fe44f84e20dbac3a09df6d4760075` | `git-blob-verified-lf-normalized` |
+| `src-cm-06-module-dependency-matrix` | `teranoo-erp-planning/03-modules/MODULE_DEPENDENCY_MATRIX.md` | `official` | `published` | `kh-doc-module-dependency-matrix-ar` | `20d935eadc1680a5ad04395094ff7eaad7fbe02f` | `git-blob-verified-lf-normalized` |
+| `src-cm-07-module-lifecycle-rules` | `teranoo-erp-planning/03-modules/MODULE_LIFECYCLE_RULES.md` | `official` | `published` | `kh-doc-module-lifecycle-rules-ar` | `ee58a40b83d6aa9bfda6a37914812bf90fbe9b54` | `git-blob-verified-lf-normalized` |
+| `src-cm-08-future-module-extension-rules` | `teranoo-erp-planning/03-modules/FUTURE_MODULE_EXTENSION_RULES.md` | `official` | `published` | `kh-doc-future-module-extension-rules-ar` | `06b67a051b8ed749b77d385f037b3c6dd0678f74` | `git-blob-verified-lf-normalized` |
+| `src-cm-09-phase-2-assumption-safety-review` | `teranoo-erp-planning/00-project-foundation/PHASE_2_ASSUMPTION_SAFETY_REVIEW.md` | `official` | `published` | `kh-doc-phase-2-assumption-safety-review-ar` | `4ab31d9cf4eab595d089c256ddeeab3cec665fd0` | `git-blob-verified-lf-normalized` |
+| `src-cm-10-phase-2-closure-review` | `teranoo-erp-planning/00-project-foundation/PHASE_2_CLOSURE_REVIEW.md` | `official` | `published` | `kh-doc-phase-2-closure-review-ar` | `bee2682ad79ad9cba80a008fa44342f40d9ec1e9` | `git-blob-verified-lf-normalized` |
+
+---
+
+## 5. Automated Manifest Validation Rules (`validateSourceManifest`)
+
+`validateSourceManifest()` enforces the following fatal checks across `OFFICIAL_SOURCE_MANIFEST` during `npm run content:validate` and `npm run build`:
 
 1. Schema compliance for every entry (`INVALID_MANIFEST_ENTRY`).
 2. Unique `sourceRefId` (`DUPLICATE_SOURCE_REF_ID`).

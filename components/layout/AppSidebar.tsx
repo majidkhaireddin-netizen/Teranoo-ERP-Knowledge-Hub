@@ -160,7 +160,9 @@ export function AppSidebar() {
                       const isActive =
                         normalizedPath === item.href ||
                         (item.href === '/knowledge' &&
-                          normalizedPath.startsWith('/knowledge/'));
+                          normalizedPath.startsWith('/knowledge/')) ||
+                        (item.href === '/modules' &&
+                          normalizedPath.startsWith('/modules/'));
                       const label = t(item.labelKey);
 
                       return (

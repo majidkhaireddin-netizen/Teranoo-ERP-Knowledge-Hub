@@ -185,13 +185,13 @@ test('getContentRegistry fails loudly on invalid files in a collection root whil
   }
 });
 
-test('approved repository collections validate cleanly with all 6 BATCH-001 official sources plus 4 foundational records', () => {
+test('approved repository collections validate cleanly with all 16 BATCH-001+002 official sources plus 4 foundational records', () => {
   resetContentRegistryCache();
   const report = validateApprovedCollections();
   assert.equal(report.ok, true);
   assert.equal(report.errors.length, 0);
-  assert.equal(report.validRecordsCount, 10);
-  assert.equal(report.publishedRecordsCount, 10);
+  assert.equal(report.validRecordsCount, 20);
+  assert.equal(report.publishedRecordsCount, 20);
   assert.equal(report.unpublishedValidRecordsCount, 0);
 
   const registry = getContentRegistry();
@@ -417,7 +417,9 @@ test('governed local images allow /assets/knowledge/*, defer relative source ima
 test('Project Foundations Source Manifest registers all 6 verified official BATCH-001 sources as published with Git blob verification', () => {
   assert.equal(PROJECT_FOUNDATIONS_SOURCE_MANIFEST.length, 6);
 
-  const summary = deriveSourceManifestSummary();
+  const summary = deriveSourceManifestSummary(
+    PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+  );
   assert.equal(summary.totalSources, 6);
   assert.equal(summary.awaitingSourceCount, 0);
   assert.equal(summary.importedCount, 0);
@@ -435,7 +437,9 @@ test('Project Foundations Source Manifest registers all 6 verified official BATC
     'git-blob-verified-lf-normalized'
   );
 
-  const report = generateSourceReadinessReport();
+  const report = generateSourceReadinessReport(
+    PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+  );
   assert.equal(report.summary.totalSources, 6);
   assert.equal(report.awaitingDelivery.length, 0);
   assert.equal(report.readyForPublicDisplay.length, 6);
@@ -571,9 +575,9 @@ test('registry stats separate published variants from unique conceptual topics a
   const registry = getContentRegistry();
   const stats = registry.getStats();
 
-  assert.equal(stats.totalPublished, 10);
-  assert.equal(stats.uniqueConceptualTopics, 8);
-  assert.equal(stats.officialImportedCount, 6);
+  assert.equal(stats.totalPublished, 20);
+  assert.equal(stats.uniqueConceptualTopics, 18);
+  assert.equal(stats.officialImportedCount, 16);
   assert.equal(stats.activeCollectionsCount, 3);
 });
 

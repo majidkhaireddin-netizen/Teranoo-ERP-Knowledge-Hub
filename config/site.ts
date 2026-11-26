@@ -3,7 +3,7 @@ export const SITE_CONFIG = {
   shortName: 'Teranoo ERP',
   subtitle: 'The Complete Journey of Building an Enterprise ERP System',
   subtitleAr: 'الرحلة الكاملة لبناء نظام ERP مؤسسي',
-  taskScope: 'TASK-004',
+  taskScope: 'TASK-005',
   storageKeys: {
     theme: 'teranoo-theme',
     locale: 'teranoo-locale',

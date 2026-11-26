@@ -1,7 +1,16 @@
+import { createHash } from 'node:crypto';
 import type { LocalizedText } from '@/content/models/types';
 import { createHeadingSlug, HEADING_ID_PREFIX } from '@/content/loaders/markdownPipeline';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
 import { BATCH_001_SOURCE_REVISION } from '@/content/manifest/sourceManifest';
+
+export const CURATED_ROADMAP_PINNED_SOURCE = {
+  sourcePath: 'teranoo-erp-planning/00-project-foundation/PROJECT_WORK_PLAN.md',
+  mappedSourceRevision: BATCH_001_SOURCE_REVISION.commitSha,
+  mappedSourceBodySha256:
+    'df43786d50640c5574b28b7930c068697a78cecf3422b69a8ff8058e6109fa06',
+  lastCuratedReviewDate: '2026-11-26',
+} as const;
 
 export type RoadmapPhaseStatus =
   | 'completed'
@@ -10,6 +19,25 @@ export type RoadmapPhaseStatus =
   | 'pending'
   | 'deferred'
   | 'ongoing_track';
+
+export interface RoadmapEvidenceLink {
+  readonly label: LocalizedText;
+  readonly href: string;
+  readonly kind: 'module-model' | 'governing-artifact' | 'review-gate' | 'explorer';
+}
+
+export interface RoadmapProjectionMetadata {
+  readonly kind: 'curated-projection';
+  readonly mappedSourceRevision: string;
+  readonly actualSourceRevision: string;
+  readonly mappedSourceBodySha256: string;
+  readonly actualSourceBodySha256: string;
+  readonly mappingFreshnessStatus:
+    | 'verified-current'
+    | 'review-required-source-changed';
+  readonly projectionDisclosure: LocalizedText;
+  readonly reviewWarning: LocalizedText | null;
+}
 
 export interface RoadmapPhaseDetail {
   readonly id: string;
@@ -31,6 +59,7 @@ export interface RoadmapPhaseDetail {
   readonly deferredWork: LocalizedText;
   readonly sourceSectionAnchor: string;
   readonly sourceDocumentSlug: string;
+  readonly relatedEvidenceLinks?: readonly RoadmapEvidenceLink[];
 }
 
 export interface ContinuousActivityTrack {
@@ -48,6 +77,7 @@ export interface ExtractedRoadmap {
   readonly sourceDocumentId: string;
   readonly sourceDocumentSlug: string;
   readonly sourceRevision: string;
+  readonly projectionMetadata: RoadmapProjectionMetadata;
   readonly phases: readonly RoadmapPhaseDetail[];
   readonly continuousTrack: ContinuousActivityTrack;
   readonly completedPhasesCount: number;
@@ -71,9 +101,17 @@ function findHeadingAnchor(
 }
 
 /**
- * Pure, deterministic extractor combining validated heading/status verification
- * from PROJECT_WORK_PLAN.md with reviewed structured phase metadata directly
- * anchored to the exact headings of the official source.
+ * KH-025 Curated Roadmap Projection Builder.
+ *
+ * IMPORTANT GOVERNANCE TRANSPARENCY:
+ * The structured localized phase cards below are a **curated projection**
+ * anchored to verified headings and status checkpoints inside
+ * `PROJECT_WORK_PLAN.md` — NOT an automatic NLP parser of every prose paragraph.
+ * To prevent stale curated mappings from silently appearing current when the
+ * official work plan advances, this builder pins both `mappedSourceRevision`
+ * and the exact LF-normalized SHA-256 digest of `PROJECT_WORK_PLAN.md` and
+ * flags `mappingFreshnessStatus = "review-required-source-changed"` whenever
+ * either the revision or body digest changes.
  */
 export function parseRoadmapMarkdown(
   markdown: string,
@@ -87,9 +125,43 @@ export function parseRoadmapMarkdown(
     options?.sourceDocumentId ?? 'kh-doc-project-work-plan-ar';
   const sourceDocumentSlug = options?.sourceDocumentSlug ?? 'project-work-plan';
   const sourceRevision =
-    options?.sourceRevision ?? BATCH_001_SOURCE_REVISION.commitSha;
+    options?.sourceRevision ?? CURATED_ROADMAP_PINNED_SOURCE.mappedSourceRevision;
 
   const normalized = markdown.replace(/\r\n/g, '\n');
+  const actualSourceBodySha256 = createHash('sha256')
+    .update(normalized.trim(), 'utf8')
+    .digest('hex');
+
+  const revisionMatches =
+    sourceRevision === CURATED_ROADMAP_PINNED_SOURCE.mappedSourceRevision;
+  const bodyDigestMatches =
+    actualSourceBodySha256 ===
+    CURATED_ROADMAP_PINNED_SOURCE.mappedSourceBodySha256;
+  const mappingFreshnessStatus: RoadmapProjectionMetadata['mappingFreshnessStatus'] =
+    revisionMatches && bodyDigestMatches
+      ? 'verified-current'
+      : 'review-required-source-changed';
+
+  const projectionMetadata: RoadmapProjectionMetadata = {
+    kind: 'curated-projection',
+    mappedSourceRevision: CURATED_ROADMAP_PINNED_SOURCE.mappedSourceRevision,
+    actualSourceRevision: sourceRevision,
+    mappedSourceBodySha256: CURATED_ROADMAP_PINNED_SOURCE.mappedSourceBodySha256,
+    actualSourceBodySha256,
+    mappingFreshnessStatus,
+    projectionDisclosure: {
+      ar: 'عرض مُنظَّم مُراجع (Curated Projection) مربوط مباشرةً بعناوين وبصمة المحتوى الرسمي لوثيقة PROJECT_WORK_PLAN.md — يُنبه تلقائيًا عند تغير مراجعة أو محتوى المصدر.',
+      en: 'Curated structured projection pinned to verified headings and exact SHA-256 body digest of PROJECT_WORK_PLAN.md — automatically flags review if the source revision or body changes.',
+    },
+    reviewWarning:
+      mappingFreshnessStatus === 'verified-current'
+        ? null
+        : {
+            ar: 'تنبيه حوكمة (KH-025): تغيرت مراجعة أو بصمة نص PROJECT_WORK_PLAN.md عن المرجع المثبّت في الإسقاط المُنظَّم؛ يلزم مراجعة تحديث البطاقات المرحلية والرجوع للنص الرسمي الكامل كمرجع أعلى.',
+            en: 'Governance Warning (KH-025): PROJECT_WORK_PLAN.md revision or body SHA-256 differs from the pinned curated projection; mapping review is required and the verbatim document remains authoritative.',
+          },
+  };
+
   const lines = normalized.split('\n');
 
   // Collect all H1 headings and compute their exact kh-h-* anchors
@@ -226,43 +298,50 @@ export function parseRoadmapMarkdown(
         en: 'Phase 2 — Module Architecture & Dependency Rules',
       },
       status: 'completed',
-      completedDate: null,
+      completedDate: '2026-09-09',
       purpose: {
-        ar: 'تأسيس خريطة الوحدات التجارية الأساسية الأربعة ونموذج الاعتماديات وقواعد دورة حياة الوحدات والتوسعة المستقبلية.',
-        en: 'Establish the four Core Business Modules map, dependency semantics (PCD/HBMD/CIC/FLD), module lifecycle governance, and future extension rules.',
+        ar: 'تأسيس النماذج المعمارية للوحدات التجارية الأساسية الأربعة ونموذج الاعتماديات (PCD/HBMD/CIC/FLD) ومصفوفة الاعتماديات وقواعد دورة حياة الوحدات والتوسعة المستقبلية.',
+        en: 'Establish architectural models for the four Core Business Modules, dependency semantics (PCD/HBMD/CIC/FLD), dependency matrix, module lifecycle governance, and future extension rules.',
       },
       scope: {
-        ar: 'Finance وInventory & Warehouse وProcurement وSales & Order Management، مع مصفوفة الاعتماديات وقواعد التوسعة.',
-        en: 'Finance, Inventory & Warehouse, Procurement, and Sales & Order Management, plus dependency matrix and extension governance.',
+        ar: '4 نماذج وحدات أساسية (34 قرارًا محليًا معتمدًا في المرحلة 2) + 4 وثائق حاكمة (DEPENDENCY_MODEL وMODULE_DEPENDENCY_MATRIX وMODULE_LIFECYCLE_RULES وFUTURE_MODULE_EXTENSION_RULES) + بوابتي مراجعة رسميتين (Assumption Safety وClosure Review).',
+        en: '4 Core Module Models (34 approved Phase 2 source-local decisions) + 4 Governing Artifacts + 2 official Phase 2 review gates (Assumption Safety PASS with Guardrails & Closure Review PASS).',
       },
       workItems: [
-        'تحديد الوحدات الأساسية الأربعة كحد تجاري معتمد (Core Modules)',
-        'توثيق نموذج الاعتماديات (PCD / HBMD / CIC / FLD)',
-        'إغلاق مصفوفة الاعتماديات وقواعد دورة حياة الوحدات وتوسعتها',
+        'اعتماد نماذج الأنظمة الأساسية الأربعة (Finance [6] · Inventory [8] · Procurement [9] · Sales [11] = 34 قرارًا محليًا)',
+        'توثيق نموذج الاعتماديات (PCD / HBMD / CIC / FLD) وتأكيد 0 اعتماديات صلبة (HBMD) و0 دورات',
+        'تثبيت 6 عقود تكامل مشروط (Core CICs) و5 اعتماديات مستوى الميزة (FLDs) وملكية 15 مجال بيانات',
+        'اجتياز مراجعة سلامة الافتراضات (PASS with Guardrails · G-ASSUMP-01..07) ومراجعة إغلاق المرحلة 2 (13 معيار خروج · 2026-09-09)',
       ],
-      decisionRange: 'Governing Artifacts (بدون معرفات D-* منفصلة)',
-      decisionCount: null,
+      decisionRange: '34 Phase 2 Source-Local Decisions (D-FIN/INV/PROC/SALES) + 4 Governing Artifacts',
+      decisionCount: 34,
       deliverables: [
+        '03-modules/finance/FINANCE_MODULE_MODEL.md',
+        '03-modules/inventory/INVENTORY_MODULE_MODEL.md',
+        '03-modules/procurement/PROCUREMENT_MODULE_MODEL.md',
+        '03-modules/sales/SALES_ORDER_MANAGEMENT_MODULE_MODEL.md',
         '03-modules/DEPENDENCY_MODEL.md',
         '03-modules/MODULE_DEPENDENCY_MATRIX.md',
         '03-modules/MODULE_LIFECYCLE_RULES.md',
         '03-modules/FUTURE_MODULE_EXTENSION_RULES.md',
+        '00-project-foundation/PHASE_2_ASSUMPTION_SAFETY_REVIEW.md',
+        '00-project-foundation/PHASE_2_CLOSURE_REVIEW.md',
       ],
       dependencies: {
         ar: 'تعتمد على إغلاق المرحلة 1 (رؤية المنتج والحدود المعيارية).',
         en: 'Depends on Phase 1 closure (Product Vision and modular boundaries).',
       },
       completionCondition: {
-        ar: 'اعتماد خريطة الوحدات ومصفوفة الاعتماديات وقواعد منع الاعتماديات الخفية.',
-        en: 'Approval of module map, dependency matrix, and rules preventing hidden coupling.',
+        ar: 'اجتياز معايير الخروج الـ 13 في PHASE_2_CLOSURE_REVIEW.md مع صفر اعتماديات صلبة (HBMD = 0) وصفر دورات.',
+        en: 'Pass all 13 exit criteria in PHASE_2_CLOSURE_REVIEW.md with 0 HBMDs and 0 dependency cycles.',
       },
       approvalOutcome: {
-        ar: 'مكتملة ومغلقة رسميًا (Phase 2 Closed) — تم التحقق من التوافق الرجعي مع المرحلة 3 بدون تعارض مادي.',
-        en: 'Officially closed (Phase 2 Closed) — backward compatibility later verified against Phase 3 with zero material conflicts.',
+        ar: 'مغلقة رسميًا بتاريخ 2026-09-09 (PASS — Phase 2 Closed) · Assumption Safety: PASS with Guardrails (G-ASSUMP-01..07) · تم نشر الوثائق الـ 10 كاملة في BATCH-002.',
+        en: 'Officially closed on 2026-09-09 (PASS — Phase 2 Closed) · Assumption Safety: PASS with Guardrails (G-ASSUMP-01..07) · All 10 official documents published in BATCH-002.',
       },
       deferredWork: {
-        ar: 'المخططات الوظيفية التفصيلية للوحدات الأساسية مؤجلة إلى المرحلة 6 والوحدات المؤسسية إلى المرحلة 7.',
-        en: 'Detailed Core functional blueprints deferred to Phase 6; Strategic Enterprise Modules deferred to Phase 7.',
+        ar: 'المخططات الوظيفية التفصيلية للوحدات الأساسية مؤجلة إلى المرحلة 6، التحقق التنفيذي من الـ 6 CICs إلى المرحلة 6.5، و12 تسليمًا إلى المرحلة 3.',
+        en: 'Detailed Core functional blueprints deferred to Phase 6; end-to-end CIC validation deferred to Phase 6.5; 12 explicit handoffs routed to Phase 3.',
       },
       sourceSectionAnchor: findHeadingAnchor(
         h1Anchors,
@@ -270,6 +349,53 @@ export function parseRoadmapMarkdown(
         'Phase 2 — Module Architecture & Dependency Rules'
       ),
       sourceDocumentSlug,
+      relatedEvidenceLinks: [
+        {
+          label: { ar: 'مستكشف الوحدات الأساسية الأربعة', en: 'Core Business Modules Explorer' },
+          href: '/modules',
+          kind: 'explorer',
+        },
+        {
+          label: { ar: 'مركز الاعتماديات والتكامل والمحاكاة', en: 'Dependencies & Integration Architecture Center' },
+          href: '/dependencies',
+          kind: 'explorer',
+        },
+        {
+          label: { ar: 'مراجعة إغلاق المرحلة 2 (PASS · 2026-09-09)', en: 'Phase 2 Closure Review (PASS · 2026-09-09)' },
+          href: '/knowledge/phase-2-closure-review',
+          kind: 'review-gate',
+        },
+        {
+          label: { ar: 'مراجعة سلامة الافتراضات (PASS with Guardrails)', en: 'Phase 2 Assumption Safety Review (PASS with Guardrails)' },
+          href: '/knowledge/phase-2-assumption-safety-review',
+          kind: 'review-gate',
+        },
+        {
+          label: { ar: 'مصفوفة الاعتماديات الرسمية', en: 'Official Module Dependency Matrix' },
+          href: '/knowledge/module-dependency-matrix',
+          kind: 'governing-artifact',
+        },
+        {
+          label: { ar: 'نموذج المالية (6 قرارات)', en: 'Finance Model (6 decisions)' },
+          href: '/modules/finance',
+          kind: 'module-model',
+        },
+        {
+          label: { ar: 'نموذج المخزون (8 قرارات)', en: 'Inventory Model (8 decisions)' },
+          href: '/modules/inventory-warehouse',
+          kind: 'module-model',
+        },
+        {
+          label: { ar: 'نموذج المشتريات (9 قرارات)', en: 'Procurement Model (9 decisions)' },
+          href: '/modules/procurement',
+          kind: 'module-model',
+        },
+        {
+          label: { ar: 'نموذج المبيعات (11 قرارًا)', en: 'Sales Model (11 decisions)' },
+          href: '/modules/sales-order-management',
+          kind: 'module-model',
+        },
+      ],
     },
     {
       id: 'phase-3',
@@ -984,6 +1110,7 @@ export function parseRoadmapMarkdown(
     sourceDocumentId,
     sourceDocumentSlug,
     sourceRevision,
+    projectionMetadata,
     phases,
     continuousTrack,
     completedPhasesCount,

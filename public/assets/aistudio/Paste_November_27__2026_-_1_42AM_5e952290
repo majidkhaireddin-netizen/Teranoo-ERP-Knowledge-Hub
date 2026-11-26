@@ -1,0 +1,1304 @@
+# TASK-005 — Core Module Architecture & Dependencies
+## BATCH-002 — Business Core Architecture Knowledge Collection
+
+**Application:** Teranoo ERP Knowledge Hub
+
+**Previous task:** TASK-004 — Independently approved with targeted notes.
+
+**Development mode:** Incremental implementation under independent supervision.
+
+---
+
+## 1. Mission
+
+Implement the second substantial official knowledge collection, dedicated to the architecture of the four core business modules of Teranoo ERP.
+
+The objective is to teach readers how to architect a modular enterprise ERP product, establish module boundaries, assign data ownership, classify dependencies, coordinate integrations, and preserve independent module activation.
+
+The application must explain not only what Teranoo ERP has decided, but also what those decisions mean, why they matter, how they relate to one another, and how they will influence future functional design and implementation.
+
+Preserve all approved functionality from TASK-001 through TASK-004.
+
+Do not rebuild the application or redesign its global visual identity.
+
+Do not start TASK-006.
+
+---
+
+## 2. Corrective Requirements from TASK-004
+
+### A. Completion Report Accuracy — KH-024
+
+The TASK-004 completion report contains incorrect architectural decision distribution figures.
+
+The verified DECISION_REGISTER.md establishes:
+
+- Phase 3: 103 indexed architectural decisions.
+- Phase 4: 10 indexed architectural decisions.
+- Phase 5: 13 indexed architectural decisions.
+- Total: 126.
+- Governing artifacts listed without D-* identifiers: 6.
+- D-MKT-01: separate conditional market decision outside the 126 counter.
+
+Correct any incorrect values in current application views and active technical documentation.
+
+Preserve the historical completion report and document its discrepancy in the TASK-005 completion report.
+
+Where possible, generate report statistics from the actual validated catalogs rather than manually repeating counts.
+
+### B. Roadmap Source Mapping Integrity — KH-025
+
+Review `content/extractors/roadmapExtractor.ts`.
+
+Some roadmap information is represented through manually curated structured mappings rather than direct deterministic extraction.
+
+A curated mapping is acceptable when it provides a reliable educational projection of a complex source document.
+
+However:
+
+- Do not describe manually curated mappings as automatically extracted data.
+- Associate mappings with the exact source revision.
+- Validate mappings against the applicable source document.
+- Detect when a new source revision requires mapping review.
+- Prevent stale mappings from being silently presented as verified current information.
+- Document how future source updates affect curated roadmap records.
+
+Do not undertake a complete roadmap rewrite.
+
+Apply targeted corrections that preserve the existing approved user experience.
+
+---
+
+## 3. Attached Official Source Documents
+
+The project owner will provide ten original Markdown files.
+
+Official source repository:
+
+    https://github.com/Alabasi1980/TeranooErp
+
+Reference commit:
+
+    397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f
+
+Reference tree SHA:
+
+    db531de6b2ab452578a550e07c5fd80e4bfe6b64
+
+This is the same official source revision used for BATCH-001.
+
+### Business Module Models
+
+| Source path relative to teranoo-erp-planning/ | Expected Git Blob SHA |
+|---|---|
+| 03-modules/finance/FINANCE_MODULE_MODEL.md | 6b76307065d851377b8e4e08cf2c2e18fc6e909e |
+| 03-modules/inventory/INVENTORY_MODULE_MODEL.md | f440331ab3867da3cece30b55dcac2e5194a4b0a |
+| 03-modules/procurement/PROCUREMENT_MODULE_MODEL.md | 2b45dbccfc654ccacc148a98da6bb49c838cdc50 |
+| 03-modules/sales/SALES_ORDER_MANAGEMENT_MODULE_MODEL.md | ee1a312cc856d593fe13959e9e97e3a9abfa2123 |
+
+### Dependency and Lifecycle Governance
+
+| Source path relative to teranoo-erp-planning/ | Expected Git Blob SHA |
+|---|---|
+| 03-modules/DEPENDENCY_MODEL.md | 0c61cc300c7fe44f84e20dbac3a09df6d4760075 |
+| 03-modules/MODULE_DEPENDENCY_MATRIX.md | 20d935eadc1680a5ad04395094ff7eaad7fbe02f |
+| 03-modules/MODULE_LIFECYCLE_RULES.md | ee58a40b83d6aa9bfda6a37914812bf90fbe9b54 |
+| 03-modules/FUTURE_MODULE_EXTENSION_RULES.md | 06b67a051b8ed749b77d385f037b3c6dd0678f74 |
+
+### Phase 2 Review Evidence
+
+| Source path relative to teranoo-erp-planning/ | Expected Git Blob SHA |
+|---|---|
+| 00-project-foundation/PHASE_2_ASSUMPTION_SAFETY_REVIEW.md | 4ab31d9cf4eab595d089c256ddeeab3cec665fd0 |
+| 00-project-foundation/PHASE_2_CLOSURE_REVIEW.md | bee2682ad79ad9cba80a008fa44342f40d9ec1e9 |
+
+All full source paths begin with:
+
+    teranoo-erp-planning/
+
+Verify the attached files using the established Git blob verification mechanism.
+
+Do not import an unexpected source revision as though it were the approved reference revision.
+
+Do not automatically synchronize newer repository versions.
+
+Do not access the private source repository through unauthorized means.
+
+---
+
+## 4. Source Ingestion
+
+Extend the existing source manifest to support BATCH-002.
+
+Reuse:
+
+- Existing Content Registry.
+- Existing source ingestion pipeline.
+- Existing Git blob verification mechanism.
+- Existing Markdown renderer.
+- Existing content metadata schemas.
+- Existing publication governance.
+- Existing relationship and backlink mechanisms.
+
+For each authorized source document:
+
+1. Verify its identity.
+2. Preserve the complete original body.
+3. Record accurate provenance.
+4. Assign stable Knowledge Hub IDs and canonical routes.
+5. Record actual approval status from source evidence.
+6. Classify the content.
+7. Associate it with Phase 2 and relevant modules.
+8. Register actual decision and requirement references.
+9. Resolve available internal relationships.
+10. Validate and publish the document.
+
+Do not introduce a parallel content architecture.
+
+If a file is missing or fails verification, identify the problem and do not fabricate its content.
+
+All original documents must remain directly readable within the application.
+
+---
+
+## 5. Knowledge Architecture for Business Modules
+
+Create a reusable knowledge structure for each core business module.
+
+This structure must eventually support the complete lifecycle of documenting a module, including:
+
+- Module overview.
+- Business purpose.
+- Architectural responsibilities.
+- Scope and exclusions.
+- Research and evidence.
+- Architectural decisions.
+- Functional blueprint.
+- Business processes.
+- Business rules.
+- Configuration and policies.
+- Screen specifications.
+- Data architecture.
+- Integration contracts.
+- Engineering implementation.
+- Testing and validation.
+- Development journal.
+- Known issues and lessons learned.
+
+### Current scope
+
+Only populate sections supported by the attached Phase 2 architectural documents.
+
+Functional blueprints, screen specifications, detailed database models, implementation, and testing evidence are future knowledge sections.
+
+Do not fabricate them.
+
+Do not present architectural scope as completed functional implementation.
+
+Do not confuse a module's conceptual responsibilities with its final approved feature list.
+
+The future content structure should be extensible without requiring a redesign of the module experience.
+
+---
+
+## 6. Business Module Explorer
+
+Upgrade the existing Business Modules section into a professional module exploration experience.
+
+The overview must display the four approved Business Core Modules:
+
+1. Finance.
+2. Inventory & Warehouse Management.
+3. Procurement.
+4. Sales & Order Management.
+
+For each module, provide a source-backed overview of:
+
+- Business purpose.
+- Core responsibilities.
+- Standalone activation boundaries.
+- Data ownership.
+- Relevant integrations.
+- Architectural decisions.
+- Current architecture documentation status.
+- Deferred design areas.
+- Related original source documents.
+
+Provide a dedicated module detail route or equivalent navigable experience.
+
+Reuse a common module detail template.
+
+Do not implement four unrelated page designs.
+
+Make module navigation consistent, educational, and expandable.
+
+---
+
+## 7. Finance Module — Knowledge Experience
+
+Use the complete original `FINANCE_MODULE_MODEL.md`.
+
+Create detailed source-backed explanations covering the actual approved financial architecture.
+
+Explain the source-defined boundaries concerning:
+
+- Finance as a first-class Business Core Module.
+- Independent activation.
+- General Ledger ownership.
+- Financial posting authority.
+- Accounting records.
+- Financial effects originating from other modules.
+- Shared platform dependencies.
+- Relationships with Inventory, Procurement, and Sales.
+- Financial capabilities required by conditional scenarios.
+- Deferred functional decisions.
+
+Explain the difference between:
+
+- Operational business transactions.
+- Accounting integration contracts.
+- Authoritative financial records.
+- Final accounting effects.
+
+### Critical limitations
+
+Do not assume that every cost calculation belongs inside Finance.
+
+Do not invent journal entry rules.
+
+Do not invent accounting transaction types.
+
+Do not create a complete Chart of Accounts.
+
+Do not determine the final inventory costing ownership boundary unless the source explicitly does so.
+
+Do not generate unapproved financial screens or database tables.
+
+Provide the complete original source and traceable links to its actual decision sections.
+
+---
+
+## 8. Inventory & Warehouse Management — Knowledge Experience
+
+Use the complete original `INVENTORY_MODULE_MODEL.md`.
+
+Explain the actual approved inventory architecture, including source-supported aspects of:
+
+- Independent inventory operation.
+- Inventory Core.
+- Warehouse execution.
+- Advanced warehouse capabilities.
+- Physical inventory quantities.
+- Stock movements.
+- On-hand balances.
+- Reservation ownership.
+- Shared product identity.
+- Integration with Procurement.
+- Integration with Sales.
+- Integration with Finance.
+- Distinction between physical movement and financial valuation.
+- Deferred costing and valuation decisions.
+
+Explain why:
+
+- A sales order is not a stock movement.
+- A purchase order is not a goods receipt.
+- A reservation does not necessarily change physical on-hand quantity.
+- Financial posting ownership and physical quantity ownership are different responsibilities.
+
+Only attribute these statements to official architecture where supported by the supplied source.
+
+Detailed costing methods, reservation policies, inventory valuation methods, warehouse layouts, and screen behavior must remain explicitly deferred where not yet approved.
+
+Do not generate a fictional WMS implementation.
+
+---
+
+## 9. Procurement Module — Knowledge Experience
+
+Use the complete original `PROCUREMENT_MODULE_MODEL.md`.
+
+Explain:
+
+- Procurement as an independently activatable module.
+- Commercial purchasing responsibilities.
+- Procurement document ownership.
+- Purchase requisitions and purchase orders where supported.
+- Purchasing of materials versus purchasing of services.
+- Supplier identity versus supplier-specific business context.
+- Goods receipt ownership boundaries.
+- Service acceptance boundaries.
+- Financial integration.
+- Supplier invoice and payment boundaries.
+- Conditional purchase-to-pay scenarios.
+- Deferred matching, accounting, and implementation decisions.
+
+### Educational comparison
+
+Provide a source-backed explanation of the architectural differences between:
+
+- Buying a physical item.
+- Purchasing a service.
+- Receiving physical goods.
+- Accepting a service.
+- Recording a supplier invoice.
+- Paying the supplier.
+
+Do not confuse conceptual process ownership with final approved workflow steps.
+
+Do not invent purchase approval thresholds, invoice matching tolerances, payment rules, or business document states.
+
+Use clearly labeled illustrative examples only where helpful.
+
+---
+
+## 10. Sales & Order Management — Knowledge Experience
+
+Use the complete original `SALES_ORDER_MANAGEMENT_MODULE_MODEL.md`.
+
+Explain:
+
+- Independent activation.
+- Sales order ownership.
+- Commercial commitments.
+- Sales document lifecycle responsibilities.
+- Customer-related business context.
+- Sales quantities versus inventory quantities.
+- Order fulfillment coordination.
+- Reservation request versus reservation record ownership.
+- Financial integration.
+- Billing and accounting ownership boundaries.
+- Drop shipment and direct delivery scenarios where supported.
+- Deferred pricing, allocation, shipment, and invoice-generation decisions.
+
+### Critical architecture boundaries
+
+Distinguish:
+
+- Ownership of the sales order.
+- Coordination of fulfillment.
+- Ownership of inventory reservations.
+- Ownership of actual stock movements.
+- Ownership of final accounting effects.
+
+Do not imply that Sales directly controls stock balances or General Ledger entries.
+
+Do not determine unresolved customer invoice generation ownership from assumptions.
+
+Do not introduce a final Pricing Engine architecture.
+
+Do not invent detailed sales workflows or order states.
+
+---
+
+## 11. Detailed Module Architecture Presentation
+
+Each module detail experience should use the same general educational pattern.
+
+### A. Module Identity
+
+- Name.
+- Purpose.
+- Scope.
+- Architecture status.
+- Original source.
+
+### B. Responsibilities
+
+Explain what the module owns and what it does not own.
+
+### C. Standalone Operation
+
+Describe the approved boundaries of independent activation.
+
+Do not imply that every business scenario remains available when other modules are absent.
+
+### D. Data Ownership
+
+Display authoritative business records and their ownership boundaries according to the source.
+
+Do not infer database tables from conceptual record names.
+
+### E. Dependencies and Integrations
+
+Separate required platform capabilities from business module dependencies and conditional integrations.
+
+### F. Approved Architecture Decisions
+
+Display actual source-backed decisions with their original IDs and wording.
+
+### G. Deferred Architecture and Functional Design
+
+Explain the matters intentionally left unresolved.
+
+### H. Related Knowledge
+
+Link to:
+
+- Dependency Model.
+- Dependency Matrix.
+- Module Lifecycle Rules.
+- Other relevant module models.
+- Phase 2 review evidence.
+- Existing cross-phase guardrails.
+- Future research sources when imported.
+
+### I. Original Document
+
+Provide direct access to the complete original document.
+
+Do not substitute the curated educational experience for the original evidence.
+
+---
+
+## 12. Dependency Model — Core Educational Experience
+
+Use the complete original `DEPENDENCY_MODEL.md`.
+
+Build a detailed explanation of the four official dependency classifications.
+
+### PCD — Platform Capability Dependency
+
+Explain dependencies on shared platform capabilities.
+
+Distinguish these from business module dependencies.
+
+### HBMD — Hard Business Module Dependency
+
+Explain explicitly approved module-level activation dependencies.
+
+### CIC — Conditional Integration Contract
+
+Explain dependencies associated with a shared business scenario.
+
+### FLD — Feature-Level Dependency
+
+Explain dependencies associated with a particular feature.
+
+For every dependency classification, present the actual source-defined:
+
+- Meaning.
+- Scope.
+- Enforcement level.
+- Activation implications.
+- Readiness implications.
+- Required / Conditional / Optional semantics where applicable.
+- Examples.
+- Governance boundaries.
+
+Explain that data ownership is independent of dependency classification.
+
+Do not conflate runtime integration with module activation dependency.
+
+Do not introduce additional official dependency categories.
+
+---
+
+## 13. Dependency Matrix Explorer
+
+Use the complete original `MODULE_DEPENDENCY_MATRIX.md`.
+
+Implement an interactive explorer for the approved architecture.
+
+Provide several complementary views:
+
+### A. Core Module Relationship Matrix
+
+Display the relationships among the four core modules.
+
+Each cell must distinguish the relationship types actually present.
+
+Do not reduce a multidimensional relationship to a single dependency flag.
+
+### B. HBMD Graph
+
+Represent approved hard business module dependencies.
+
+The Phase 2 closure source establishes:
+
+- Approved HBMD edges: 0.
+- HBMD cycles: 0.
+
+Verify these facts against the supplied documents.
+
+Display the absence of approved hard dependencies explicitly.
+
+Do not draw invented arrows merely to make the diagram look visually complete.
+
+### C. CIC Register
+
+Display the actual six Core Conditional Integration Contracts using their original identifiers.
+
+Expected source-defined identifiers include:
+
+- CIC-CORE-INV-FIN-001.
+- CIC-CORE-PROC-INV-001.
+- CIC-CORE-PROC-FIN-001.
+- CIC-CORE-SALES-INV-001.
+- CIC-CORE-SALES-FIN-001.
+- CIC-CORE-SALES-PROC-001.
+
+Verify each identifier and its semantics against the supplied matrix.
+
+For each contract, show the available architectural information, conditions, ownership boundaries, related modules, and deferred details.
+
+Do not present these conceptual contracts as fully specified API contracts.
+
+### D. FLD Register
+
+Extract and present actual feature-level dependencies from the source.
+
+Distinguish module activation from feature activation.
+
+### E. PCD Matrix
+
+Provide a separate view of shared platform capability dependencies.
+
+Do not include PCD relationships in the HBMD graph.
+
+### F. Relationship Detail
+
+Selecting a relationship should reveal:
+
+- Relationship type.
+- Participating modules.
+- Scenario or capability.
+- Enforcement scope.
+- Related decision IDs.
+- Source section.
+- Known boundaries.
+- Deferred design details.
+
+All relationships must be source-backed.
+
+---
+
+## 14. Interactive Module Activation Simulator
+
+Create an educational simulator for the approved dependency model.
+
+This is a documentation simulation, not an operational ERP component.
+
+Allow readers to select which of the four business modules are conceptually active:
+
+- Finance.
+- Inventory.
+- Procurement.
+- Sales.
+
+Also support appropriate illustrative readiness controls for relevant platform prerequisites.
+
+The simulator must distinguish between:
+
+- Base module activation.
+- Platform capability readiness.
+- Feature availability.
+- Conditional shared scenario availability.
+- Entitlement where represented by the source.
+
+### Required architectural behavior
+
+- A business module is not automatically blocked because another business module is inactive.
+- Required platform dependencies must be respected.
+- CIC readiness determines the availability of its specific shared scenario.
+- FLD determines the availability of its specific feature.
+- CIC and FLD do not automatically become HBMD.
+- A conceptual scenario becoming available does not prove that the full future workflow is implemented.
+
+Use rules derived from the actual approved matrix and lifecycle documents.
+
+Do not invent dependency rules.
+
+Provide an explanation of why a selected scenario is available, unavailable, or not sufficiently specified.
+
+If information is insufficient, display that limitation instead of deriving unsupported behavior.
+
+Use a visible disclaimer:
+
+    Educational simulation of approved architectural boundaries.
+    Not a running ERP implementation or a validated functional workflow.
+
+Test all 16 combinations of the four core module selections for the relevant architectural behavior.
+
+Do not build a general-purpose rules engine.
+
+---
+
+## 15. Data Ownership Explorer
+
+Create a visual and structured experience explaining business data ownership across the four modules and the shared platform.
+
+Use the actual ownership definitions in the module models, Dependency Matrix, and Phase 2 Closure Review.
+
+Where supported, distinguish:
+
+- Shared identity.
+- Business role or contextual data.
+- Transaction ownership.
+- Authoritative quantity.
+- Accounting effect.
+- Commercial commitment.
+- Derived reporting information.
+
+The explorer must help readers answer:
+
+1. Which module owns a business record?
+2. Which modules consume or reference it?
+3. Which module may change its authoritative state?
+4. What cross-module interaction may occur?
+5. Which details remain unresolved?
+
+Use source-backed examples such as:
+
+- Purchase order.
+- Goods receipt.
+- Sales order.
+- Stock reservation.
+- Stock movement.
+- Financial posting.
+
+Do not transform conceptual ownership records into final database entity specifications.
+
+Do not invent persistence structures, APIs, event names, or technical messaging mechanisms.
+
+---
+
+## 16. Cross-Module Scenario Education
+
+Create educational visualizations explaining the six Core CIC scenarios identified in the approved source documents.
+
+For every scenario, distinguish:
+
+- Initiating business context.
+- Participating modules.
+- Owned records.
+- Conceptual integration boundary.
+- Required readiness.
+- Resulting business effect.
+- Unresolved details.
+
+Potential educational examples, subject to verification against the sources:
+
+- Inventory movement and financial effect.
+- Purchase order and physical receipt.
+- Supplier invoice and financial processing.
+- Sales order and inventory fulfillment.
+- Sales order and financial integration.
+- Sales-driven procurement or direct delivery.
+
+Use conceptual flow diagrams and responsibility lanes where useful.
+
+Do not present an illustrative sequence as an approved operational workflow.
+
+Do not invent state transitions, retry policies, event payloads, compensation rules, or accounting entries.
+
+Explain that detailed contract validation remains part of Phase 6.5.
+
+---
+
+## 17. Module Lifecycle Explorer
+
+Use the complete original `MODULE_LIFECYCLE_RULES.md`.
+
+Create a detailed educational experience for the module lifecycle.
+
+Cover the actual approved conceptual states:
+
+- Inactive.
+- Active.
+- Frozen.
+
+Verify their exact definitions and permitted transitions.
+
+Explain:
+
+- Entitlement versus functional state.
+- Activation preconditions.
+- Required platform capabilities.
+- Feature activation.
+- CIC readiness.
+- Deactivation preconditions.
+- Open work handling.
+- Freeze, not Delete.
+- Shared data safety.
+- Reactivation.
+- Historical record preservation.
+
+### Interactive illustration
+
+Provide a small lifecycle visualization showing only source-supported conceptual transitions.
+
+Where possible, allow readers to select an illustrative lifecycle scenario and understand its implications.
+
+Do not implement real module provisioning.
+
+Do not invent complete runtime state machines.
+
+Do not confuse module lifecycle with Tenant Lifecycle, which is a separate architectural subject.
+
+---
+
+## 18. Future Module Extension Governance
+
+Use the complete original `FUTURE_MODULE_EXTENSION_RULES.md`.
+
+Create an educational section explaining how Teranoo ERP can expand beyond its initial four modules without damaging the existing Business Core.
+
+Cover source-supported rules concerning:
+
+- New enterprise modules.
+- Industry extensions.
+- Dependency declaration.
+- Data ownership.
+- Core compatibility.
+- Conditional integrations.
+- Feature extensions.
+- Shared capability extraction.
+- Extension of existing contracts.
+- Impact assessment.
+- Matrix updates.
+- Prevention of accidental Core back-dependencies.
+
+Provide illustrative examples of how a future module might interact with the Core only when the example is clearly identified as educational or explicitly supported by the source.
+
+Do not invent approved architecture decisions for future modules.
+
+Do not determine their final implementation sequence.
+
+---
+
+## 19. Phase 2 Architectural Decisions
+
+The four Module Model documents contain approved decision identifiers such as:
+
+- D-FIN-*.
+- D-INV-*.
+- D-PROC-*.
+- D-SALES-*.
+
+These decisions require careful treatment because the centralized DECISION_REGISTER.md has its own explicit counting and authority rules.
+
+### Requirements
+
+Extract the actual decisions from their owning source documents.
+
+Preserve:
+
+- Original decision ID.
+- Original title.
+- Original approved wording.
+- Relevant rationale where explicitly available.
+- Scope.
+- Architectural impact.
+- Source section.
+- Related dependencies.
+- Deferred details.
+
+Do not fabricate missing decision IDs or rationale.
+
+Do not assign artificial D-* identifiers to governing documents.
+
+### Decision counting boundary
+
+The official centralized Decision Register contains 126 indexed architectural decisions in the current reference revision.
+
+Do not automatically add Phase 2 source-local decisions to that official counter.
+
+Maintain distinct metrics for:
+
+1. Official architectural decisions indexed in DECISION_REGISTER.md.
+2. Approved source-local architectural decisions discovered in owning documents.
+3. Decisions whose complete authoritative source is available locally.
+4. Governing artifacts without decision identifiers.
+5. The independent market decision D-MKT-01.
+
+Clearly explain these distinctions in the Decision Register experience.
+
+Do not present source-local Phase 2 decisions as newly approved project decisions.
+
+Use their actual historical approval evidence.
+
+---
+
+## 20. Phase 2 Assumption Safety Review
+
+Import the complete original `PHASE_2_ASSUMPTION_SAFETY_REVIEW.md`.
+
+Create an educational review experience explaining:
+
+- Why the review was required.
+- Which assumptions were examined.
+- What risks were identified.
+- Which guardrails were adopted.
+- Which issues were deferred.
+- What corrections were made, if documented.
+- How later phases were expected to preserve compatibility.
+
+Use the actual source-defined result:
+
+    PASS with Guardrails
+
+Verify the wording against the supplied document.
+
+Do not confuse the original project review with ChatGPT's independent advisory review notes.
+
+Keep them in distinct authority classifications.
+
+---
+
+## 21. Phase 2 Closure Review
+
+Import the complete original `PHASE_2_CLOSURE_REVIEW.md`.
+
+Create a detailed phase completion experience explaining:
+
+- Exit gate result.
+- Approved module models.
+- Dependency baseline.
+- Core ownership baseline.
+- Core CIC baseline.
+- Lifecycle baseline.
+- Future extension baseline.
+- Deferred architectural commitments.
+- Assumption Safety Review outcome.
+- Backward compatibility expectations.
+- Actual exit criteria.
+
+Use the source-defined result:
+
+    PASS — Phase 2 Closed
+
+Show the approved closure date from the source.
+
+Explain why deferred decisions did not necessarily block phase closure.
+
+Do not imply that Phase 2 closure means the four ERP modules have been implemented.
+
+Integrate this information into the existing roadmap's Phase 2 details.
+
+---
+
+## 22. Source-Backed Educational Depth
+
+This task must produce substantial educational knowledge.
+
+For each major architectural subject, explain:
+
+- What the concept means.
+- Why it matters when building an ERP.
+- What architectural problem it addresses.
+- What Teranoo adopted.
+- What it deliberately did not adopt.
+- What implications it has for future design.
+- What readers can learn from the approach.
+- Which questions remain unanswered.
+
+Preserve all official source terminology.
+
+Use references to exact source sections wherever possible.
+
+Keep explanatory material separate from original decision text.
+
+Do not write superficial one-paragraph summaries when the source supports deeper explanations.
+
+Do not fill gaps with generic ERP assumptions.
+
+Research reports will be imported in a separate task.
+
+Do not generate or fabricate missing research evidence.
+
+---
+
+## 23. Knowledge Library & Related Content
+
+Integrate BATCH-002 into the existing Knowledge Library.
+
+Allow readers to explore content by:
+
+- Business module.
+- Project phase.
+- Architectural topic.
+- Dependency classification.
+- Data ownership.
+- Lifecycle.
+- Integration scenario.
+- Review evidence.
+
+Preserve existing BATCH-001 records and routes.
+
+Create meaningful typed relationships among the new records and the previously imported Project Foundations documents.
+
+Examples include:
+
+- Module model → Dependency Model.
+- Module model → Dependency Matrix.
+- Dependency Matrix → related module models.
+- Lifecycle Rules → Dependency Model.
+- Future Extension Rules → Core module models.
+- Closure Review → all official Phase 2 deliverables.
+- Assumption Safety Review → relevant governing documents.
+
+Use actual stable Knowledge Hub content IDs.
+
+Do not create broken links to unimported research reports.
+
+Represent those relationships as deferred where necessary.
+
+---
+
+## 24. Search Integration
+
+Extend existing Global Search and section-specific search.
+
+Support search by:
+
+- Module name.
+- Architectural decision ID.
+- CIC identifier.
+- Dependency classification.
+- Architectural responsibility.
+- Source title.
+- Related project phase.
+- Lifecycle concept.
+- Ownership concept.
+
+Search results should navigate to the most specific available record or source section.
+
+For example:
+
+- D-FIN-01 → corresponding source-backed decision.
+- CIC-CORE-INV-FIN-001 → corresponding integration contract.
+- HBMD → relevant Dependency Model section.
+- Freeze, not Delete → relevant lifecycle section.
+
+Avoid generic destination pages when exact records exist.
+
+Do not introduce external search services or AI-based retrieval.
+
+---
+
+## 25. Dashboard and Existing Pages
+
+Update Dashboard metrics using actual imported content.
+
+Distinguish:
+
+- Official architectural decision inventory.
+- Source-local Phase 2 decisions.
+- Imported original documents.
+- Conceptual knowledge topics.
+- Published language variants.
+- Available authoritative decision sources.
+- Deferred research and functional documents.
+
+If all ten BATCH-002 documents are successfully imported, the total number of full original source documents from BATCH-001 and BATCH-002 should become 16.
+
+Derive the actual count from the source manifest and registry.
+
+Do not hardcode it.
+
+Update the Phase 2 roadmap detail to link to the newly available documents and review evidence.
+
+Update architectural and module navigation where necessary.
+
+Preserve unrelated project status values from the approved reference snapshot.
+
+Do not imply that BATCH-002 changes the underlying ERP project's official approval state.
+
+---
+
+## 26. Visual and Interaction Design
+
+Maintain the existing approved Design System.
+
+The new experiences should feel like an integrated architecture reference, not a collection of disconnected document pages.
+
+Prioritize:
+
+- Readable long-form documentation.
+- Professional diagrams.
+- Compact comparison matrices.
+- Clear relationship labels.
+- Accessible detail panels.
+- Consistent module navigation.
+- Contextual source references.
+- Intuitive interactive simulations.
+- Responsive layouts.
+- Arabic RTL and English LTR.
+- Light and dark theme consistency.
+
+Use SVG or reusable React visualization components where appropriate.
+
+Do not introduce a heavyweight diagramming library unless there is a justified need.
+
+All diagrams must remain legible and accessible.
+
+Do not use color alone to communicate dependency classification or status.
+
+Avoid overcrowded diagrams and excessive cards.
+
+---
+
+## 27. Maintainability and Source Revision Control
+
+Extend the established source ingestion workflow rather than creating a new architecture for every content batch.
+
+Where source records can be reliably extracted, use validated deterministic extraction.
+
+Where educational views require reviewed mappings:
+
+- Identify them as curated projections.
+- Associate them with exact source revisions.
+- Validate their required source relationships.
+- Document their maintenance process.
+- Prevent stale data from silently appearing as current.
+
+Keep original documents authoritative.
+
+Keep extracted metadata and educational interpretations distinguishable.
+
+Do not introduce a separate content database, graph database, or CMS.
+
+---
+
+## 28. Testing Requirements
+
+Preserve all existing tests.
+
+Add relevant automated tests covering:
+
+### Source ingestion
+
+- Verification of all supplied original documents.
+- Source hash mismatch.
+- Original body preservation.
+- Duplicate source mappings.
+- Publication authorization.
+- Source manifest accuracy.
+
+### Module architecture
+
+- Exactly four approved Core Business Modules in this source collection.
+- Stable module identifiers.
+- Correct source associations.
+- Actual source-local architectural decision extraction.
+- No invented decision identifiers.
+
+### Dependencies
+
+- PCD, HBMD, CIC, and FLD remain distinct.
+- Zero approved Core HBMD edges.
+- Zero HBMD cycles.
+- Actual six Core CIC records.
+- Dependency Matrix relationship integrity.
+- PCD exclusion from the business dependency graph.
+- Source-backed FLD classification.
+
+### Activation simulation
+
+- All 16 module activation selections.
+- Missing required platform capability behavior.
+- CIC-specific readiness.
+- FLD-specific availability.
+- Correct explanations.
+- No unsupported module-level dependency inference.
+
+### Lifecycle
+
+- Source-supported lifecycle states.
+- Correct distinction between entitlement and functional state.
+- Historical preservation.
+- No automatic conversion of freezing into deletion.
+
+### Decisions
+
+- Official architectural decision counter remains 126 for the reference revision.
+- Source-local Phase 2 decisions remain separately counted.
+- D-MKT-01 remains outside the architectural counter.
+- Governing artifact classification remains correct.
+- Actual source links resolve.
+
+### Regression
+
+- BATCH-001 content integrity.
+- Existing knowledge routes.
+- Existing global search.
+- Existing roadmap.
+- Existing FAC Explorer.
+- Existing Decision Register.
+- RTL/LTR.
+- Light/Dark.
+- Responsive behavior.
+- Standalone production document availability.
+
+Execute the complete verification command.
+
+Report actual results.
+
+Do not claim tests were executed when they were not.
+
+---
+
+## 29. Acceptance Criteria
+
+TASK-005 is complete only when:
+
+1. KH-024 and KH-025 are addressed.
+2. All supplied and authorized BATCH-002 documents are verified and ingested.
+3. Original source bodies are preserved.
+4. Four comprehensive module architecture experiences are available.
+5. All four dependency classifications are documented.
+6. The Dependency Matrix Explorer is functional.
+7. Approved HBMD absence is represented accurately.
+8. All six source-defined Core CICs are navigable.
+9. PCD and FLD remain semantically distinct.
+10. The activation simulator is educational, functional, and source-backed.
+11. Data ownership boundaries are explained.
+12. Cross-module scenarios are clearly distinguished from final functional workflows.
+13. Module Lifecycle documentation is available.
+14. Future module extension rules are documented.
+15. Actual Phase 2 source-local decisions are accessible.
+16. The official indexed decision count remains semantically correct.
+17. The Assumption Safety Review is available.
+18. The Phase 2 Closure Review is available.
+19. Roadmap links to actual Phase 2 evidence.
+20. Related knowledge navigation works.
+21. Search returns specific source-backed records.
+22. No functional blueprint or ERP implementation detail has been fabricated.
+23. Original documents and educational explanations remain distinguishable.
+24. Existing application functionality remains intact.
+25. Content integrity validation succeeds.
+26. Type checking succeeds.
+27. ESLint succeeds.
+28. Automated tests pass.
+29. Production build succeeds.
+30. Standalone production document availability is verified.
+
+---
+
+## 30. Technical Documentation
+
+Create:
+
+    docs/BATCH-002-INGESTION_REPORT.md
+    docs/CORE_MODULE_KNOWLEDGE_STRUCTURE.md
+    docs/DEPENDENCY_EXPLORER_SPECIFICATION.md
+    docs/TASK-005-COMPLETION_REPORT.md
+
+Update existing technical documentation where materially required.
+
+Preserve historical task completion reports.
+
+### Batch ingestion report
+
+For every source document, record:
+
+- Original source path.
+- Expected Git blob SHA.
+- Actual source verification result.
+- Original and stored content digests.
+- Canonical content ID.
+- Content classification.
+- Approval status.
+- Publication status.
+- Extracted records.
+- Source references.
+- Deferred relationships.
+- Known limitations.
+
+### Task completion report
+
+Include:
+
+A. Executive summary.
+
+B. KH-024 and KH-025 corrections.
+
+C. Imported official sources.
+
+D. Source verification results.
+
+E. Module knowledge experiences.
+
+F. Dependency Explorer.
+
+G. Activation Simulator.
+
+H. Ownership Explorer.
+
+I. CIC and FLD representations.
+
+J. Module lifecycle.
+
+K. Future module extension governance.
+
+L. Decision catalog changes and counting semantics.
+
+M. Phase 2 review evidence.
+
+N. Search and relationship integration.
+
+O. Dashboard and roadmap updates.
+
+P. Technical decisions.
+
+Q. Actual test and build results.
+
+R. Files created or modified.
+
+S. Deviations and limitations.
+
+T. Readiness for independent review.
+
+Generate numerical summaries from the actual verified records wherever possible.
+
+---
+
+## 31. Scope Restrictions
+
+Do not implement:
+
+- Operational ERP modules.
+- ERP database tables.
+- ERP transaction processing.
+- Unapproved business rules.
+- Full functional blueprints.
+- Actual procurement, inventory, finance, or sales screens.
+- Final API contracts.
+- Final event payloads.
+- Final inventory costing architecture.
+- Final pricing architecture.
+- A full workflow engine.
+- Research reports not supplied in this batch.
+- Phase 3 Platform & Tenancy documentation.
+- Internal Teranoo development system documentation.
+- External AI services.
+- A new content management architecture.
+
+Do not start BATCH-003.
+
+Do not start TASK-006.
+
+---
+
+## Final Instructions
+
+The Knowledge Hub must become a genuinely useful public reference for designing and building an enterprise ERP system.
+
+This task should teach readers how to establish core business module boundaries, preserve independent activation, classify dependencies, assign data ownership, coordinate integrations, and govern future module expansion.
+
+Do not merely import ten Markdown files and display a list of document titles.
+
+Deliver substantial, structured, navigable, source-backed knowledge.
+
+Preserve complete original evidence.
+
+Explain complex architectural concepts clearly.
+
+Use interactive visualization where it adds educational value.
+
+Distinguish approved architecture from illustrative examples and unresolved future design.
+
+Never fabricate ERP functionality or implementation evidence.
+
+Implement TASK-005, execute all required verification checks, document the actual results, and stop for independent review.

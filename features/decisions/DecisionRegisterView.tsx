@@ -17,6 +17,11 @@ import type {
   ExtractedDecisionRegister,
   IndexedArchitecturalDecision,
 } from '@/content/extractors/decisionRegisterExtractor';
+import type {
+  CoreModuleId,
+  Phase2SourceLocalDecision,
+} from '@/content/extractors/moduleModelsExtractor';
+import { resolveLocalizedText } from '@/content/models/types';
 import { getSnapshotProvenance } from '@/content/repositories/projectRepository';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -32,14 +37,45 @@ import { StatusIndicator } from '@/components/ui/StatusIndicator';
 import { Button } from '@/components/ui/Button';
 import { QueryParamSync } from '@/components/navigation/QueryParamSync';
 
+function renderInlineDecisionText(text: string): React.ReactNode {
+  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={idx} className="font-semibold text-text-primary">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return (
+        <code
+          key={idx}
+          className="rounded-xs bg-surface-secondary px-1 py-0.5 font-mono text-[11px] text-text-primary bidi-ltr"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
+  });
+}
+
 export interface DecisionRegisterViewProps {
   decisionRegisterSourceEntry?: SourceManifestEntry;
   extractedRegister: ExtractedDecisionRegister;
+  phase2Decisions?: readonly Phase2SourceLocalDecision[];
+  phase2CountsByModule?: Readonly<Record<CoreModuleId, number>>;
+  officialSourcesPublishedCount?: number;
+  officialSourcesTotalCount?: number;
 }
 
 export function DecisionRegisterView({
   decisionRegisterSourceEntry,
   extractedRegister,
+  phase2Decisions = [],
+  phase2CountsByModule,
+  officialSourcesPublishedCount = 16,
+  officialSourcesTotalCount = 16,
 }: DecisionRegisterViewProps) {
   const t = useTranslations();
   const { locale } = useAppLocale();
@@ -52,6 +88,10 @@ export function DecisionRegisterView({
   const [selectedDecisionId, setSelectedDecisionId] = useState<string | null>(
     null
   );
+  const [phase2Query, setPhase2Query] = useState('');
+  const [selectedPhase2Module, setSelectedPhase2Module] = useState<
+    'all' | CoreModuleId
+  >('all');
 
   const handleQueryParam = useCallback((param: string | null) => {
     if (!param) return;
@@ -114,6 +154,49 @@ export function DecisionRegisterView({
       ) ?? null
     );
   }, [allDecisions, selectedDecisionId]);
+
+  const selectedPhase2Decision: Phase2SourceLocalDecision | null = useMemo(() => {
+    if (!selectedDecisionId || selectedDecisionId === 'D-MKT-01') return null;
+    return (
+      phase2Decisions.find(
+        (d) => d.decisionId.toUpperCase() === selectedDecisionId.toUpperCase()
+      ) ?? null
+    );
+  }, [phase2Decisions, selectedDecisionId]);
+
+  const filteredPhase2Decisions = useMemo(() => {
+    const q = phase2Query.trim().toLowerCase();
+    return phase2Decisions.filter((d) => {
+      if (
+        selectedPhase2Module !== 'all' &&
+        d.owningModuleId !== selectedPhase2Module
+      ) {
+        return false;
+      }
+      if (q) {
+        const haystack = [
+          d.decisionId,
+          d.family,
+          d.title,
+          d.verbatimBody,
+          d.owningModuleLabel.ar,
+          d.owningModuleLabel.en,
+          d.owningDocumentPath,
+        ]
+          .join(' ')
+          .toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [phase2Decisions, phase2Query, selectedPhase2Module]);
+
+  const publishedArtifactsCount = useMemo(
+    () =>
+      extractedRegister.governingArtifacts.filter((g) => Boolean(g.importedSlug))
+        .length,
+    [extractedRegister.governingArtifacts]
+  );
 
   const isMarketHighlighted = selectedDecisionId === 'D-MKT-01';
   const hasFilters =
@@ -179,8 +262,8 @@ export function DecisionRegisterView({
         {t('foundations.decisions.indexNoticeBody')}
       </InformationCallout>
 
-      {/* Authoritative Metrics Strip (100% Derived from Extractor) */}
-      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+      {/* Authoritative Metrics Strip (5 Distinct Governance Counters — Strictly Never Conflated) */}
+      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
         <MetricCard
           label={t('foundations.decisions.sourceDeclaredLabel')}
           value={allDecisions.length}
@@ -193,10 +276,18 @@ export function DecisionRegisterView({
           className="bg-surface"
         />
         <MetricCard
-          label={t('foundations.decisions.locallyAvailableLabel')}
-          value={importedOwningCount}
-          suffix={`/ ${allDecisions.length}`}
-          note={t('foundations.decisions.locallyAvailableNote')}
+          label={
+            isAr
+              ? 'قرارات المرحلة 2 المحلية (منفصلة)'
+              : 'Phase 2 Source-Local Decisions'
+          }
+          value={phase2Decisions.length}
+          emphasis="primary"
+          note={
+            isAr
+              ? `FIN: ${phase2CountsByModule?.finance ?? 6} · INV: ${phase2CountsByModule?.['inventory-warehouse'] ?? 8} · PROC: ${phase2CountsByModule?.procurement ?? 9} · SALES: ${phase2CountsByModule?.['sales-order-management'] ?? 11} (خارج عدّاد 126)`
+              : `FIN: ${phase2CountsByModule?.finance ?? 6} · INV: ${phase2CountsByModule?.['inventory-warehouse'] ?? 8} · PROC: ${phase2CountsByModule?.procurement ?? 9} · SALES: ${phase2CountsByModule?.['sales-order-management'] ?? 11} (separate from 126)`
+          }
           className="bg-surface"
         />
         <MetricCard
@@ -212,15 +303,105 @@ export function DecisionRegisterView({
         />
         <MetricCard
           label={isAr ? 'الوثائق الحاكمة بدون D-*' : 'Governing Artifacts'}
-          value={extractedRegister.governingArtifacts.length}
+          value={publishedArtifactsCount}
+          suffix={`/ ${extractedRegister.governingArtifacts.length}`}
           note={
             isAr
-              ? `${extractedRegister.governingArtifacts.filter((g) => g.importedSlug).length} منشورة في BATCH-001 · ${extractedRegister.governingArtifacts.filter((g) => !g.importedSlug).length} بانتظار الدفعات اللاحقة`
-              : `${extractedRegister.governingArtifacts.filter((g) => g.importedSlug).length} published in BATCH-001 · ${extractedRegister.governingArtifacts.filter((g) => !g.importedSlug).length} awaiting later batches`
+              ? '2 في BATCH-001 + 4 في BATCH-002 · جميعها منشورة محليًا'
+              : '2 in BATCH-001 + 4 in BATCH-002 · All locally published'
+          }
+          className="bg-surface"
+        />
+        <MetricCard
+          label={t('foundations.decisions.locallyAvailableLabel')}
+          value={importedOwningCount}
+          suffix={`/ ${allDecisions.length}`}
+          note={
+            isAr
+              ? `${officialSourcesPublishedCount}/${officialSourcesTotalCount} مصدر رسمي منشور (BATCH-001+002) · الوثائق المالكة للمراحل 3–5 مجدولة لدفعات لاحقة`
+              : `${officialSourcesPublishedCount}/${officialSourcesTotalCount} official sources published (BATCH-001+002) · Phase 3–5 owning docs await later batches`
           }
           className="bg-surface"
         />
       </div>
+
+      {/* Selected Phase 2 Source-Local Decision Detail Card (when clicked or deep-linked via ?decision=D-FIN-01 etc.) */}
+      {selectedPhase2Decision ? (
+        <section
+          aria-label={
+            isAr
+              ? 'تفاصيل قرار محلي من المرحلة 2'
+              : 'Phase 2 Source-Local Decision Details'
+          }
+          className="rounded-lg border-2 border-primary/50 bg-surface p-4 sm:p-5 space-y-3"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <code className="rounded-sm bg-primary-subtle px-2 py-0.5 font-mono text-sm font-bold text-primary bidi-ltr">
+                  {selectedPhase2Decision.decisionId}
+                </code>
+                <span className="font-mono rounded-sm border border-border bg-surface-subtle px-1.5 py-0.5 text-[11px] text-text-secondary bidi-ltr">
+                  Phase 2 · Source-Local ({selectedPhase2Decision.family})
+                </span>
+                <span className="rounded-sm border border-info-border bg-info-bg px-1.5 py-0.5 text-[11px] font-medium text-info">
+                  {isAr
+                    ? 'خارج عدّاد الـ 126 المركزي'
+                    : 'Outside 126 centralized counter'}
+                </span>
+                <StatusIndicator status="approved" label={t('status.approved')} />
+              </div>
+              <h2 className="text-base font-semibold text-text-primary">
+                {selectedPhase2Decision.title}
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedDecisionId(null)}
+              aria-label={t('controls.close')}
+              className="rounded-md p-1.5 text-text-muted hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+
+          <p className="whitespace-pre-line rounded-md border border-border bg-surface-secondary/50 p-3.5 text-xs leading-relaxed text-text-primary">
+            {renderInlineDecisionText(selectedPhase2Decision.verbatimBody)}
+          </p>
+
+          <div className="flex flex-col gap-2 border-t border-border pt-3 text-xs sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-2 text-text-secondary">
+              <span>
+                {isAr ? 'النظام المالك:' : 'Owning Module:'}{' '}
+                <Link
+                  href={`/modules/${selectedPhase2Decision.owningModuleId}`}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  {resolveLocalizedText(
+                    selectedPhase2Decision.owningModuleLabel,
+                    locale
+                  )}
+                </Link>
+              </span>
+              <span aria-hidden="true">·</span>
+              <code className="font-mono text-[11px] bidi-ltr text-text-muted">
+                {selectedPhase2Decision.owningDocumentPath}
+              </code>
+            </div>
+            <Link
+              href={`/knowledge/${selectedPhase2Decision.owningDocumentSlug}#${selectedPhase2Decision.sectionAnchor}`}
+              className="inline-flex shrink-0 items-center gap-1 font-medium text-primary hover:underline"
+            >
+              <span>
+                {isAr
+                  ? 'فتح النص الحرفي في الوثيقة المالكة'
+                  : 'Open Verbatim Anchor in Owning Doc'}
+              </span>
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       {/* Selected Decision Detail Drawer/Panel (when clicked or deep-linked via ?decision=D-*) */}
       {selectedDecision ? (
@@ -351,7 +532,7 @@ export function DecisionRegisterView({
           </div>
           <div className="space-y-1">
             <p className="font-semibold text-text-muted">
-              {isAr ? 'الوثيقة المالكة (غير مستوردة في BATCH-001)' : 'Owning Source Document (Not Imported in BATCH-001)'}
+              {isAr ? 'الوثيقة المالكة (غير مستوردة بعد في BATCH-001 / BATCH-002)' : 'Owning Source Document (Not Yet Imported in BATCH-001 / BATCH-002)'}
             </p>
             <code className="block font-mono text-[11px] bidi-ltr break-all text-text-secondary">
               {extractedRegister.marketDecision.normalizedOfficialSourcePath}
@@ -531,7 +712,175 @@ export function DecisionRegisterView({
         )}
       </section>
 
-      {/* Governing Artifacts Without D-* IDs (6 Official Documents) */}
+      {/* Phase 2 Source-Local Core Module Decisions (34 Decisions — Strictly Separate from 126 Centralized Register) */}
+      {phase2Decisions.length > 0 ? (
+        <section
+          id="phase-2-module-decisions"
+          aria-label={
+            isAr
+              ? 'قرارات المرحلة 2 المحلية في وثائق الأنظمة الأساسية (34 قرارًا)'
+              : 'Phase 2 Source-Local Core Module Decisions (34 Decisions)'
+          }
+          className="space-y-4"
+        >
+          <SectionHeader
+            title={
+              isAr
+                ? `قرارات المرحلة 2 المحلية في نماذج الأنظمة الأساسية (${phase2Decisions.length} قرارًا — منفصلة عن عدّاد الـ 126)`
+                : `Phase 2 Source-Local Core Module Decisions (${phase2Decisions.length} Decisions — Separate from Centralized 126)`
+            }
+            subtitle={
+              isAr
+                ? 'مستخرجة حرفيًا من نماذج الأنظمة الأربعة المنشورة في BATCH-002 (D-FIN-01..06 · D-INV-01..08 · D-PROC-01..09 · D-SALES-01..11)؛ غير مضافة إلى عدّاد سجل القرارات المركزي (126) احترامًا لقواعد DECISION_REGISTER.md.'
+                : 'Extracted verbatim from the four published BATCH-002 Core Module Models (D-FIN-01..06 · D-INV-01..08 · D-PROC-01..09 · D-SALES-01..11); kept strictly outside the centralized 126 counter per DECISION_REGISTER.md.'
+            }
+          />
+
+          <div className="rounded-lg border border-border bg-surface p-3.5 space-y-3">
+            <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
+              <div className="flex-1 min-w-0">
+                <SearchInput
+                  value={phase2Query}
+                  onChange={setPhase2Query}
+                  placeholder={
+                    isAr
+                      ? 'ابحث في قرارات المرحلة 2 (مثل D-FIN-01 أو D-INV-03 أو D-PROC-05 أو D-SALES-06)...'
+                      : 'Search Phase 2 decisions (e.g. D-FIN-01, D-INV-03, D-PROC-05, D-SALES-06)...'
+                  }
+                  aria-label={
+                    isAr
+                      ? 'البحث في قرارات المرحلة 2 المحلية'
+                      : 'Search Phase 2 source-local decisions'
+                  }
+                  clearLabel={t('controls.clearSearch')}
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                {(
+                  [
+                    {
+                      id: 'all',
+                      label: isAr
+                        ? `الكل (${phase2Decisions.length})`
+                        : `All (${phase2Decisions.length})`,
+                    },
+                    {
+                      id: 'finance',
+                      label: `D-FIN (${phase2CountsByModule?.finance ?? 6})`,
+                    },
+                    {
+                      id: 'inventory-warehouse',
+                      label: `D-INV (${phase2CountsByModule?.['inventory-warehouse'] ?? 8})`,
+                    },
+                    {
+                      id: 'procurement',
+                      label: `D-PROC (${phase2CountsByModule?.procurement ?? 9})`,
+                    },
+                    {
+                      id: 'sales-order-management',
+                      label: `D-SALES (${phase2CountsByModule?.['sales-order-management'] ?? 11})`,
+                    },
+                  ] as const
+                ).map((btn) => (
+                  <button
+                    key={btn.id}
+                    type="button"
+                    onClick={() => setSelectedPhase2Module(btn.id)}
+                    aria-pressed={selectedPhase2Module === btn.id}
+                    className={`rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                      selectedPhase2Module === btn.id
+                        ? 'border-primary bg-primary-subtle text-primary'
+                        : 'border-border bg-surface-secondary text-text-secondary hover:border-border-strong'
+                    }`}
+                  >
+                    {btn.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+            <table className="w-full border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-border bg-surface-secondary text-text-primary">
+                  <th className="px-3.5 py-2.5 text-start font-semibold whitespace-nowrap">
+                    {isAr ? 'معرف القرار' : 'Decision ID'}
+                  </th>
+                  <th className="px-3.5 py-2.5 text-start font-semibold whitespace-nowrap">
+                    {isAr ? 'النظام المالك' : 'Owning Module'}
+                  </th>
+                  <th className="px-3.5 py-2.5 text-start font-semibold min-w-[260px]">
+                    {isAr ? 'عنوان القرار المعتمد' : 'Approved Decision Title'}
+                  </th>
+                  <th className="px-3.5 py-2.5 text-start font-semibold whitespace-nowrap">
+                    {isAr ? 'النص الحرفي والمصدر' : 'Verbatim Source'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filteredPhase2Decisions.map((dec) => {
+                  const isSelected =
+                    selectedDecisionId?.toUpperCase() ===
+                    dec.decisionId.toUpperCase();
+                  return (
+                    <tr
+                      key={dec.decisionId}
+                      onClick={() => setSelectedDecisionId(dec.decisionId)}
+                      className={`cursor-pointer transition-colors align-top ${
+                        isSelected
+                          ? 'bg-primary-subtle/50'
+                          : 'hover:bg-surface-hover/60'
+                      }`}
+                    >
+                      <td className="px-3.5 py-2.5 whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDecisionId(dec.decisionId);
+                          }}
+                          className="font-mono font-semibold text-primary hover:underline bidi-ltr cursor-pointer"
+                        >
+                          {dec.decisionId}
+                        </button>
+                      </td>
+                      <td className="px-3.5 py-2.5 whitespace-nowrap">
+                        <Link
+                          href={`/modules/${dec.owningModuleId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-medium text-text-primary hover:text-primary hover:underline"
+                        >
+                          {resolveLocalizedText(dec.owningModuleLabel, locale)}
+                        </Link>
+                      </td>
+                      <td className="px-3.5 py-2.5 text-text-primary leading-relaxed">
+                        <p className="font-medium">{dec.title}</p>
+                        <p className="mt-0.5 text-[11px] text-text-secondary line-clamp-2">
+                          {renderInlineDecisionText(dec.verbatimBody)}
+                        </p>
+                      </td>
+                      <td className="px-3.5 py-2.5 whitespace-nowrap">
+                        <Link
+                          href={`/knowledge/${dec.owningDocumentSlug}#${dec.sectionAnchor}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                        >
+                          <span>{isAr ? 'الوثيقة المالكة' : 'Owning Doc'}</span>
+                          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Governing Artifacts Without D-* IDs (6 Official Documents — All 6 Now Locally Published) */}
       <section
         aria-label={t('foundations.decisions.governingArtifactsTitle')}
         className="space-y-3"
@@ -540,8 +889,8 @@ export function DecisionRegisterView({
           title={t('foundations.decisions.governingArtifactsTitle')}
           subtitle={
             isAr
-              ? 'وثائق حاكمة معتمدة بدون معرفات D-* منفصلة وفق جدول DECISION_REGISTER.md.'
-              : 'Approved governing documents without individual D-* identifiers per DECISION_REGISTER.md.'
+              ? 'وثائق حاكمة معتمدة بدون معرفات D-* منفصلة وفق جدول DECISION_REGISTER.md — جميعها الـ 6 متاحة الآن محليًا (2 في BATCH-001 و4 في BATCH-002).'
+              : 'Approved governing documents without individual D-* identifiers per DECISION_REGISTER.md — all 6 are now locally published (2 in BATCH-001 and 4 in BATCH-002).'
           }
         />
         <div className="overflow-x-auto rounded-lg border border-border bg-surface">
@@ -560,39 +909,48 @@ export function DecisionRegisterView({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {extractedRegister.governingArtifacts.map((art) => (
-                <tr key={art.normalizedPath} className="align-top">
-                  <td className="px-3.5 py-2.5">
-                    {art.importedSlug ? (
-                      <Link
-                        href={`/knowledge/${art.importedSlug}`}
-                        className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-primary hover:underline bidi-ltr"
-                      >
-                        <span>{art.artifactPath}</span>
-                        <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                      </Link>
-                    ) : (
-                      <code className="font-mono text-[11px] text-text-secondary bidi-ltr">
-                        {art.artifactPath}
-                      </code>
-                    )}
-                  </td>
-                  <td className="px-3.5 py-2.5 text-text-secondary leading-relaxed">
-                    {art.role}
-                  </td>
-                  <td className="px-3.5 py-2.5 whitespace-nowrap">
-                    {art.importedSlug ? (
-                      <span className="rounded-sm border border-success-border bg-success-bg px-2 py-0.5 text-[11px] font-medium text-success">
-                        {isAr ? 'منشور في BATCH-001' : 'Published (BATCH-001)'}
-                      </span>
-                    ) : (
-                      <span className="rounded-sm border border-border bg-surface-subtle px-2 py-0.5 text-[11px] text-text-muted">
-                        {isAr ? 'دفعة مستقبلية' : 'Future batch'}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {extractedRegister.governingArtifacts.map((art) => {
+                const isBatch002 = art.normalizedPath.includes('/03-modules/');
+                return (
+                  <tr key={art.normalizedPath} className="align-top">
+                    <td className="px-3.5 py-2.5">
+                      {art.importedSlug ? (
+                        <Link
+                          href={`/knowledge/${art.importedSlug}`}
+                          className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-primary hover:underline bidi-ltr"
+                        >
+                          <span>{art.artifactPath}</span>
+                          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Link>
+                      ) : (
+                        <code className="font-mono text-[11px] text-text-secondary bidi-ltr">
+                          {art.artifactPath}
+                        </code>
+                      )}
+                    </td>
+                    <td className="px-3.5 py-2.5 text-text-secondary leading-relaxed">
+                      {art.role}
+                    </td>
+                    <td className="px-3.5 py-2.5 whitespace-nowrap">
+                      {art.importedSlug ? (
+                        <span className="rounded-sm border border-success-border bg-success-bg px-2 py-0.5 text-[11px] font-medium text-success">
+                          {isBatch002
+                            ? isAr
+                              ? 'منشور في BATCH-002'
+                              : 'Published (BATCH-002)'
+                            : isAr
+                              ? 'منشور في BATCH-001'
+                              : 'Published (BATCH-001)'}
+                        </span>
+                      ) : (
+                        <span className="rounded-sm border border-border bg-surface-subtle px-2 py-0.5 text-[11px] text-text-muted">
+                          {isAr ? 'دفعة مستقبلية' : 'Future batch'}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

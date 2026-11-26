@@ -1,7 +1,7 @@
 # Teranoo ERP Knowledge Hub
 
 **Subtitle:** The Complete Journey of Building an Enterprise ERP System (`الرحلة الكاملة لبناء نظام ERP مؤسسي`)  
-**Current Scope:** TASK-004 — Official Knowledge Population (`BATCH-001 — Project Foundations`, 6/6 verified official files published) building upon approved TASK-001, TASK-001-FIX-01, TASK-002, and TASK-003
+**Current Scope:** TASK-005 — Core Module Architecture & Dependencies (`BATCH-002 — Business Core Architecture`, `16/16` verified official files published across BATCH-001 + BATCH-002) building upon approved TASK-001, TASK-001-FIX-01, TASK-002, TASK-003, and TASK-004
 
 Teranoo ERP Knowledge Hub is a dedicated enterprise documentation, encyclopedia, engineering guide, living architecture, research library, and build-in-public knowledge platform for the **Teranoo ERP** product. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.
 
@@ -73,18 +73,19 @@ content/
   taxonomy/           # Controlled taxonomy (8 classifications, 35 types, 15 relationships, 5 discovery dimensions)
   models/             # Strict TypeScript domain & knowledge record contracts
   schemas/            # Zod frontmatter schema & URL protocol validators
-  manifest/           # Validated Official Source Manifest & readiness reporting (6/6 BATCH-001 published)
+  manifest/           # Validated Official Source Manifest & readiness reporting (16/16 BATCH-001 + BATCH-002 published)
   ingestion/          # Deterministic verbatim official Markdown envelope generator, Git blob SHA-1 & SHA-256
-  extractors/         # Pure deterministic extractors (126 Decisions + D-MKT-01, 24 FACs, 8 Guardrails, 14 Roadmap stages)
+  extractors/         # Pure deterministic extractors (126 Decisions + D-MKT-01, 34 Phase 2 decisions, 4 Core Modules, 6 CICs, 5 FLDs, 21 PCDs, 15 Ownership, 24 FACs, 8 Guardrails, 14 Roadmap stages)
+  simulators/         # Pure deterministic 16-combination Core Module Activation & PCD Simulator (illustrative educational)
   loaders/            # Two-pass YAML-only loader, safe relative link/image resolver & sanitized Markdown pipeline
   validators/         # Build-enforced integrity validator & CLI (`npm run content:validate`)
   registry/           # Fail-loud Content Registry enforcing the Publication Boundary & derived metrics
-  search/             # Unified deterministic search (published records, 126 decisions, 24 FACs, 14 roadmap stages, 8 guardrails)
+  search/             # Unified deterministic search (20 published records, 126 + 34 decisions, 4 modules, 6 CICs, 5 FLDs, 4 dependency types, 15 ownership objects, 24 FACs, 14 roadmap stages, 8 + 7 guardrails)
   renderers/          # Extensible specialized viewer descriptor registry
-  seed/               # Authorized BATCH-001 reference snapshot & preserved historical 2026-11-25 snapshot
+  seed/               # Authorized BATCH-001/002 reference snapshot & preserved historical 2026-11-25 snapshot
   repositories/       # Derived-metrics queries, runtime-capability selectors, and unit tests
-scripts/              # Repeatable BATCH-001 official source ingestion generator (`scripts/ingest-batch-001.ts`)
-features/             # Feature-oriented views (dashboard, knowledge, product-vision, roadmap, decisions, ...)
+scripts/              # Repeatable official source ingestion generators (`ingest-batch-001.ts`, `ingest-batch-002.ts`)
+features/             # Feature-oriented views (dashboard, knowledge, product-vision, roadmap, modules, dependencies, decisions, ...)
 i18n/                 # Locale configuration & ar/en translation dictionaries (100% key parity tested)
 lib/                  # Shared utilities (cn helper, pure modal focusTrap helper + unit tests)
 providers/            # AppProviders (next-themes, next-intl LocaleProvider, SidebarProvider)
@@ -117,6 +118,10 @@ docs/                 # Vision, architecture, ingestion, manifest, schema, autho
 - [`docs/TASK-003-COMPLETION_REPORT.md`](docs/TASK-003-COMPLETION_REPORT.md)
 - [`docs/BATCH-001-INGESTION_REPORT.md`](docs/BATCH-001-INGESTION_REPORT.md)
 - [`docs/TASK-004-COMPLETION_REPORT.md`](docs/TASK-004-COMPLETION_REPORT.md)
+- [`docs/BATCH-002-INGESTION_REPORT.md`](docs/BATCH-002-INGESTION_REPORT.md)
+- [`docs/CORE_MODULE_KNOWLEDGE_STRUCTURE.md`](docs/CORE_MODULE_KNOWLEDGE_STRUCTURE.md)
+- [`docs/DEPENDENCY_EXPLORER_SPECIFICATION.md`](docs/DEPENDENCY_EXPLORER_SPECIFICATION.md)
+- [`docs/TASK-005-COMPLETION_REPORT.md`](docs/TASK-005-COMPLETION_REPORT.md)
 
 ---
 

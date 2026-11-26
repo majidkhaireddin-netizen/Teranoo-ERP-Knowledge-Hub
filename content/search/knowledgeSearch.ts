@@ -9,6 +9,8 @@ import type { ExtractedDecisionRegister } from '@/content/extractors/decisionReg
 import type { ExtractedFacRegister } from '@/content/extractors/facRegisterExtractor';
 import type { ExtractedGuardrailsDocument } from '@/content/extractors/guardrailsExtractor';
 import type { ExtractedRoadmap } from '@/content/extractors/roadmapExtractor';
+import type { ExtractedCoreModulesCatalog } from '@/content/extractors/moduleModelsExtractor';
+import type { ExtractedDependencyArchitecture } from '@/content/extractors/dependencyArchitectureExtractor';
 import { PROJECT_REFERENCE_SNAPSHOT } from '@/content/seed/projectSnapshot';
 import { buildSearchIndex } from '@/content/repositories/projectRepository';
 import {
@@ -26,7 +28,11 @@ export type KnowledgeSearchCategory =
   | 'document'
   | 'fac'
   | 'phase'
-  | 'guardrail';
+  | 'guardrail'
+  | 'contract'
+  | 'dependency'
+  | 'lifecycle'
+  | 'ownership';
 
 export interface KnowledgeSearchEntry {
   readonly id: string;
@@ -45,6 +51,8 @@ export interface UnifiedSearchStructuredSources {
   readonly facRegister?: ExtractedFacRegister;
   readonly guardrails?: ExtractedGuardrailsDocument;
   readonly roadmap?: ExtractedRoadmap;
+  readonly coreModulesCatalog?: ExtractedCoreModulesCatalog;
+  readonly dependencyArchitecture?: ExtractedDependencyArchitecture;
 }
 
 export function knowledgeRecordToSearchEntry(
@@ -169,6 +177,232 @@ function buildDecisionEntries(
   return [marketEntry, ...archEntries];
 }
 
+function buildPhase2ModuleEntries(
+  catalog: ExtractedCoreModulesCatalog
+): readonly KnowledgeSearchEntry[] {
+  const moduleEntries: KnowledgeSearchEntry[] = catalog.modules.map((mod) => ({
+    id: `core-mod-${mod.id}`,
+    href: `/modules/${mod.id}`,
+    title: mod.name,
+    subtitle: {
+      ar: `${mod.code} · ${mod.decisions.length} قرار مرحلة 2 · 0 HBMD · ${mod.relatedCicIds.length} عقود CIC`,
+      en: `${mod.code} · ${mod.decisions.length} Phase 2 decisions · 0 HBMD · ${mod.relatedCicIds.length} Core CICs`,
+    },
+    category: 'module',
+    classification: 'official',
+    code: mod.code,
+    searchTokens: [
+      mod.id,
+      mod.code,
+      mod.shortName.ar,
+      mod.shortName.en,
+      mod.officialSourcePath,
+      mod.identitySummary.ar,
+      mod.identitySummary.en,
+      ...mod.relatedCicIds,
+      ...mod.relatedFldLabels,
+      ...mod.decisions.map((d) => d.decisionId),
+    ],
+  }));
+
+  const phase2DecisionEntries: KnowledgeSearchEntry[] =
+    catalog.allPhase2Decisions.map((dec) => ({
+      id: `p2-dec-${dec.decisionId}`,
+      href: `/decisions?decision=${encodeURIComponent(dec.decisionId)}`,
+      title: {
+        ar: dec.title,
+        en: dec.title,
+      },
+      subtitle: {
+        ar: `المرحلة 2 (محلي في ${dec.owningModuleLabel.ar}) · خارج عدّاد 126`,
+        en: `Phase 2 (Source-local in ${dec.owningModuleLabel.en}) · Outside 126 counter`,
+      },
+      category: 'decision',
+      classification: 'approved-decision',
+      code: dec.decisionId,
+      searchTokens: [
+        dec.decisionId,
+        dec.family,
+        'phase-2',
+        'source-local',
+        dec.owningModuleId,
+        dec.owningModuleLabel.ar,
+        dec.owningModuleLabel.en,
+        dec.owningDocumentPath,
+        dec.verbatimBody,
+      ],
+    }));
+
+  return [...phase2DecisionEntries, ...moduleEntries];
+}
+
+function buildDependencyArchitectureEntries(
+  arch: ExtractedDependencyArchitecture
+): readonly KnowledgeSearchEntry[] {
+  const typeEntries: KnowledgeSearchEntry[] =
+    arch.dependencyModel.officialTypes.map((dt) => ({
+      id: `dep-type-${dt.code}`,
+      href: `/dependencies?tab=model&type=${encodeURIComponent(dt.code)}`,
+      title: {
+        ar: `${dt.code} — ${dt.name}`,
+        en: `${dt.code} — ${dt.name}`,
+      },
+      subtitle: {
+        ar: dt.purpose,
+        en: dt.purpose,
+      },
+      category: 'dependency',
+      classification: 'official',
+      code: dt.code,
+      searchTokens: [
+        dt.code,
+        dt.name,
+        dt.purpose,
+        dt.blocksModuleActivation,
+        'dependency model',
+        'نموذج الاعتماديات',
+      ],
+    }));
+
+  const cicEntries: KnowledgeSearchEntry[] = arch.matrix.coreCics.map((cic) => ({
+    id: `cic-${cic.contractId}`,
+    href: `/dependencies?tab=matrix&cic=${encodeURIComponent(cic.contractId)}`,
+    title: {
+      ar: `${cic.sourceInitiator} → ${cic.target}: ${cic.businessScenario}`,
+      en: `${cic.sourceInitiator} → ${cic.target}: ${cic.businessScenario}`,
+    },
+    subtitle: {
+      ar: `عقد تكامل مشروط (v0.1-conceptual) · ${cic.evidence}`,
+      en: `Core CIC Contract (v0.1-conceptual) · ${cic.evidence}`,
+    },
+    category: 'contract',
+    classification: 'official',
+    code: cic.contractId,
+    searchTokens: [
+      cic.contractId,
+      'CIC',
+      cic.sourceInitiator,
+      cic.target,
+      cic.businessScenario,
+      cic.evidence,
+      cic.metadata.participatingModules,
+      cic.metadata.businessObjectRefs,
+      cic.metadata.expectedOutcome,
+    ],
+  }));
+
+  const fldEntries: KnowledgeSearchEntry[] = arch.matrix.coreFlds.map((fld) => ({
+    id: `fld-${fld.id}`,
+    href: '/dependencies?tab=matrix#fld-register',
+    title: {
+      ar: `${fld.sourceModuleFeature} → ${fld.targetModuleCapability}`,
+      en: `${fld.sourceModuleFeature} → ${fld.targetModuleCapability}`,
+    },
+    subtitle: {
+      ar: `اعتمادية مستوى الميزة (FLD) · ${fld.featureScenario}`,
+      en: `Feature-Level Dependency (FLD) · ${fld.featureScenario}`,
+    },
+    category: 'dependency',
+    classification: 'official',
+    code: 'FLD',
+    searchTokens: [
+      'FLD',
+      fld.sourceModuleFeature,
+      fld.targetModuleCapability,
+      fld.featureScenario,
+      fld.featureOwner,
+      fld.evidence,
+    ],
+  }));
+
+  const lifecycleEntries: KnowledgeSearchEntry[] = [
+    {
+      id: 'lifecycle-freeze-not-delete',
+      href: '/dependencies?tab=lifecycle',
+      title: {
+        ar: 'Freeze, not Delete — التجميد لا الحذف ودورة حياة الأنظمة',
+        en: 'Freeze, not Delete — Module Lifecycle States (Inactive / Active / Frozen)',
+      },
+      subtitle: {
+        ar: 'حفظ التاريخ والأرصدة والبيانات المشتركة عند إيقاف أي نظام فرعي دون حذف البيانات',
+        en: 'Preserves operational history, balances, and shared master data when deactivating a module',
+      },
+      category: 'lifecycle',
+      classification: 'official',
+      code: 'LIFECYCLE',
+      searchTokens: [
+        'Freeze, not Delete',
+        'Freeze not Delete',
+        'التجميد لا الحذف',
+        'Inactive',
+        'Active',
+        'Frozen',
+        'Entitlement',
+        'MODULE_LIFECYCLE_RULES',
+        'دورة حياة الأنظمة',
+      ],
+    },
+  ];
+
+  const ownershipEntries: KnowledgeSearchEntry[] =
+    arch.matrix.dataOwnershipRecords.map((rec) => ({
+      id: `own-${rec.id}`,
+      href: '/dependencies?tab=ownership',
+      title: {
+        ar: `${rec.businessObject} — المالك: ${rec.ownerAtPhase2}`,
+        en: `${rec.businessObject} — Owner: ${rec.ownerAtPhase2}`,
+      },
+      subtitle: {
+        ar: `المستهلكون: ${rec.consumers}`,
+        en: `Consumers: ${rec.consumers}`,
+      },
+      category: 'ownership',
+      classification: 'official',
+      code: rec.isDeferredBoundary ? 'DEFERRED-OWNER' : 'DATA-OWNER',
+      searchTokens: [
+        rec.businessObject,
+        rec.ownerAtPhase2,
+        rec.consumers,
+        rec.dependencyNote,
+        'Data Ownership',
+        'ملكية البيانات',
+      ],
+    }));
+
+  const phase2GuardrailEntries: KnowledgeSearchEntry[] =
+    arch.phase2Reviews.assumptionSafety.guardrails.map((gr) => ({
+      id: `p2-gr-${gr.code}`,
+      href: '/dependencies?tab=reviews',
+      title: {
+        ar: `${gr.code} — ${gr.title}`,
+        en: `${gr.code} — ${gr.title}`,
+      },
+      subtitle: {
+        ar: 'ضابط سلامة افتراضات ملزم للمرحلة 3 وما بعدها (PHASE_2_ASSUMPTION_SAFETY_REVIEW.md)',
+        en: 'Binding Phase 2 Assumption Safety Guardrail for Phase 3+ (PHASE_2_ASSUMPTION_SAFETY_REVIEW.md)',
+      },
+      category: 'guardrail',
+      classification: 'official',
+      code: gr.code,
+      searchTokens: [
+        gr.code,
+        gr.title,
+        'G-ASSUMP',
+        'Assumption Safety Review',
+        'Phase 2 Closure',
+      ],
+    }));
+
+  return [
+    ...typeEntries,
+    ...cicEntries,
+    ...fldEntries,
+    ...lifecycleEntries,
+    ...phase2GuardrailEntries,
+    ...ownershipEntries,
+  ];
+}
+
 function buildFacEntries(
   facRegister: ExtractedFacRegister
 ): readonly KnowledgeSearchEntry[] {
@@ -249,7 +483,10 @@ function buildGuardrailEntries(
 /**
  * Combines published Content Registry metadata, TASK-004 extracted official
  * structured records (126 decisions + D-MKT-01, 24 FACs, 14 roadmap stages,
- * 8 Cross-Phase Product Guardrails), and base navigation/snapshot items.
+ * 8 Cross-Phase Product Guardrails), TASK-005 BATCH-002 Core Modules &
+ * Dependency Architecture records (4 modules, 34 Phase 2 decisions, 6 CICs,
+ * 5 FLDs, 4 Dependency Types, Lifecycle governance, 15 Ownership records,
+ * 7 G-ASSUMP guardrails), and base navigation/snapshot items.
  *
  * Only explicitly published, non-fixture records should ever be passed into
  * publishedRecords. Active full official documents rank ahead of superseded
@@ -278,6 +515,12 @@ export function buildUnifiedSearchIndex(
   const decisionEntries = structured?.decisionRegister
     ? buildDecisionEntries(structured.decisionRegister)
     : [];
+  const phase2ModuleEntries = structured?.coreModulesCatalog
+    ? buildPhase2ModuleEntries(structured.coreModulesCatalog)
+    : [];
+  const dependencyEntries = structured?.dependencyArchitecture
+    ? buildDependencyArchitectureEntries(structured.dependencyArchitecture)
+    : [];
   const facEntries = structured?.facRegister
     ? buildFacEntries(structured.facRegister)
     : [];
@@ -288,20 +531,25 @@ export function buildUnifiedSearchIndex(
     ? buildGuardrailEntries(structured.guardrails)
     : [];
 
-  // When extracted decisions are indexed, re-tag base snapshot capability items
-  // as 'capability' (linked to /platform) so searching D-PLAT-* resolves directly
-  // to the authoritative /decisions?decision=D-PLAT-* entry first.
-  const baseEntries = buildSearchIndex(snapshot).map((item) => {
-    const entry = baseItemToSearchEntry(item);
-    if (structured?.decisionRegister && item.id.startsWith('cap-')) {
-      return { ...entry, category: 'capability' as const };
-    }
-    return entry;
-  });
+  // When extracted decisions or core modules are indexed, avoid duplicate coarse
+  // snapshot module rows overriding deep-linked /modules/[id] entries.
+  const baseEntries = buildSearchIndex(snapshot)
+    .filter((item) =>
+      structured?.coreModulesCatalog ? !item.id.startsWith('mod-') : true
+    )
+    .map((item) => {
+      const entry = baseItemToSearchEntry(item);
+      if (structured?.decisionRegister && item.id.startsWith('cap-')) {
+        return { ...entry, category: 'capability' as const };
+      }
+      return entry;
+    });
 
   return [
     ...activeDocuments,
     ...decisionEntries,
+    ...phase2ModuleEntries,
+    ...dependencyEntries,
     ...facEntries,
     ...roadmapEntries,
     ...guardrailEntries,
@@ -342,9 +590,9 @@ export function searchUnifiedKnowledge(
 
     let score = 10;
     if (codeLower === normalized) {
-      score = 100;
+      score = item.category === 'document' ? 100 : 110;
     } else if (codeLower && codeLower.startsWith(normalized)) {
-      score = 80;
+      score = item.category === 'document' ? 80 : 85;
     } else if (titleAr.includes(normalized) || titleEn.includes(normalized)) {
       score = 60;
     } else if (item.category === 'document') {

@@ -280,16 +280,28 @@ test('decisionRegisterExtractor extracts all 126 D-* decisions, exact phase/fami
   assert.equal(register.marketDecision.outsideArchitecturalCounter, true);
   assert.equal(register.marketDecision.authoritativeSourceImported, false);
 
-  // Governing artifacts: 2 published in BATCH-001, 4 Phase 2 docs awaiting later batch
+  // Governing artifacts: all 6 published across BATCH-001 (2) + BATCH-002 (4)
   assert.equal(register.governingArtifacts.length, 6);
   const publishedGoverning = register.governingArtifacts.filter(
     (g) => g.importedSlug !== null
   );
-  assert.equal(publishedGoverning.length, 2);
+  assert.equal(publishedGoverning.length, 6);
   assert.ok(publishedGoverning.some((g) => g.importedSlug === 'project-vision'));
   assert.ok(
     publishedGoverning.some(
       (g) => g.importedSlug === 'cross-phase-product-guardrails'
+    )
+  );
+  assert.ok(publishedGoverning.some((g) => g.importedSlug === 'dependency-model'));
+  assert.ok(
+    publishedGoverning.some((g) => g.importedSlug === 'module-dependency-matrix')
+  );
+  assert.ok(
+    publishedGoverning.some((g) => g.importedSlug === 'module-lifecycle-rules')
+  );
+  assert.ok(
+    publishedGoverning.some(
+      (g) => g.importedSlug === 'future-module-extension-rules'
     )
   );
 });

@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
 import {
-  PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
+  OFFICIAL_SOURCE_MANIFEST,
   deriveSourceManifestSummary,
 } from '@/content/manifest/sourceManifest';
 import { getExtractedDecisionRegister } from '@/content/extractors/decisionRegisterExtractor';
 import { getExtractedFacRegister } from '@/content/extractors/facRegisterExtractor';
 import { getExtractedRoadmap } from '@/content/extractors/roadmapExtractor';
+import { getExtractedCoreModulesCatalog } from '@/content/extractors/moduleModelsExtractor';
+import { getExtractedDependencyArchitecture } from '@/content/extractors/dependencyArchitectureExtractor';
 import { DashboardView } from '@/features/dashboard/DashboardView';
 
 export const metadata: Metadata = {
@@ -15,12 +17,12 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   const registryStats = getContentRegistry().getStats();
-  const manifestSummary = deriveSourceManifestSummary(
-    PROJECT_FOUNDATIONS_SOURCE_MANIFEST
-  );
+  const manifestSummary = deriveSourceManifestSummary(OFFICIAL_SOURCE_MANIFEST);
   const decisionRegister = getExtractedDecisionRegister();
   const facRegister = getExtractedFacRegister();
   const roadmap = getExtractedRoadmap();
+  const coreModules = getExtractedCoreModulesCatalog();
+  const dependencyArch = getExtractedDependencyArchitecture();
 
   const importedOwningDecisionDocsCount =
     decisionRegister.architecturalDecisions.filter(
@@ -35,6 +37,8 @@ export default function DashboardPage() {
         indexedArchitecturalDecisionsCount:
           decisionRegister.architecturalDecisions.length,
         importedOwningDecisionDocsCount,
+        phase2SourceLocalDecisionsCount: coreModules.totalPhase2DecisionsCount,
+        coreCicsCount: dependencyArch.matrix.coreCics.length,
         facRecordsCount: facRegister.records.length,
         completedOfficialPhasesCount: roadmap.completedPhasesCount,
         totalOfficialPhasesCount: roadmap.totalOfficialPhasesCount,

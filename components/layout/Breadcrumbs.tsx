@@ -19,9 +19,29 @@ export function Breadcrumbs() {
     ? decodeURIComponent(normalizedPath.slice('/knowledge/'.length))
     : null;
 
+  const isCoreModuleRoute = normalizedPath.startsWith('/modules/');
+  const coreModuleId = isCoreModuleRoute
+    ? decodeURIComponent(normalizedPath.slice('/modules/'.length))
+    : null;
+
+  const coreModuleLabelMap: Record<string, { ar: string; en: string }> = {
+    finance: { ar: 'المالية والمحاسبة', en: 'Finance' },
+    'inventory-warehouse': { ar: 'المخزون والمستودعات', en: 'Inventory & Warehouse' },
+    procurement: { ar: 'المشتريات', en: 'Procurement' },
+    'sales-order-management': { ar: 'المبيعات وإدارة الطلبات', en: 'Sales & Order Management' },
+  };
+  const resolvedCoreModuleLabel =
+    coreModuleId && coreModuleLabelMap[coreModuleId]
+      ? direction === 'rtl'
+        ? coreModuleLabelMap[coreModuleId].ar
+        : coreModuleLabelMap[coreModuleId].en
+      : coreModuleId;
+
   const currentItem = isKnowledgeDocumentRoute
     ? findNavItemByPath('/knowledge')
-    : findNavItemByPath(normalizedPath);
+    : isCoreModuleRoute
+      ? findNavItemByPath('/modules')
+      : findNavItemByPath(normalizedPath);
   const currentGroup = currentItem
     ? findNavGroupById(currentItem.groupId)
     : undefined;
@@ -70,6 +90,25 @@ export function Breadcrumbs() {
                 className="font-mono text-xs font-medium text-text-primary truncate min-w-0 bidi-ltr"
               >
                 {knowledgeSlug}
+              </span>
+            </>
+          ) : isCoreModuleRoute && resolvedCoreModuleLabel ? (
+            <>
+              <Link
+                href="/modules"
+                className="hidden sm:inline text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap shrink-0"
+              >
+                {t(currentItem.labelKey)}
+              </Link>
+              <Separator
+                className="hidden sm:inline h-3.5 w-3.5 text-text-muted shrink-0"
+                aria-hidden="true"
+              />
+              <span
+                aria-current="page"
+                className="font-medium text-text-primary truncate min-w-0"
+              >
+                {resolvedCoreModuleLabel}
               </span>
             </>
           ) : (

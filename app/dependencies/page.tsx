@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
-import { DependenciesView } from '@/features/architecture/PlannedArchitectureViews';
+import { getExtractedDependencyArchitecture } from '@/content/extractors/dependencyArchitectureExtractor';
+import { DependenciesArchitectureView } from '@/features/dependencies/DependenciesArchitectureView';
 
 export const metadata: Metadata = {
-  title: 'Dependencies & Integration',
+  title: 'Dependencies & Integration Architecture',
 };
 
 export default function DependenciesPage() {
-  return <DependenciesView />;
+  const architecture = getExtractedDependencyArchitecture();
+  return <DependenciesArchitectureView architecture={architecture} />;
 }

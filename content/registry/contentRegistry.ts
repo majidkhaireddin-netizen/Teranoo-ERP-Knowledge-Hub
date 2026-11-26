@@ -27,7 +27,7 @@ import {
   validateLoadedEntries,
   type ValidationDiagnostic,
 } from '@/content/validators/contentValidator';
-import { PROJECT_FOUNDATIONS_SOURCE_MANIFEST } from '@/content/manifest/sourceManifest';
+import { OFFICIAL_SOURCE_MANIFEST } from '@/content/manifest/sourceManifest';
 
 export interface KnowledgeFilterCriteria {
   readonly query?: string;
@@ -510,7 +510,7 @@ export function getContentRegistry(
   const validation = validateLoadedEntries(entries, {
     manifestEntries:
       collectionsRoot === CONTENT_COLLECTIONS_ROOT
-        ? PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+        ? OFFICIAL_SOURCE_MANIFEST
         : undefined,
   });
 

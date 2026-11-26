@@ -105,9 +105,9 @@ test('approved local collections load cleanly and pass full integrity validation
   const report = validateApprovedCollections();
   assert.equal(report.ok, true);
   assert.equal(report.errors.length, 0);
-  assert.equal(report.totalFilesScanned, 10);
-  assert.equal(report.validRecordsCount, 10);
-  assert.equal(report.publishedRecordsCount, 10);
+  assert.equal(report.totalFilesScanned, 20);
+  assert.equal(report.validRecordsCount, 20);
+  assert.equal(report.publishedRecordsCount, 20);
   // Explicit deferred reference to DECISION_GATE_A_PRIMARY_LAUNCH_MARKET.md produces non-blocking warning
   assert.ok(report.warnings.some((w) => w.code === 'DEFERRED_REFERENCE'));
 });
@@ -289,8 +289,8 @@ test('publication boundary excludes unpublished drafts, approved-but-unauthorize
   resetContentRegistryCache();
   const prodRegistry = getContentRegistry();
 
-  // Production registry contains only the 10 authorized records, zero fixtures
-  assert.equal(prodRegistry.getStats().totalPublished, 10);
+  // Production registry contains only the 20 authorized records (BATCH-001 + BATCH-002 + foundational), zero fixtures
+  assert.equal(prodRegistry.getStats().totalPublished, 20);
   assert.equal(prodRegistry.getBySlug('unpublished-draft'), null);
   assert.equal(prodRegistry.getBySlug('unauthorized-approved-record'), null);
   assert.equal(prodRegistry.getBySlug('fixture-research-sample'), null);

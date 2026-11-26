@@ -42,7 +42,7 @@ In addition, `createContentRegistry()` and `getContentRegistry()` enforce fatal 
 - `DEFERRED_REFERENCE`: Explicitly declared frontmatter `deferredRef` pointing to a real artifact scheduled for a future ingestion task (for example, `DECISION_GATE_A_PRIMARY_LAUNCH_MARKET.md`).
 - `DEFERRED_MARKDOWN_LINK`: Relative Markdown link inside a document body pointing to an unimported official source file (safely neutralized into `.kh-deferred-link`).
 - `DEFERRED_MARKDOWN_ASSET`: Relative image path inside a document body pointing to an unimported source image (safely neutralized into `.kh-deferred-asset`).
-- `SOURCE_AWAITING_DELIVERY`: Official source file registered in `PROJECT_FOUNDATIONS_SOURCE_MANIFEST` whose full body has not yet been delivered.
+- `SOURCE_AWAITING_DELIVERY`: Official source file registered in `OFFICIAL_SOURCE_MANIFEST` (`16/16` currently published across BATCH-001 and BATCH-002, out of `20` total published Knowledge Hub records) whose full body has not yet been delivered.
 - `UNRESOLVED_PREVIOUS_REVISION`: `versioning.previousRevisionId` referencing an earlier revision not present in local collections.
 
 ## 4. Runtime & Repository Security Invariants

@@ -25,6 +25,14 @@ export const BATCH_001_SOURCE_REVISION = {
   publicationDate: '2026-11-26',
 } as const;
 
+export const BATCH_002_SOURCE_REVISION = {
+  batchId: 'BATCH-002',
+  commitSha: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+  treeSha: 'db531de6b2ab452578a550e07c5fd80e4bfe6b64',
+  reviewDate: '2026-11-26',
+  publicationDate: '2026-11-26',
+} as const;
+
 export const SOURCE_IMPORT_STATUS_VALUES = [
   'expected',
   'awaiting-source',
@@ -68,6 +76,7 @@ export const sourceManifestEntrySchema = z.object({
     .string()
     .trim()
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'sourceRefId must be lowercase kebab-case'),
+  batchId: z.string().trim().min(1).optional(),
   repository: z
     .string()
     .trim()
@@ -132,6 +141,7 @@ export const sourceManifestEntrySchema = z.object({
 export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[] = [
   {
     sourceRefId: 'src-pf-01-project-vision',
+    batchId: 'BATCH-001',
     repository: OFFICIAL_ERP_REPOSITORY_URL,
     sourcePath: 'teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md',
     title: {
@@ -165,6 +175,7 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
   },
   {
     sourceRefId: 'src-pf-02-project-work-plan',
+    batchId: 'BATCH-001',
     repository: OFFICIAL_ERP_REPOSITORY_URL,
     sourcePath: 'teranoo-erp-planning/00-project-foundation/PROJECT_WORK_PLAN.md',
     title: {
@@ -198,6 +209,7 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
   },
   {
     sourceRefId: 'src-pf-03-working-rules',
+    batchId: 'BATCH-001',
     repository: OFFICIAL_ERP_REPOSITORY_URL,
     sourcePath: 'teranoo-erp-planning/00-project-foundation/WORKING_RULES.md',
     title: {
@@ -231,6 +243,7 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
   },
   {
     sourceRefId: 'src-pf-04-cross-phase-guardrails',
+    batchId: 'BATCH-001',
     repository: OFFICIAL_ERP_REPOSITORY_URL,
     sourcePath:
       'teranoo-erp-planning/00-project-foundation/CROSS_PHASE_PRODUCT_GUARDRAILS.md',
@@ -265,6 +278,7 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
   },
   {
     sourceRefId: 'src-pf-05-decision-register',
+    batchId: 'BATCH-001',
     repository: OFFICIAL_ERP_REPOSITORY_URL,
     sourcePath: 'teranoo-erp-planning/00-project-foundation/DECISION_REGISTER.md',
     title: {
@@ -298,6 +312,7 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
   },
   {
     sourceRefId: 'src-pf-06-future-architecture-considerations',
+    batchId: 'BATCH-001',
     repository: OFFICIAL_ERP_REPOSITORY_URL,
     sourcePath:
       'teranoo-erp-planning/00-project-foundation/FUTURE_ARCHITECTURE_CONSIDERATIONS.md',
@@ -332,6 +347,367 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
   },
 ];
 
+/**
+ * Verified Business Core Architecture Official Source Inventory — BATCH-002 (TASK-005).
+ *
+ * All ten Phase 2 official source files under teranoo-erp-planning/03-modules/
+ * were supplied by the project owner, verified byte-for-byte against their
+ * exact Git blob SHAs (after lossless CRLF -> LF normalization), wrapped verbatim
+ * in canonical frontmatter envelopes, and published through the Content Registry.
+ */
+export const CORE_MODULE_ARCHITECTURE_SOURCE_MANIFEST: readonly SourceManifestEntry[] = [
+  {
+    sourceRefId: 'src-cm-01-finance-module-model',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/03-modules/finance/FINANCE_MODULE_MODEL.md',
+    title: {
+      ar: 'نموذج نظام المالية والمحاسبة (FINANCE_MODULE_MODEL.md)',
+      en: 'Finance & Accounting Module Model (FINANCE_MODULE_MODEL.md)',
+    },
+    purpose: {
+      ar: 'النموذج المعماري المعتمد لنظام المالية والمحاسبة: الملكية، العمل المستقل، 6 قرارات معتمدة (D-FIN-01..06)، الاستثناءات، وتكاملات المرحلة 2.',
+      en: 'Approved architectural model for Finance & Accounting: ownership, standalone operation, 6 approved Phase 2 decisions (D-FIN-01..06), exclusions, and cross-module boundaries.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '6b76307065d851377b8e4e08cf2c2e18fc6e909e',
+    actualGitBlobSha: '6b76307065d851377b8e4e08cf2c2e18fc6e909e',
+    rawSourceSha256: '88e02ca63f2181d7157b5cc07adcfa3d7561530e1b936bba0e581a005b3a6c1d',
+    sourceFileHash: '4638fa9334a96274a7c5ddf5ebbd2642ac435d84a00b6f1ff71877fa4399ad2b',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'module-model',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-finance-module-model-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة معمارية رسمية معتمدة للمرحلة 2 (Approved / Phase 2 Closed — تحتوي على القرارات المحلية D-FIN-01 إلى D-FIN-06).',
+      en: 'Approved official Phase 2 module architecture model (Phase 2 Closed — contains source-local decisions D-FIN-01 through D-FIN-06).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-02-inventory-module-model',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/03-modules/inventory/INVENTORY_MODULE_MODEL.md',
+    title: {
+      ar: 'نموذج نظام المخزون والمستودعات (INVENTORY_MODULE_MODEL.md)',
+      en: 'Inventory & Warehouse Module Model (INVENTORY_MODULE_MODEL.md)',
+    },
+    purpose: {
+      ar: 'النموذج المعماري المعتمد لنظام المخزون والمستودعات: الملكية الكمية والمستودعية، العمل المستقل، 8 قرارات معتمدة (D-INV-01..08)، وحدود التقييم والتكاليف المؤجلة.',
+      en: 'Approved architectural model for Inventory & Warehouse: quantity and warehouse ownership, standalone operation, 8 approved Phase 2 decisions (D-INV-01..08), and deferred costing boundaries.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: 'f440331ab3867da3cece30b55dcac2e5194a4b0a',
+    actualGitBlobSha: 'f440331ab3867da3cece30b55dcac2e5194a4b0a',
+    rawSourceSha256: '185e4c862b9f46ab0fac09325294b117b46e5a532dd7d97e681c4b0ccb2c2a43',
+    sourceFileHash: 'c28df337e23ca9cc1cb086e69b0e1a60de86a25ba55a31818881598630d66729',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'module-model',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-inventory-module-model-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة معمارية رسمية معتمدة للمرحلة 2 (Approved / Phase 2 Closed — تحتوي على القرارات المحلية D-INV-01 إلى D-INV-08).',
+      en: 'Approved official Phase 2 module architecture model (Phase 2 Closed — contains source-local decisions D-INV-01 through D-INV-08).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-03-procurement-module-model',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/03-modules/procurement/PROCUREMENT_MODULE_MODEL.md',
+    title: {
+      ar: 'نموذج نظام المشتريات (PROCUREMENT_MODULE_MODEL.md)',
+      en: 'Procurement Module Model (PROCUREMENT_MODULE_MODEL.md)',
+    },
+    purpose: {
+      ar: 'النموذج المعماري المعتمد لنظام المشتريات: الالتزامات الشرائية، السلع مقابل الخدمات، 9 قرارات معتمدة (D-PROC-01..09)، وحدود الاستلام والفوترة والمدفوعات.',
+      en: 'Approved architectural model for Procurement: purchasing commitments, physical goods vs services, 9 approved Phase 2 decisions (D-PROC-01..09), and receipt/invoicing/payment boundaries.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '2b45dbccfc654ccacc148a98da6bb49c838cdc50',
+    actualGitBlobSha: '2b45dbccfc654ccacc148a98da6bb49c838cdc50',
+    rawSourceSha256: 'ebb36396c6746c7b72bd4c2583c43972ee6adf59aa60ec5bff3f48533de5fb36',
+    sourceFileHash: '89c207dd693b93fae802b1b55e8424e5bcae00c0b1b67a5c28ffe5507a7e46f9',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'module-model',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-procurement-module-model-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة معمارية رسمية معتمدة للمرحلة 2 (Approved / Phase 2 Closed — تحتوي على القرارات المحلية D-PROC-01 إلى D-PROC-09).',
+      en: 'Approved official Phase 2 module architecture model (Phase 2 Closed — contains source-local decisions D-PROC-01 through D-PROC-09).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-04-sales-order-management-module-model',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath:
+      'teranoo-erp-planning/03-modules/sales/SALES_ORDER_MANAGEMENT_MODULE_MODEL.md',
+    title: {
+      ar: 'نموذج نظام المبيعات وإدارة الطلبات (SALES_ORDER_MANAGEMENT_MODULE_MODEL.md)',
+      en: 'Sales & Order Management Module Model (SALES_ORDER_MANAGEMENT_MODULE_MODEL.md)',
+    },
+    purpose: {
+      ar: 'النموذج المعماري المعتمد لنظام المبيعات وإدارة الطلبات: عروض الأسعار والطلبات، 11 قرارًا معتمدًا (D-SALES-01..11)، وتنسيق التسليم والفوترة دون ملكية المخزون أو الأستاذ.',
+      en: 'Approved architectural model for Sales & Order Management: quotations and orders, 11 approved Phase 2 decisions (D-SALES-01..11), and fulfillment/billing orchestration without stock or ledger ownership.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: 'ee1a312cc856d593fe13959e9e97e3a9abfa2123',
+    actualGitBlobSha: 'ee1a312cc856d593fe13959e9e97e3a9abfa2123',
+    rawSourceSha256: '6d38e84dfc80421c15066128ff3d8289cadc06431eb45cb2e81a082921c4ea97',
+    sourceFileHash: '331bcac1def77d6114e5114d25e6c22b80adabca2246e9c2a2ea21c4544528c1',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'module-model',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-sales-order-management-module-model-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة معمارية رسمية معتمدة للمرحلة 2 (Approved / Phase 2 Closed — محدثة بتاريخ 2026-09-09 — تحتوي على القرارات المحلية D-SALES-01 إلى D-SALES-11).',
+      en: 'Approved official Phase 2 module architecture model (Phase 2 Closed — updated 2026-09-09 — contains source-local decisions D-SALES-01 through D-SALES-11).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-05-dependency-model',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/03-modules/DEPENDENCY_MODEL.md',
+    title: {
+      ar: 'نموذج الاعتماديات بين الأنظمة (DEPENDENCY_MODEL.md)',
+      en: 'Module Dependency Model (DEPENDENCY_MODEL.md)',
+    },
+    purpose: {
+      ar: 'النموذج الحاكم الرسمي لأنواع الاعتماديات الأربع (PCD وHBMD وCIC وFLD) ونطاقات الإنفاذ وقواعد الحوكمة الـ 12.',
+      en: 'Official governing specification of the four dependency types (PCD, HBMD, CIC, FLD), enforcement scopes, and 12 architectural governance rules.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '0c61cc300c7fe44f84e20dbac3a09df6d4760075',
+    actualGitBlobSha: '0c61cc300c7fe44f84e20dbac3a09df6d4760075',
+    rawSourceSha256: 'afefabc79219c08270c287c60bf1e9bf4800f66db4fe2653630b427d4b37e3d4',
+    sourceFileHash: '6ca9bff934962b679d43a881ddd343a04fe2fbe250550440bc6db982dc83d629',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'architecture-document',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-dependency-model-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة حاكمة رسمية معتمدة ضمن القائمة الـ 6 في DECISION_REGISTER.md (بدون معرفات D-* منفصلة — Phase 2 Closed 2026-09-09).',
+      en: 'Approved Governing Artifact listed in DECISION_REGISTER.md (without standalone D-* IDs — Phase 2 Closed 2026-09-09).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-06-module-dependency-matrix',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/03-modules/MODULE_DEPENDENCY_MATRIX.md',
+    title: {
+      ar: 'مصفوفة الاعتماديات بين الأنظمة الأساسية (MODULE_DEPENDENCY_MATRIX.md)',
+      en: 'Module Dependency Matrix (MODULE_DEPENDENCY_MATRIX.md)',
+    },
+    purpose: {
+      ar: 'المصفوفة الحاكمة للأنظمة الأربعة: 0 اعتماديات صلبة (HBMD)، سجل 6 عقود تكامل مشروط (CIC)، سجل 5 اعتماديات مستوى الميزة (FLD)، مصفوفة 21 قدرة منصة (PCD)، وملكية 15 مجال بيانات.',
+      en: 'Authoritative four-module dependency matrix: 0 HBMDs, 6 Core CIC contracts, 5 FLDs, 21-row PCD Matrix, and 15-row Data Ownership cross-reference.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '20d935eadc1680a5ad04395094ff7eaad7fbe02f',
+    actualGitBlobSha: '20d935eadc1680a5ad04395094ff7eaad7fbe02f',
+    rawSourceSha256: '765fc6592febba4b48f4f510414b680e51785537fb8006bbd2614741f987765f',
+    sourceFileHash: '34700c3027731399dd8a3276cf41f1fa3f5bc9234453502901589f8a46c55c43',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'architecture-document',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-module-dependency-matrix-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة حاكمة رسمية معتمدة ضمن القائمة الـ 6 في DECISION_REGISTER.md (بدون معرفات D-* منفصلة — Phase 2 Closed 2026-09-09).',
+      en: 'Approved Governing Artifact listed in DECISION_REGISTER.md (without standalone D-* IDs — Phase 2 Closed 2026-09-09).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-07-module-lifecycle-rules',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/03-modules/MODULE_LIFECYCLE_RULES.md',
+    title: {
+      ar: 'قواعد دورة حياة الأنظمة (MODULE_LIFECYCLE_RULES.md)',
+      en: 'Module Lifecycle Rules (MODULE_LIFECYCLE_RULES.md)',
+    },
+    purpose: {
+      ar: 'الحالات الوظيفية الثلاث للأنظمة داخل المستأجر (Inactive / Active / Frozen)، الفصل عن التفعيل التجاري (Entitlement)، قاعدة التجميد لا الحذف، وتأثير التفعيل والتجميد على العقود.',
+      en: 'Three tenant-level module functional states (Inactive / Active / Frozen), separation from commercial Entitlement, Freeze-not-Delete rule, and cross-module impact.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: 'ee58a40b83d6aa9bfda6a37914812bf90fbe9b54',
+    actualGitBlobSha: 'ee58a40b83d6aa9bfda6a37914812bf90fbe9b54',
+    rawSourceSha256: '5c83a4b71fbc8817ccb739674edf2de05687e7ece452ed0593abc7bedf106d87',
+    sourceFileHash: '48b2e498841e8f97ea88837ff249359200e8abc8531f350fe3bddfc218f07658',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'architecture-document',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-module-lifecycle-rules-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة حاكمة رسمية معتمدة ضمن القائمة الـ 6 في DECISION_REGISTER.md (بدون معرفات D-* منفصلة — منفصلة عن دورة حياة المستأجر في المرحلة 3).',
+      en: 'Approved Governing Artifact listed in DECISION_REGISTER.md (without standalone D-* IDs — distinct from Phase 3 Tenant Lifecycle).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-08-future-module-extension-rules',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/03-modules/FUTURE_MODULE_EXTENSION_RULES.md',
+    title: {
+      ar: 'قواعد امتداد الأنظمة المستقبلية (FUTURE_MODULE_EXTENSION_RULES.md)',
+      en: 'Future Module Extension Rules (FUTURE_MODULE_EXTENSION_RULES.md)',
+    },
+    purpose: {
+      ar: 'قواعد حوكمة إضافة أنظمة مستقبلية فوق النواة الأربعة: حماية الملكية، منع الاعتماد العكسي، معايير مراجعة التوافق الثمانية، والأمثلة التوجيهية.',
+      en: 'Governance rules for adding future modules on top of the 4 core modules: ownership protection, no core back-dependency, 8-point compatibility review, and directional examples.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '06b67a051b8ed749b77d385f037b3c6dd0678f74',
+    actualGitBlobSha: '06b67a051b8ed749b77d385f037b3c6dd0678f74',
+    rawSourceSha256: '98c4a1ef0e3dd40d40b5775ae3cd641530187d6bac994007ead208ad76034990',
+    sourceFileHash: 'ed8bb75a5b227661cab1dde61607e2c125c674912bab7d63ce27ae0d89102313',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'architecture-document',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-future-module-extension-rules-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة حاكمة رسمية معتمدة ضمن القائمة الـ 6 في DECISION_REGISTER.md (بدون معرفات D-* منفصلة — Phase 2 Closed 2026-09-09).',
+      en: 'Approved Governing Artifact listed in DECISION_REGISTER.md (without standalone D-* IDs — Phase 2 Closed 2026-09-09).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-09-phase-2-assumption-safety-review',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/00-project-foundation/PHASE_2_ASSUMPTION_SAFETY_REVIEW.md',
+    title: {
+      ar: 'مراجعة سلامة الافتراضات — المرحلة 2 (PHASE_2_ASSUMPTION_SAFETY_REVIEW.md)',
+      en: 'Phase 2 Assumption Safety Review (PHASE_2_ASSUMPTION_SAFETY_REVIEW.md)',
+    },
+    purpose: {
+      ar: 'المراجعة المعمارية الرسمية لسلامة افتراضات المرحلة 2: النتيجة (PASS with Guardrails)، أحكام الأنظمة الأربعة، 7 ضوابط (G-ASSUMP-01..07)، و12 تسليمًا للمرحلة 3.',
+      en: 'Official Phase 2 Assumption Safety Review: verdict (PASS with Guardrails), four module verdicts, 7 guardrails (G-ASSUMP-01..07), and 12 Phase 3 handoffs.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '4ab31d9cf4eab595d089c256ddeeab3cec665fd0',
+    actualGitBlobSha: '4ab31d9cf4eab595d089c256ddeeab3cec665fd0',
+    rawSourceSha256: '64db0da5ba72ddfe9e0908280e681f4770d5136a6d5232b2131774e6254a3f45',
+    sourceFileHash: 'e2c966713ad8970b4bd2db6ae9e30bdbdcb549d732cbfc59fcfc43848484eb26',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'architecture-document',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-phase-2-assumption-safety-review-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'بوابة مراجعة معمارية رسمية للمشروع (PASS with Guardrails — ليست مراجعة استشارية مستقلة خارجية).',
+      en: 'Official internal project architecture review gate (PASS with Guardrails — distinct from external independent advisory reviews).',
+    },
+  },
+  {
+    sourceRefId: 'src-cm-10-phase-2-closure-review',
+    batchId: 'BATCH-002',
+    repository: OFFICIAL_ERP_REPOSITORY_URL,
+    sourcePath: 'teranoo-erp-planning/00-project-foundation/PHASE_2_CLOSURE_REVIEW.md',
+    title: {
+      ar: 'مراجعة إغلاق المرحلة 2 (PHASE_2_CLOSURE_REVIEW.md)',
+      en: 'Phase 2 Closure Review (PHASE_2_CLOSURE_REVIEW.md)',
+    },
+    purpose: {
+      ar: 'مراجعة إغلاق المرحلة 2 الرسمية: النتيجة (PASS — Phase 2 Closed 2026-09-09)، التحقق من معايير الخروج الـ 13، وتأكيد صفر اعتماديات صلبة وصفر دورات.',
+      en: 'Official Phase 2 Closure Review: verdict (PASS — Phase 2 Closed 2026-09-09), 13 exit criteria verification, and confirmation of 0 HBMDs and 0 cycles.',
+    },
+    sourceRevision: BATCH_002_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: 'bee2682ad79ad9cba80a008fa44342f40d9ec1e9',
+    actualGitBlobSha: 'bee2682ad79ad9cba80a008fa44342f40d9ec1e9',
+    rawSourceSha256: '2fd365b66cffcc07cfdc8120a4bcf017573ce8af9c0a3ce0d82f27e8dcc09cab',
+    sourceFileHash: 'eb1a9b11debd223aae17480cc05e2c352de8fe14509dadc37de84e0234717c4b',
+    lineEndingNormalization: 'crlf-to-lf',
+    classification: 'official',
+    expectedContentType: 'architecture-document',
+    phaseRef: 'phase-2',
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-phase-2-closure-review-ar',
+    referenceSummaryContentId: null,
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'بوابة إغلاق رسمية للمرحلة 2 (PASS — Phase 2 Closed بتاريخ 2026-09-09 — ليست مراجعة استشارية مستقلة خارجية).',
+      en: 'Official Phase 2 closure gate (PASS — Phase 2 Closed on 2026-09-09 — distinct from external independent advisory reviews).',
+    },
+  },
+];
+
+/**
+ * Combined Official Source Manifest across all authorized ingested batches
+ * (BATCH-001 Project Foundations [6] + BATCH-002 Core Module Architecture [10] = 16).
+ */
+export const OFFICIAL_SOURCE_MANIFEST: readonly SourceManifestEntry[] = [
+  ...PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
+  ...CORE_MODULE_ARCHITECTURE_SOURCE_MANIFEST,
+];
+
 export interface ManifestValidationIssue {
   readonly severity: 'error' | 'warning';
   readonly code: string;
@@ -353,7 +729,7 @@ export interface SourceManifestValidationResult {
  * and publication authorization discipline.
  */
 export function validateSourceManifest(
-  entries: readonly SourceManifestEntry[] = PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
+  entries: readonly SourceManifestEntry[] = OFFICIAL_SOURCE_MANIFEST,
   publishedContentIds?: ReadonlySet<string>
 ): SourceManifestValidationResult {
   const errors: ManifestValidationIssue[] = [];
@@ -540,7 +916,7 @@ export function validateSourceManifest(
 }
 
 export function deriveSourceManifestSummary(
-  entries: readonly SourceManifestEntry[] = PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+  entries: readonly SourceManifestEntry[] = OFFICIAL_SOURCE_MANIFEST
 ): SourceManifestSummary {
   let expectedCount = 0;
   let awaitingSourceCount = 0;
@@ -590,20 +966,20 @@ export function deriveSourceManifestSummary(
 
 export function getSourceManifestEntryByPath(
   sourcePath: string,
-  entries: readonly SourceManifestEntry[] = PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+  entries: readonly SourceManifestEntry[] = OFFICIAL_SOURCE_MANIFEST
 ): SourceManifestEntry | undefined {
   return entries.find((entry) => entry.sourcePath === sourcePath);
 }
 
 export function getSourceManifestEntryByRefId(
   sourceRefId: string,
-  entries: readonly SourceManifestEntry[] = PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+  entries: readonly SourceManifestEntry[] = OFFICIAL_SOURCE_MANIFEST
 ): SourceManifestEntry | undefined {
   return entries.find((entry) => entry.sourceRefId === sourceRefId);
 }
 
 export function generateSourceReadinessReport(
-  entries: readonly SourceManifestEntry[] = PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+  entries: readonly SourceManifestEntry[] = OFFICIAL_SOURCE_MANIFEST
 ): SourceReadinessReport {
   const summary = deriveSourceManifestSummary(entries);
   const awaitingDelivery = entries
@@ -630,7 +1006,12 @@ export function generateSourceReadinessReport(
     .map((entry) => entry.publishedContentId as string);
 
   return {
-    generatedFromManifest: 'PROJECT_FOUNDATIONS_SOURCE_MANIFEST',
+    generatedFromManifest:
+      entries === PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+        ? 'PROJECT_FOUNDATIONS_SOURCE_MANIFEST'
+        : entries === CORE_MODULE_ARCHITECTURE_SOURCE_MANIFEST
+          ? 'CORE_MODULE_ARCHITECTURE_SOURCE_MANIFEST'
+          : 'OFFICIAL_SOURCE_MANIFEST',
     officialRepository: OFFICIAL_ERP_REPOSITORY_URL,
     summary,
     awaitingDelivery,

@@ -6,7 +6,7 @@ import {
   type LoadedContentEntry,
 } from '@/content/loaders/contentLoader';
 import {
-  PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
+  OFFICIAL_SOURCE_MANIFEST,
   validateSourceManifest,
 } from '@/content/manifest/sourceManifest';
 
@@ -388,7 +388,7 @@ export function validateApprovedCollections(
   collectionsRoot: string = CONTENT_COLLECTIONS_ROOT,
   manifestEntries: readonly SourceManifestEntry[] | undefined =
     collectionsRoot === CONTENT_COLLECTIONS_ROOT
-      ? PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+      ? OFFICIAL_SOURCE_MANIFEST
       : undefined
 ): ContentValidationReport {
   const entries = loadApprovedCollections(collectionsRoot);
