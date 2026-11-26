@@ -33,8 +33,10 @@ Every snapshot metric is explicitly anchored to verifiable provenance metadata i
 - **Independent Reference Review Date:** `2026-11-25` (explicitly labeled as the independent review date of this snapshot, not the approval date of each individual source document)
 - **Snapshot Nature:** Static local reference snapshot (`isLiveSynced: false`) — not live-synced with the source repository.
 - **Metrics Source Distinction:**
-  - **Official source-derived metrics:** `120` approved architectural decisions and Phase 5 planning progress (`7` of `13` items approved).
-  - **Independent review statistics:** `57` independent review notes and `24` future architecture considerations are explicitly distinguished from official approved decisions.
+  - **Official source-derived metrics:** `120` approved architectural decisions (`DECISION_REGISTER.md`) and Phase 5 planning progress (`7` of `13` items approved in `PROJECT_WORK_PLAN.md`).
+  - **Official future considerations register:** `24` future architecture considerations (distinct from approved decisions and distinct from independent review statistics).
+  - **Research & independent advisory review inventories:** `13` architectural research packages and `57` independent review notes (distinct from official approved decisions).
+  - **Locally published Knowledge Library records:** Tracked independently by `content/registry/contentRegistry.ts` and never conflated with source-declared aggregate counts.
 
 ---
 
@@ -52,16 +54,20 @@ Semantic separation rules enforced in both the repository layer and UI:
 
 ---
 
-## 4. Content Classification Model
+## 4. Content Classification Model (8 Authority Classifications)
 
-All knowledge artifacts belong to one of four mandatory classifications (`ContentClassificationType`):
+All knowledge artifacts belong to one of eight mandatory authority classifications (`ContentClassificationType` — see `docs/CONTENT_SCHEMA.md` and `docs/CONTENT_AUTHORING_GUIDE.md` for full frontmatter rules):
 
 | Classification Key | Arabic Label | English Label | Meaning |
 |---|---|---|---|
-| `official` | وثيقة رسمية معتمدة | Official Documentation | Approved Teranoo ERP documents and architectural decisions |
-| `research` | أبحاث وأدلة مرجعية | Research & Evidence | Research packages, benchmarks, and reference sources |
-| `independent` | تحليل استشاري مستقل | Independent Analysis | Independent advisory reviews and notes |
+| `official` | وثيقة رسمية معتمدة | Official Documentation | Approved foundational and architectural documents of Teranoo ERP |
+| `approved-decision` | قرار معماري أو وظيفي معتمد | Approved Decision | Formal architectural or functional decision with an official identifier |
+| `research` | أبحاث وأدلة مرجعية | Research & Evidence | Research packages, benchmarks, and reference evidence |
+| `independent` | تحليل استشاري مستقل | Independent Analysis | Independent advisory reviews and review notes |
 | `future` | اعتبارات معمارية مستقبلية | Future Considerations | Unapproved future architectural topics |
+| `educational` | شرح تعليمي | Educational Explanation | Conceptual or explanatory guides authored to clarify architecture/governance |
+| `illustrative` | مثال توضيحي أو محاكاة | Illustrative Example | Non-binding illustrative scenarios, examples, or simulations |
+| `engineering` | سجل هندسي وتنفيذي | Engineering Record | Build-in-public engineering journals, development tasks, issues, solutions, and lessons learned |
 
 ---
 

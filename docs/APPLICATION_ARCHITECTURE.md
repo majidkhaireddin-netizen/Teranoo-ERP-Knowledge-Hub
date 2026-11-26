@@ -8,10 +8,10 @@ Key architectural boundaries:
 
 1. **Routing Layer (`app/`)**: Thin route files (`page.tsx`) export page metadata and render the corresponding feature view. Global App Router states (`loading.tsx`, `error.tsx`, `not-found.tsx`) provide consistent feedback across all routes.
 2. **Feature Layer (`features/`)**: Self-contained domain views (`dashboard`, `product-vision`, `roadmap`, `architecture`, `modules`, `platform`, `decisions`, `research`, `future-considerations`, `independent-reviews`, `business-scenarios`, `glossary`, `change-history`, `about`). Feature views read data exclusively through repository functions and compose reusable UI, layout, documentation, and visualization components.
-3. **Content & Repository Layer (`content/`)**:
-   - `content/models/types.ts`: Domain contracts for snapshot provenance, identity, modules, planning phases, Phase 5 capabilities vs. planning gates (`Phase5ItemKind`), content classifications, document metadata, and search items.
-   - `content/seed/`: Authoritative local static reference snapshot (`projectSnapshot.ts`, `productVisionDoc.ts`).
-   - `content/repositories/projectRepository.ts`: Pure query and derived-calculation layer. Dashboard metrics (`120` approved decisions, `4/5` completed planning phases, `4` core modules, `7/13` Phase 5 planning progress = `54%`), runtime architecture capability counts (`12` runtime capabilities: `7` approved, `5` pending), and search results are always computed from structured data rather than hardcoded inside UI components.
+3. **Content, Knowledge Pipeline & Repository Layer (`content/`)**:
+   - `content/taxonomy/registry.ts`, `content/models/knowledge.ts`, `content/schemas/frontmatterSchema.ts`: Controlled taxonomy (8 classifications, 35 content types, 15 typed relationships, 5 discovery dimensions) and strict Zod schema.
+   - `content/loaders/`, `content/validators/`, `content/registry/`, `content/search/`, `content/renderers/`: Server-only local Markdown + YAML frontmatter loading, sanitized remark/rehype HTML rendering, integrity validation (`npm run content:validate`), Publication Boundary enforcement, unified search, and extensible specialized viewer descriptors (see `docs/KNOWLEDGE_ARCHITECTURE.md`).
+   - `content/models/types.ts`, `content/seed/`, `content/repositories/projectRepository.ts`: Authoritative static reference snapshot (`projectSnapshot.ts`, `productVisionDoc.ts`) and pure derived-metric selectors.
 4. **Presentation Layer (`components/`)**:
    - `components/ui/`: Domain-agnostic enterprise primitives, including the accessibility-hardened portal `Modal` (dialog & drawer variants).
    - `components/layout/`: Application Shell (`AppShell`, `AppSidebar`, `AppHeader`, `Breadcrumbs`, `PageContainer`, `PageHeader`, `SectionHeader`, `ContentLayout`, `TableOfContents`, `GlobalSearchModal`).
@@ -51,13 +51,13 @@ Key architectural boundaries:
 
 ---
 
-## 5. Information Architecture (18 Routes across 5 Groups)
+## 5. Information Architecture (20 Navigation Routes + Dynamic Document Reader)
 
 - **Overview:** `/`, `/product-vision`, `/roadmap`
 - **Architecture:** `/architecture`, `/modules`, `/dependencies`, `/platform`, `/tenancy`, `/deployment`
-- **Knowledge & Decisions:** `/decisions`, `/research`, `/future-considerations`, `/independent-reviews`
+- **Knowledge & Decisions:** `/knowledge` (+ dynamic `/knowledge/[slug]`), `/decisions`, `/research`, `/future-considerations`, `/independent-reviews`
 - **Exploration:** `/business-scenarios`, `/diagrams`, `/glossary`
-- **Project:** `/change-history`, `/about`
+- **Project:** `/engineering-journal`, `/change-history`, `/about`
 
 ---
 
@@ -71,7 +71,7 @@ By explicit approval of the project owner, **Teranoo ERP Knowledge Hub** operate
 
 Deferred to future authorized tasks by design:
 
-- Database persistence or backend APIs.
-- GitHub repository live synchronization or automated document ingestion.
-- Full Markdown/MDX authoring pipeline and full ingestion of all 120 decisions, 13 research packages, 57 independent review notes, and 24 future considerations.
-- Interactive business scenario simulators.
+- Database persistence, CMS, authentication, or backend APIs.
+- GitHub repository live synchronization or automated external ingestion.
+- Full ingestion of all 120 decisions, 13 research packages, 57 independent review notes, and 24 future considerations.
+- Full specialized interactive editors/viewers for Screen Specifications, Data Models, and interactive business scenario simulators.

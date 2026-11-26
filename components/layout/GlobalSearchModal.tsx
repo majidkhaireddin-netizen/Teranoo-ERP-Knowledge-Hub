@@ -6,9 +6,10 @@ import { ArrowUpRight, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { resolveLocalizedText } from '@/content/models/types';
 import {
-  buildSearchIndex,
-  searchKnowledgeHub,
-} from '@/content/repositories/projectRepository';
+  buildUnifiedSearchIndex,
+  searchUnifiedKnowledge,
+  type KnowledgeSearchEntry,
+} from '@/content/search/knowledgeSearch';
 import { Modal } from '@/components/ui/Modal';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { ContentClassification } from '@/components/documentation/ContentClassification';
@@ -18,17 +19,25 @@ import { useAppLocale } from '@/providers/LocaleProvider';
 export interface GlobalSearchModalProps {
   open: boolean;
   onClose: () => void;
+  searchEntries?: readonly KnowledgeSearchEntry[];
 }
 
-export function GlobalSearchModal({ open, onClose }: GlobalSearchModalProps) {
+export function GlobalSearchModal({
+  open,
+  onClose,
+  searchEntries,
+}: GlobalSearchModalProps) {
   const [query, setQuery] = useState('');
   const router = useRouter();
   const t = useTranslations();
   const { locale } = useAppLocale();
 
-  const searchIndex = useMemo(() => buildSearchIndex(), []);
+  const searchIndex = useMemo(
+    () => searchEntries ?? buildUnifiedSearchIndex([]),
+    [searchEntries]
+  );
   const results = useMemo(
-    () => searchKnowledgeHub(query, searchIndex),
+    () => searchUnifiedKnowledge(query, searchIndex),
     [query, searchIndex]
   );
 
@@ -84,6 +93,11 @@ export function GlobalSearchModal({ open, onClose }: GlobalSearchModalProps) {
               >
                 <div className="min-w-0 space-y-0.5">
                   <div className="flex items-center gap-2 min-w-0">
+                    {item.category === 'document' ? (
+                      <span className="rounded-sm border border-border bg-surface-subtle px-1.5 py-0.5 text-[10px] font-medium text-text-secondary shrink-0">
+                        {t('knowledge.searchDocBadge')}
+                      </span>
+                    ) : null}
                     {item.code ? (
                       <code className="font-mono text-xs font-semibold text-primary bidi-ltr shrink-0">
                         {item.code}

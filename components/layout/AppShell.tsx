@@ -7,12 +7,14 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { GlobalSearchModal } from '@/components/layout/GlobalSearchModal';
 
 import { APP_SHELL_ROOT_ID } from '@/components/ui/Modal';
+import type { KnowledgeSearchEntry } from '@/content/search/knowledgeSearch';
 
 export interface AppShellProps {
   children: React.ReactNode;
+  searchEntries?: readonly KnowledgeSearchEntry[];
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, searchEntries }: AppShellProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const t = useTranslations();
 
@@ -48,6 +50,7 @@ export function AppShell({ children }: AppShellProps) {
       <GlobalSearchModal
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
+        searchEntries={searchEntries}
       />
     </div>
   );

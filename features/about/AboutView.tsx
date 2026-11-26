@@ -4,8 +4,9 @@ import React, { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   resolveLocalizedText,
-  type ContentClassificationType,
 } from '@/content/models/types';
+import { CONTENT_CLASSIFICATION_VALUES } from '@/content/taxonomy/registry';
+import { SITE_CONFIG } from '@/config/site';
 import { getSnapshotProvenance } from '@/content/repositories/projectRepository';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -17,12 +18,7 @@ import { InformationCallout } from '@/components/documentation/InformationCallou
 import { MetadataPanel } from '@/components/documentation/MetadataPanel';
 import { ComparisonTable } from '@/components/documentation/ComparisonTable';
 
-const CLASSIFICATIONS: readonly ContentClassificationType[] = [
-  'official',
-  'research',
-  'independent',
-  'future',
-];
+const CONCEPT_KEYS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'] as const;
 
 export function AboutView() {
   const t = useTranslations();
@@ -42,7 +38,7 @@ export function AboutView() {
         subtitle={t('about.subtitle')}
         meta={
           <>
-            <span className="font-mono bidi-ltr">TASK-001</span>
+            <span className="font-mono bidi-ltr">{SITE_CONFIG.taskScope}</span>
             <span aria-hidden="true">·</span>
             <span>{t('app.subtitleEn')}</span>
           </>
@@ -50,6 +46,22 @@ export function AboutView() {
       />
 
       <DocumentationArticle>
+        <DocumentationSection id="vision" title={t('about.visionTitle')}>
+          <p className="text-text-secondary">{t('about.visionBody')}</p>
+          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2">
+            {CONCEPT_KEYS.map((key) => (
+              <div key={key} className="bg-surface p-4 space-y-1">
+                <h3 className="text-sm font-semibold text-text-primary">
+                  {t(`about.concepts.${key}Title`)}
+                </h3>
+                <p className="text-xs leading-relaxed text-text-secondary">
+                  {t(`about.concepts.${key}Body`)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </DocumentationSection>
+
         <DocumentationSection id="purpose" title={t('about.purposeTitle')}>
           <p className="text-text-secondary">{t('about.purposeBody')}</p>
           <ComparisonTable
@@ -69,7 +81,7 @@ export function AboutView() {
         >
           <p className="text-text-secondary">{t('about.classificationBody')}</p>
           <div className="space-y-3">
-            {CLASSIFICATIONS.map((classification) => (
+            {CONTENT_CLASSIFICATION_VALUES.map((classification) => (
               <ContentClassification
                 key={classification}
                 variant="banner"

@@ -1,0 +1,1531 @@
+# TASK-002 — Comprehensive Knowledge Architecture & Content Foundation
+
+**Project:** Teranoo ERP Knowledge Hub
+
+**Status of TASK-001:** Independently Approved.
+
+**Development Mode:** Incremental implementation under independent supervision.
+
+---
+
+## 1. Mission
+
+Implement the comprehensive content architecture and knowledge management foundation for Teranoo ERP Knowledge Hub.
+
+This task is not limited to implementing a Markdown reader or a documentation website.
+
+The objective is to establish the foundation of a long-term, publicly accessible, structured ERP knowledge platform capable of documenting the entire lifecycle of building an enterprise-grade ERP product.
+
+Preserve the approved TASK-001 application foundation, visual identity, navigation, design system, localization, accessibility, and existing functionality.
+
+Do not rebuild the application from scratch.
+
+---
+
+## 2. Updated Product Vision — Binding Direction
+
+The project owner has clarified the complete vision of Teranoo ERP Knowledge Hub.
+
+The platform shall document the complete journey of designing, researching, building, testing, deploying, and continuously improving Teranoo ERP.
+
+Its ultimate purpose is to provide sufficient structured knowledge for readers, business analysts, consultants, architects, designers, developers, and engineering teams to understand how an enterprise ERP system is built and potentially use that knowledge to build their own systems.
+
+The platform combines six complementary concepts:
+
+1. ERP Encyclopedia.
+2. ERP Engineering Guide.
+3. Living Architecture Documentation.
+4. Research & Evidence Library.
+5. Implementation Handbook.
+6. Build-in-Public Engineering Journal.
+
+It must eventually document:
+
+- Product discovery and vision.
+- Market research.
+- ERP concepts and terminology.
+- Research reports and original sources.
+- Architectural alternatives.
+- Approved and superseded decisions.
+- Decision rationale.
+- Functional specifications.
+- Business processes.
+- Business rules.
+- Validation rules.
+- Configuration and policies.
+- Screen designs and specifications.
+- Form fields and behaviors.
+- Data models.
+- Database entities and relationships.
+- Integration contracts.
+- APIs and events.
+- Engineering implementation.
+- Code examples.
+- Actual implementation tasks.
+- Development obstacles.
+- Failed approaches.
+- Alternative solutions.
+- Bug reports and resolutions.
+- Test cases and results.
+- Deployment procedures.
+- Operational considerations.
+- Release history.
+- Lessons learned.
+
+Do not fabricate any of these details before they exist in the actual Teranoo ERP project.
+
+The content architecture must support them from the beginning without requiring their immediate population.
+
+### Application identity
+
+Keep the existing application name:
+
+**Teranoo ERP Knowledge Hub**
+
+Update the primary subtitle to:
+
+**The Complete Journey of Building an Enterprise ERP System**
+
+Arabic:
+
+**الرحلة الكاملة لبناء نظام ERP مؤسسي**
+
+Update the About page and application metadata to reflect the clarified vision.
+
+The website is a public knowledge-sharing platform, not an operational ERP system.
+
+---
+
+## 3. Scope of TASK-002
+
+Implement:
+
+- Structured content domain models.
+- Content classification and lifecycle semantics.
+- Local Markdown ingestion.
+- Frontmatter metadata validation.
+- Content registry.
+- Stable content identifiers.
+- Content relationships and cross-references.
+- Source attribution and provenance.
+- Content versioning foundations.
+- Knowledge library and document reader.
+- Research document presentation foundation.
+- Content discovery and filtering.
+- Integration with existing global search.
+- Reusable documentation content blocks.
+- Foundations for future screen specifications.
+- Foundations for future engineering journals.
+- Content integrity validation.
+- Publishing governance.
+- Technical documentation and automated tests.
+
+Do not populate the entire Teranoo ERP knowledge library during this task.
+
+Do not implement all future specialized content viewers or modules.
+
+Do not start TASK-003.
+
+---
+
+## 4. Fundamental Content Architecture
+
+The platform must distinguish between the following concepts.
+
+### A. Content Classification
+
+Defines the authority and nature of the knowledge.
+
+Support:
+
+- Official Documentation.
+- Approved Decision.
+- Research & Evidence.
+- Independent Analysis.
+- Future Consideration.
+- Educational Explanation.
+- Illustrative Example.
+- Engineering Record.
+
+A research finding must never be displayed as an approved decision.
+
+An educational explanation must never silently become an official requirement.
+
+An illustrative simulation must never be presented as actual implemented ERP behavior.
+
+### B. Content Type
+
+Defines the structure or purpose of the content.
+
+The content type registry must support:
+
+- Product Vision.
+- Roadmap.
+- Architecture Document.
+- Module Model.
+- Platform Framework.
+- Architectural Decision.
+- Functional Decision.
+- Requirement.
+- Research Report.
+- Comparative Research.
+- Research Evidence.
+- Future Consideration.
+- Independent Review.
+- Independent Review Note.
+- Business Process.
+- Business Rule.
+- Functional Specification.
+- Screen Specification.
+- Data Model.
+- Entity Specification.
+- Integration Contract.
+- API Specification.
+- Implementation Guide.
+- Code Example.
+- Engineering Journal Entry.
+- Development Task.
+- Technical Issue.
+- Solution Record.
+- Test Specification.
+- Test Result.
+- Deployment Guide.
+- Release Note.
+- Lesson Learned.
+- Glossary Entry.
+
+These types define extensibility requirements.
+
+Do not build an empty custom page or a separate database model for every type.
+
+Implement a generic content model and content type registry, with specialized structured schemas only where they are genuinely needed in the current task.
+
+### C. Content Status
+
+Content status must be independent of classification and content type.
+
+Support appropriate lifecycle semantics such as:
+
+- Draft.
+- Under Review.
+- Approved.
+- Reference.
+- Published.
+- Superseded.
+- Deprecated.
+- Archived.
+
+Distinguish explicitly between:
+
+- Editorial status.
+- Official ERP approval status.
+- Publication status.
+- Implementation status, where applicable.
+
+These are independent dimensions.
+
+For example, a published research report is not necessarily an approved ERP decision.
+
+An approved architectural decision is not necessarily an implemented software feature.
+
+### D. Knowledge Depth
+
+Support optional knowledge depth metadata:
+
+- L1 — Overview.
+- L2 — Business Analysis.
+- L3 — Architecture.
+- L4 — Detailed Specification.
+- L5 — Implementation.
+
+Depth levels are organizational metadata.
+
+Do not impose artificial restrictions on the detail or structure of documents.
+
+---
+
+## 5. Knowledge Organization Dimensions
+
+The same content must be discoverable through multiple independent dimensions.
+
+### Dimension 1 — Project Journey
+
+Organize knowledge by its position in the lifecycle of building ERP:
+
+- Product Discovery.
+- Research.
+- Architecture.
+- Functional Design.
+- Detailed System Design.
+- Engineering.
+- Testing.
+- Deployment.
+- Operations.
+- Continuous Evolution.
+
+### Dimension 2 — Official Planning Phases
+
+Support association with the official Teranoo ERP project phases and items.
+
+Do not confuse these phases with Knowledge Hub development tasks.
+
+Official phase identifiers must support values such as Phase 6.5 without relying on integer-only numbering.
+
+### Dimension 3 — Business Modules
+
+Support associations with:
+
+- Finance.
+- Inventory & Warehouse Management.
+- Procurement.
+- Sales & Order Management.
+
+Allow future modules to be registered without restructuring the content architecture.
+
+### Dimension 4 — Platform Domains
+
+Support association with shared capabilities such as:
+
+- Identity & Access.
+- Workflow & Approvals.
+- Audit Trail.
+- Shared Master Data.
+- Localization.
+- Tax.
+- Currency.
+- Calendar.
+- Documents & Attachments.
+- Notifications.
+- Integration.
+- Reporting.
+- Configuration.
+- Extensions.
+
+Do not assume that every domain is already approved or implemented.
+
+### Dimension 5 — Topics and Tags
+
+Support controlled topics and flexible tags for cross-cutting subjects such as:
+
+- Security.
+- Multi-Tenancy.
+- Accounting.
+- Data Governance.
+- User Experience.
+- Performance.
+- Compliance.
+- Upgradeability.
+- Extensibility.
+
+### Fundamental rule
+
+A document may belong to multiple relevant dimensions.
+
+Maintain one canonical content record rather than copying the same document into multiple folders or pages to support navigation.
+
+---
+
+## 6. Stable Content Identity
+
+Every knowledge record must have a globally unique and stable internal content ID.
+
+Distinguish between:
+
+- Internal content ID.
+- URL slug.
+- Official source identifier.
+- Official decision ID.
+- Official requirement ID.
+- Source document path.
+- Content version.
+- Display title.
+
+Do not use the title or file path as the permanent identity.
+
+Do not invent official D-* or R-* identifiers.
+
+Identifiers introduced by Knowledge Hub must be clearly distinguishable from official Teranoo ERP identifiers.
+
+For example:
+
+- `D-PLAT-01` is an official ERP decision ID.
+- `R-IDN-3` is an official ERP requirement ID.
+- `IR-050` is an independent review note ID.
+- `FAC-018` is an official future consideration ID.
+- An internal Knowledge Hub document ID identifies a platform content record.
+
+Renaming a document or changing its title must not break existing content relationships.
+
+---
+
+## 7. Structured Metadata and Content Model
+
+Implement a strictly typed content model.
+
+The following metadata categories are required or optional according to the content type.
+
+### Identity
+
+- Stable content ID.
+- Slug.
+- Title.
+- Optional subtitle.
+- Description or abstract.
+- Language.
+- Optional translation group ID.
+
+### Classification
+
+- Content type.
+- Authority classification.
+- Editorial status.
+- Publication status.
+- Official approval status, when applicable.
+- Knowledge depth.
+
+### Organization
+
+- Project journey stages.
+- Official project phase references.
+- Module references.
+- Platform domain references.
+- Topics.
+- Tags.
+
+### Traceability
+
+- Official document ID, when available.
+- Decision IDs.
+- Requirement IDs.
+- Research IDs.
+- Future consideration IDs.
+- Independent review IDs.
+- Related content IDs.
+
+### Source Provenance
+
+- Source repository or publisher.
+- Original source path or URL.
+- Source title.
+- Source revision or commit SHA, when verified.
+- Source tree SHA, where appropriate.
+- Source document date, when available.
+- Review date, when available.
+- Publication date, when available.
+- Source language.
+- Attribution.
+- Original copyright or intellectual property notice.
+- Publication authorization metadata.
+
+### Versioning
+
+- Content revision.
+- Optional source version.
+- Optional previous revision reference.
+- Optional supersedes reference.
+- Optional last verified date.
+
+Do not invent dates or use the current application build date as an official source date.
+
+Unknown metadata must remain null, omitted, or explicitly unknown.
+
+Use discriminated unions or similarly appropriate TypeScript structures where they improve correctness.
+
+Avoid one oversized model containing hundreds of unrelated optional properties.
+
+---
+
+## 8. Content Storage Strategy
+
+Use a Git-based local content architecture.
+
+No database or external CMS is required.
+
+Recommended organization:
+
+```text
+content/
+  models/
+  schemas/
+  registry/
+  repositories/
+  loaders/
+  validators/
+  search/
+  collections/
+    official/
+    research/
+    analysis/
+    future/
+    educational/
+    engineering/
+  taxonomy/
+  assets/
+  fixtures/
+```
+
+Adapt this structure to the existing project architecture.
+
+Use:
+
+- Markdown files for long-form narrative documentation.
+- YAML Frontmatter for structured document metadata.
+- JSON or TypeScript data for structured catalogs and records where appropriate.
+- React components for interactive simulations.
+- SVG or structured visualization components for architectural diagrams.
+- Local approved media assets for screenshots and illustrations.
+
+Do not use separate storage technologies without a clear need.
+
+Content files must remain readable and maintainable by humans.
+
+---
+
+## 9. Markdown and Frontmatter Support
+
+Implement safe server-side loading of local Markdown documents.
+
+Use mature, maintained libraries where appropriate, such as:
+
+- gray-matter.
+- remark.
+- remark-gfm.
+- rehype.
+- rehype-sanitize.
+- Zod or an equivalent runtime schema validation library.
+
+Select the smallest compatible dependency set required by the implementation.
+
+Document all additions.
+
+### Markdown rendering requirements
+
+Support:
+
+- Headings.
+- Paragraphs.
+- Ordered and unordered lists.
+- Tables.
+- Blockquotes.
+- Code blocks.
+- Inline code.
+- Links.
+- Images.
+- Footnotes where supported by the selected renderer.
+- Horizontal dividers.
+- Mixed Arabic and English content.
+
+### Security requirements
+
+- Do not execute arbitrary JavaScript from content.
+- Do not enable unrestricted MDX execution.
+- Do not trust raw HTML by default.
+- Sanitize rendered content using an explicit safe policy.
+- Validate link and image protocols.
+- Prevent filesystem path traversal.
+- Do not expose arbitrary local files through document routes.
+- Do not expose unpublished content through public APIs or client bundles.
+- Restrict document loading to approved content collections.
+
+MDX may be evaluated later if controlled interactive embedding is required.
+
+Do not introduce unrestricted executable content in TASK-002.
+
+---
+
+## 10. Example Frontmatter Structure
+
+The following is an illustrative schema example only.
+
+```yaml
+id: kh-doc-example
+slug: example-document
+
+title:
+  ar: وثيقة توضيحية
+  en: Example Document
+
+language: ar
+type: educational-explanation
+classification: educational
+
+editorialStatus: published
+publicationStatus: public
+approvalStatus: not-applicable
+
+depth: L2
+
+journeyStages:
+  - architecture
+
+phaseRefs: []
+moduleRefs: []
+domainRefs: []
+
+topics:
+  - documentation
+
+tags:
+  - example
+
+decisionRefs: []
+requirementRefs: []
+
+source:
+  kind: illustrative
+  attribution: Teranoo ERP Knowledge Hub
+
+revision: 1
+```
+
+The example must not be registered as an official Teranoo ERP decision or requirement.
+
+Refine the final schema according to the architectural principles of this task.
+
+Document the implemented schema and provide human-readable examples.
+
+---
+
+## 11. Content Registry
+
+Implement a centralized Content Registry that discovers and indexes authorized content records.
+
+The registry must support:
+
+- Lookup by stable content ID.
+- Lookup by slug.
+- Lookup by official identifier.
+- Filtering by type.
+- Filtering by classification.
+- Filtering by status.
+- Filtering by project phase.
+- Filtering by module.
+- Filtering by platform domain.
+- Filtering by topic.
+- Filtering by language.
+- Filtering by knowledge depth.
+- Resolving relationships.
+- Resolving available content revisions.
+- Resolving language variants.
+
+Registry generation may occur at build time or through a controlled server-side loader.
+
+Do not perform uncontrolled filesystem scans on every browser interaction.
+
+Do not create a separate search or content database.
+
+The registry must become the foundation for future Knowledge Hub sections.
+
+---
+
+## 12. Content Relationships and Traceability
+
+Implement typed knowledge relationships.
+
+Support relationship categories such as:
+
+- References.
+- Supported by evidence.
+- Derived from.
+- Justifies.
+- Implements.
+- Constrains.
+- Depends on.
+- Related to.
+- Part of.
+- Supersedes.
+- Tests.
+- Validates.
+- Resolves.
+- Illustrates.
+- Translation of.
+
+These relationships describe knowledge traceability.
+
+They must not automatically be interpreted as official ERP runtime dependencies.
+
+For example:
+
+A research report supports an architectural decision.
+
+The decision constrains a functional specification.
+
+The specification defines a screen requirement.
+
+An implementation record implements that requirement.
+
+A test specification validates the behavior.
+
+An issue record documents a problem.
+
+A solution record resolves the issue.
+
+This chain must eventually be navigable in both directions.
+
+### Required functionality in TASK-002
+
+Implement:
+
+- Outgoing related content.
+- Incoming references or backlinks.
+- Relationship labels.
+- Link resolution by stable ID.
+- Missing reference handling.
+- Relationship integrity validation.
+
+Do not implement a graph database.
+
+Do not build a large interactive knowledge graph in this task.
+
+---
+
+## 13. Full Content Versus Interpretation
+
+The future knowledge platform must preserve the distinction between:
+
+1. Original source document.
+2. Structured source metadata.
+3. Faithful translation, where applicable.
+4. Educational explanation.
+5. Independent analysis.
+6. Interactive illustration.
+
+Do not replace original research reports with short summaries.
+
+A reader should eventually be able to inspect the complete published research report and the supporting sources.
+
+An educational article may explain an official document without silently rewriting it.
+
+Whenever full source content is published, preserve its original meaning, source attribution, and applicable intellectual property notices.
+
+If only an excerpt is available, explicitly identify it as an excerpt.
+
+Never represent an incomplete source as a complete document.
+
+---
+
+## 14. Source and Publication Governance
+
+The Knowledge Hub is an authorized public knowledge-sharing platform.
+
+However, public application visibility does not grant automatic permission to publish every file from a private source repository.
+
+Implement an explicit publishing boundary.
+
+Content must not become publicly available merely because a file exists in a local source directory.
+
+Only explicitly publication-authorized records may enter the public content registry and public search index.
+
+### Required behavior
+
+- Draft and unpublished records must not be included in public output.
+- Publication authorization must be separate from official ERP approval.
+- An approved ERP document is not automatically authorized for public redistribution.
+- Source attribution must remain available.
+- Existing copyright notices must be preserved.
+- Secrets, credentials, customer data, and sensitive operational information must never be published.
+- Do not create a license for the original ERP project.
+- Do not infer third-party redistribution rights from public website availability.
+
+### External research sources
+
+The platform may eventually publish original project-authored research reports and properly attributed source references.
+
+Do not copy entire copyrighted third-party documentation pages into the website without appropriate authorization.
+
+Do not connect to GitHub APIs or retrieve private repository contents in this task.
+
+---
+
+## 15. Knowledge Library — User Interface
+
+Create a functional Knowledge Library page as the initial interface for the new content architecture.
+
+Suggested route:
+
+`/knowledge`
+
+Add a corresponding navigation entry within the existing Knowledge & Decisions group.
+
+Do not remove existing sections.
+
+### Knowledge Library requirements
+
+Provide:
+
+- Page title and explanatory subtitle.
+- Search field.
+- Content type filtering.
+- Content classification filtering.
+- Project phase filtering.
+- Module or domain filtering where relevant.
+- Knowledge depth filtering.
+- Language filtering.
+- Result count.
+- Clear filters action.
+- Compact structured results.
+- Meaningful empty states.
+- Accessible keyboard navigation.
+
+Use actual registered content only.
+
+Do not display invented document counts.
+
+Do not populate filter options with fake content records.
+
+Preserve the approved enterprise visual identity.
+
+Avoid creating a generic card-heavy file manager.
+
+The Knowledge Library should feel like a professional technical documentation catalog.
+
+---
+
+## 16. Unified Document Reader
+
+Create a canonical dynamic document route, for example:
+
+`/knowledge/[slug]`
+
+The final route design may differ if a better stable identity approach is justified.
+
+Reuse and improve existing documentation components rather than duplicating the TASK-001 design system.
+
+### Reader structure
+
+#### A. Document Header
+
+Display:
+
+- Title.
+- Optional subtitle.
+- Content classification.
+- Content type.
+- Relevant status.
+- Official identifiers.
+- Source language.
+- Revision information.
+
+#### B. Contextual Navigation
+
+Display:
+
+- Breadcrumbs.
+- Parent or collection information.
+- Relevant phase, module, and topic references.
+
+#### C. Reading Area
+
+Render the complete authorized Markdown content.
+
+Support readable long-form content, appropriate typography, accessible tables, code blocks, images, and mixed-direction text.
+
+#### D. Table of Contents
+
+Generate the table of contents from the document headings.
+
+Support:
+
+- Stable heading anchors.
+- Duplicate heading handling.
+- Active heading tracking.
+- Direct section links.
+- Responsive behavior.
+- Arabic headings.
+
+#### E. Source and Provenance Panel
+
+Display known source metadata and source links.
+
+Clearly distinguish:
+
+- Original source date.
+- Review date.
+- Publication date.
+- Content revision.
+
+Do not show missing information as fabricated dates or values.
+
+#### F. Related Knowledge
+
+Display outgoing relationships and incoming references.
+
+Allow readers to navigate related records without searching manually.
+
+#### G. Document Navigation
+
+Support previous and next items where an explicit collection sequence exists.
+
+Do not invent a reading sequence for unrelated documents.
+
+#### H. Error Handling
+
+Provide appropriate:
+
+- Document not found state.
+- Invalid content handling.
+- Missing reference handling.
+- Unavailable translation state.
+
+Do not expose server filesystem details through public errors.
+
+---
+
+## 17. Reading Experience
+
+The application will eventually contain very long and technically complex documents.
+
+Design the reader for sustained reading.
+
+Maintain:
+
+- Appropriate maximum article width.
+- Comfortable Arabic typography.
+- Clear heading hierarchy.
+- Readable tables.
+- Visible section navigation.
+- Proper technical identifier rendering.
+- Horizontally scrollable code and wide tables where necessary.
+- Consistent light and dark themes.
+- Print-friendly document presentation where practical.
+
+Do not place every paragraph inside a card.
+
+Avoid overwhelming the reader with metadata before the document itself.
+
+Use progressive disclosure for secondary metadata when appropriate.
+
+---
+
+## 18. Foundations for Specialized Content Viewers
+
+Prepare a lightweight content renderer registry or equivalent extension mechanism.
+
+The architecture must allow future specialized viewers for:
+
+### A. Screen Specification
+
+Future content may contain:
+
+- Screen overview.
+- Design screenshots.
+- Interactive UI preview.
+- Field definitions.
+- Data sources.
+- Default values.
+- Validation rules.
+- Business rules.
+- Permissions.
+- Actions.
+- State transitions.
+- Error messages.
+- Integrations.
+- Acceptance criteria.
+- Test scenarios.
+
+### B. Data Model
+
+Future content may contain:
+
+- Entities.
+- Fields.
+- Data types.
+- Primary keys.
+- Foreign keys.
+- Relationships.
+- Constraints.
+- Indexes.
+- Ownership.
+- Lifecycle.
+- Security scope.
+- Migration notes.
+
+### C. Engineering Journal
+
+Future content may contain:
+
+- Objective.
+- Actual date.
+- ERP project task or work item.
+- Related specification.
+- Implementation approach.
+- Encountered problem.
+- Root cause.
+- Alternatives considered.
+- Chosen solution.
+- Changed files or verified commits.
+- Testing evidence.
+- Result.
+- Lessons learned.
+- Follow-up issues.
+
+### D. Test Specification and Result
+
+Future content may contain:
+
+- Test objective.
+- Preconditions.
+- Steps.
+- Test data.
+- Expected result.
+- Actual result.
+- Execution status.
+- Evidence.
+- Related requirements.
+- Known issues.
+
+### Scope limitation
+
+Do not implement complete specialized viewers for all these types now.
+
+Establish a small extensibility mechanism that permits future specialized renderers without changing the fundamental content registry or duplicating content records.
+
+A generic document reader must remain the default renderer.
+
+---
+
+## 19. Build-in-Public Foundation
+
+The platform must support the owner's intention to document the real construction of Teranoo ERP publicly.
+
+Introduce an Engineering Journal entry in the navigation.
+
+Suggested route:
+
+`/engineering-journal`
+
+In TASK-002, this may be a well-designed foundational page explaining the purpose of the journal.
+
+It must explicitly indicate that detailed engineering records will be added when actual ERP engineering work begins.
+
+Do not fabricate development tasks, incidents, code commits, implementation dates, errors, solutions, or lessons learned.
+
+### Critical distinction
+
+There are two separate development projects:
+
+1. Teranoo ERP — the actual ERP product being documented.
+2. Teranoo ERP Knowledge Hub — the documentation platform itself.
+
+The Engineering Journal is primarily intended to document the actual ERP product development journey.
+
+Knowledge Hub development tasks and commits must not be represented as ERP implementation progress.
+
+Keep the two project identities and their progress records distinct.
+
+---
+
+## 20. Global Search Integration
+
+Integrate the new authorized content registry with the existing Global Search component.
+
+Preserve existing navigation search and reference snapshot search.
+
+Support search by:
+
+- Document title.
+- Description.
+- Official decision ID.
+- Requirement ID.
+- Content ID.
+- Topic.
+- Tag.
+- Module.
+- Content type.
+- Arabic and English metadata.
+
+Search results must navigate to the actual document or relevant section.
+
+Do not send users to a generic section when an exact content route is available.
+
+Do not index unpublished content.
+
+Use a simple, deterministic search implementation.
+
+Full-text indexing of thousands of documents, advanced ranking, semantic search, and external search engines are deferred.
+
+Do not integrate AI search.
+
+---
+
+## 21. Internationalization of Knowledge Content
+
+Distinguish between:
+
+- Application interface language.
+- Original document language.
+- Available document translations.
+
+Changing the application interface from Arabic to English must not create the false impression that all documents have been translated.
+
+Support:
+
+- Arabic source documents.
+- English source documents.
+- Mixed-language documents.
+- Optional linked translations.
+- Correct content language indicators.
+- Appropriate reading direction.
+- Explicit fallback when a translation does not exist.
+
+Never generate an unofficial translation and present it as an official source document.
+
+Maintain the established next-intl interface translation system.
+
+Preserve stable content identity across available translations through explicit translation relationships.
+
+---
+
+## 22. Content Revision and History Foundation
+
+The content architecture must support future version history.
+
+Establish principles for:
+
+- Stable content identity.
+- Content revisions.
+- Original source revision tracking.
+- Supersession.
+- Deprecation.
+- Correction notes.
+- Publication history.
+
+Do not silently overwrite historical decisions or engineering records.
+
+Distinguish between correcting presentation errors and changing substantive source information.
+
+Do not implement a full version-control system inside the application.
+
+Git remains the underlying history mechanism at this stage.
+
+Provide sufficient metadata and architectural boundaries for future revision comparison and history viewers.
+
+---
+
+## 23. Reference Snapshot Correction
+
+Address the minor source provenance issue identified during independent review.
+
+The current `SnapshotProvenance.metricsOriginNote` incorrectly groups the 24 Future Architecture Considerations with independent review statistics.
+
+Correct both Arabic and English descriptions.
+
+The correct classification is:
+
+- 120 approved architectural decisions: official project decision register.
+- Phase 5 progress of 7 out of 13 planning items: official project work plan.
+- 24 Future Architecture Considerations: official project future considerations register, but not necessarily approved architecture decisions.
+- 13 architectural research packages: project research inventory.
+- 57 independent review notes: independent advisory review inventory.
+
+Do not update the numerical values without verified source information.
+
+Preserve the existing snapshot review date and source reference.
+
+Where appropriate, distinguish between:
+
+- Source-declared aggregate counts.
+- Actual locally registered and published content counts.
+
+For example, the official source may declare 120 decisions while the Knowledge Hub currently contains only a limited number of imported decision records.
+
+Do not present all 120 decisions as locally available before they have been imported.
+
+---
+
+## 24. Initial Content — Authorized Scope
+
+Use only the verified reference information already present in the application from TASK-001 and TASK-001-FIX-01.
+
+Migrate or adapt the existing Product Vision reference content to demonstrate the new content architecture.
+
+Label it accurately as a reference document derived from the authorized project snapshot, not as a complete reproduction of the original Product Vision source file.
+
+Preserve the existing Product Vision route and functionality.
+
+Create one Knowledge Hub-authored educational article explaining the distinction between:
+
+- Official documentation.
+- Research evidence.
+- Independent analysis.
+- Future considerations.
+- Illustrative examples.
+- Engineering records.
+
+This article is educational content about the Knowledge Hub content model, not an official ERP architectural decision.
+
+Use clearly identified test fixtures to verify:
+
+- Markdown rendering.
+- Relationships.
+- Source attribution.
+- Different content classifications.
+- Unpublished content exclusion.
+- Arabic and English behavior.
+
+Test fixtures must not appear as real project documentation in production.
+
+Do not invent research reports or ERP implementation content.
+
+Do not import the full official ERP documentation collection in this task.
+
+Real content ingestion will occur through separately authorized tasks.
+
+---
+
+## 25. Content Integrity Validation
+
+Implement runtime or build-time validation of structured content.
+
+Validation must detect:
+
+- Invalid metadata.
+- Missing required fields.
+- Duplicate content IDs.
+- Duplicate canonical routes.
+- Invalid classifications.
+- Invalid status combinations.
+- Invalid relationship types.
+- Broken internal content references.
+- Invalid taxonomy references.
+- Invalid translation relationships.
+- Invalid or unsafe URLs.
+- Invalid publication metadata.
+- Inconsistent source attribution.
+
+Distinguish between fatal integrity errors and non-blocking warnings.
+
+For example, an explicitly declared external or deferred reference may be unresolved without causing a build failure, provided it is displayed honestly and is not a broken internal navigation target.
+
+Do not silently discard invalid content.
+
+Provide clear diagnostic output identifying affected files and fields.
+
+Add a stable command such as:
+
+`content:validate`
+
+Integrate content validation into the existing combined quality verification command.
+
+---
+
+## 26. Performance Requirements
+
+The application must eventually support a substantial knowledge library.
+
+Maintain:
+
+- Server-side loading of document bodies.
+- Compact metadata indexes.
+- No unnecessary transfer of all document bodies to the browser.
+- No inclusion of unpublished files in client bundles.
+- Lazy rendering of heavy specialized viewers where appropriate.
+- Reusable document rendering components.
+- Predictable content discovery and indexing.
+- Appropriate caching without misleading freshness claims.
+
+Use Next.js capabilities appropriately.
+
+Do not add Redis, Elasticsearch, vector databases, background services, or unnecessary infrastructure.
+
+Do not prematurely optimize for unverified scale assumptions.
+
+---
+
+## 27. Scope Restrictions
+
+Do NOT implement:
+
+- Database.
+- User accounts.
+- Authentication.
+- Online content editing.
+- Administrative CMS.
+- GitHub API synchronization.
+- Automated external content scraping.
+- AI chatbot.
+- AI-generated research.
+- Semantic or vector search.
+- Graph database.
+- Full interactive knowledge graph.
+- Full ERP functional specifications.
+- Full research library population.
+- Full screen specification viewer.
+- Full implementation handbook.
+- Full ERP engineering journal content.
+- Public contribution workflows.
+- Comments or discussions.
+
+These may be considered in separately authorized tasks if needed.
+
+TASK-002 focuses on the content foundation and a small but genuinely working end-to-end demonstration.
+
+---
+
+## 28. Backward Compatibility
+
+Preserve:
+
+- Existing approved application routes.
+- Dashboard.
+- Product Vision.
+- Roadmap.
+- Architecture overview.
+- Platform capabilities.
+- Existing source snapshot.
+- Arabic-first experience.
+- English interface.
+- RTL/LTR behavior.
+- Light and dark themes.
+- Sidebar behavior.
+- Modal accessibility.
+- Global Search.
+- Existing design tokens.
+- Existing automated tests.
+- Google AI Studio deployment compatibility.
+
+Do not redesign unrelated screens.
+
+Do not remove approved functionality.
+
+Where existing components must change to support the content architecture, reuse them and document the change.
+
+---
+
+## 29. Acceptance Criteria
+
+TASK-002 is complete only when:
+
+1. The expanded public knowledge-platform vision is reflected in the application.
+2. A typed and validated content model exists.
+3. Content classification, type, approval, publication, and implementation status are distinct.
+4. Markdown content is loaded safely from local authorized collections.
+5. YAML Frontmatter is validated.
+6. A functional Content Registry exists.
+7. Stable content identifiers are supported.
+8. Documents have canonical working URLs.
+9. The Knowledge Library is functional.
+10. The unified document reader renders real authorized local content.
+11. Heading-based navigation works.
+12. Source provenance is visible and accurate.
+13. Content relationships and backlinks resolve correctly.
+14. Global Search includes authorized registered content.
+15. Arabic and English interface behavior remains correct.
+16. Document language is independent of interface language.
+17. Unpublished records do not enter public search, routes, indexes, or client bundles.
+18. Test fixtures are excluded from production content.
+19. Duplicate IDs and broken internal references are detected.
+20. The corrected FAC provenance classification is implemented.
+21. Source aggregate counts and published record counts are distinguishable.
+22. Engineering Journal foundation clearly distinguishes ERP development from Knowledge Hub development.
+23. Existing routes and functionality remain intact.
+24. Specialized future renderers can be added without redesigning the content architecture.
+25. Production Build succeeds.
+26. Type Checking succeeds.
+27. ESLint succeeds.
+28. Existing and new automated tests pass.
+29. Content validation succeeds.
+30. No fabricated ERP content or unauthorized source ingestion exists.
+
+---
+
+## 30. Automated Testing Requirements
+
+Add tests covering:
+
+### Content Loading
+
+- Valid Markdown document.
+- Valid Frontmatter.
+- Invalid Frontmatter.
+- Missing required metadata.
+- Duplicate content ID.
+- Duplicate route.
+
+### Content Relationships
+
+- Valid outgoing relationship.
+- Incoming reference.
+- Broken internal reference.
+- Explicitly deferred or external reference.
+
+### Publication Boundary
+
+- Published authorized document is available.
+- Unpublished document is excluded.
+- Draft is excluded from public routes and search.
+- Test fixtures are excluded.
+- Direct access to an unpublished slug fails safely.
+
+### Search
+
+- Search by Arabic title.
+- Search by English title.
+- Search by official identifier.
+- Search by topic.
+- Search by content type.
+- Zero results.
+
+### Localization
+
+- Arabic content in Arabic interface.
+- English content in Arabic interface.
+- Arabic content in English interface.
+- Missing translation fallback.
+
+### Security
+
+- Unsafe HTML sanitization.
+- Unsafe URL rejection.
+- Filesystem path traversal prevention.
+- Unauthorized file access prevention.
+
+### Regression
+
+- Existing TASK-001 tests.
+- Existing TASK-001-FIX-01 tests.
+- Existing navigation and theme behavior.
+- Existing snapshot calculations.
+
+Use deterministic test fixtures and the established locally declared testing tools.
+
+Update the test command to include all relevant suites.
+
+Do not claim that tests passed without actual execution.
+
+---
+
+## 31. Technical Documentation
+
+Create:
+
+```text
+docs/
+  KNOWLEDGE_PLATFORM_VISION.md
+  KNOWLEDGE_ARCHITECTURE.md
+  CONTENT_SCHEMA.md
+  CONTENT_AUTHORING_GUIDE.md
+  CONTENT_RELATIONSHIPS.md
+  CONTENT_PUBLICATION_POLICY.md
+  CONTENT_VALIDATION.md
+  TASK-002-COMPLETION_REPORT.md
+```
+
+Update existing architecture and content documentation where materially required.
+
+Avoid conflicting or duplicated documentation.
+
+Each document should have a clear responsibility.
+
+### CONTENT_AUTHORING_GUIDE.md
+
+Explain how a future developer or content author can:
+
+- Add a Markdown document.
+- Assign a stable content ID.
+- Configure metadata.
+- Reference an official decision.
+- Add source attribution.
+- Link related content.
+- Register a translation.
+- Add an educational explanation.
+- Add a research report.
+- Prepare a future screen specification.
+- Prepare an engineering journal entry.
+- Validate content.
+- Authorize publication.
+- Update an existing content revision.
+
+Provide working examples matching the implemented architecture.
+
+This guide will be the foundation for all subsequent content ingestion tasks.
+
+---
+
+## 32. Completion Report
+
+Create:
+
+**docs/TASK-002-COMPLETION_REPORT.md**
+
+The report must include:
+
+A. Executive implementation summary.
+
+B. Updated product vision.
+
+C. Content architecture.
+
+D. Content classifications and types.
+
+E. Metadata schema.
+
+F. Content storage structure.
+
+G. Markdown rendering and security.
+
+H. Content registry.
+
+I. Relationships and backlinks.
+
+J. Knowledge Library implementation.
+
+K. Document Reader implementation.
+
+L. Search integration.
+
+M. Publication governance.
+
+N. Internationalization behavior.
+
+O. Specialized renderer extension mechanism.
+
+P. Engineering Journal foundation.
+
+Q. Reference snapshot corrections.
+
+R. Dependencies added and reasons.
+
+S. Automated test results.
+
+T. Content validation results.
+
+U. Build, TypeScript, and ESLint results.
+
+V. Files created and modified.
+
+W. Known limitations.
+
+X. Deviations from requirements.
+
+Y. Readiness for independent review.
+
+Preserve historical completion reports.
+
+Clearly state what was implemented, what was verified, and what remains deferred.
+
+---
+
+## Final Instructions
+
+This application will eventually become a comprehensive public reference for understanding and building an enterprise ERP system.
+
+Do not limit its architecture to displaying a small collection of documentation cards or static project metrics.
+
+Build a trustworthy knowledge foundation capable of growing throughout the entire ERP development lifecycle.
+
+However, do not confuse architectural readiness with immediate feature implementation.
+
+Implement a small, complete, genuinely working content pipeline demonstrating:
+
+**Authorized Content → Metadata Validation → Content Registry → Discovery → Document Rendering → Source Attribution → Relationships → Search.**
+
+Prioritize content integrity, maintainability, accessibility, readability, extensibility, and publishing safety.
+
+Preserve the approved visual identity and application foundation.
+
+Do not fabricate future ERP knowledge.
+
+Do not start TASK-003.
+
+Implement TASK-002, execute the quality checks, document the results, and stop for independent review.

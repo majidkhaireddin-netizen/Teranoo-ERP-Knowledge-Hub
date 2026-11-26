@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { ChevronDown, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface TableOfContentsItem {
@@ -13,6 +14,48 @@ export interface TableOfContentsProps {
   title: string;
   items: readonly TableOfContentsItem[];
   className?: string;
+}
+
+export function MobileTableOfContents({
+  title,
+  items,
+  className,
+}: TableOfContentsProps) {
+  if (items.length === 0) return null;
+
+  return (
+    <details
+      className={cn(
+        'xl:hidden rounded-lg border border-border bg-surface px-4 py-3 text-xs group',
+        className
+      )}
+    >
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 font-semibold text-text-primary select-none">
+        <span className="inline-flex items-center gap-2">
+          <List className="h-3.5 w-3.5 text-text-muted" aria-hidden="true" />
+          <span>{title}</span>
+        </span>
+        <ChevronDown
+          className="h-3.5 w-3.5 text-text-muted transition-transform duration-150 group-open:rotate-180"
+          aria-hidden="true"
+        />
+      </summary>
+      <nav aria-label={title} className="mt-3 border-t border-border pt-3">
+        <ul className="space-y-1.5">
+          {items.map((item) => (
+            <li key={item.id} className={item.level === 3 ? 'ps-3' : ''}>
+              <a
+                href={`#${item.id}`}
+                className="block py-0.5 leading-snug text-text-secondary hover:text-primary transition-colors"
+              >
+                {item.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
+  );
 }
 
 export function TableOfContents({

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { resolveLocalizedText } from '@/content/models/types';
 import { PRODUCT_VISION_DOC } from '@/content/seed/productVisionDoc';
@@ -169,6 +171,28 @@ export function ProductVisionView() {
               locale
             )}
           </InformationCallout>
+
+          <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-0.5 text-xs">
+              <p className="font-semibold text-text-primary">
+                {t('productVision.libraryLinkTitle')}
+              </p>
+              <p className="text-text-secondary">
+                {t('productVision.libraryLinkBody')}
+              </p>
+            </div>
+            <Link
+              href={
+                locale === 'en'
+                  ? '/knowledge/teranoo-product-vision-reference-en'
+                  : '/knowledge/teranoo-product-vision-reference'
+              }
+              className="inline-flex shrink-0 items-center gap-1 rounded-md border border-border bg-surface-subtle px-3 py-1.5 text-xs font-medium text-primary hover:bg-surface-hover transition-colors"
+            >
+              <span>{t('productVision.libraryLinkAction')}</span>
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          </div>
 
           {/* Section 1: Product Identity */}
           <DocumentationSection

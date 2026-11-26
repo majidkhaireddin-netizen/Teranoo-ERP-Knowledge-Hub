@@ -2,8 +2,8 @@
   "app": {
     "name": "Teranoo ERP Knowledge Hub",
     "shortName": "Teranoo ERP",
-    "subtitle": "Documentation & Architecture",
-    "subtitleEn": "Product Documentation & Architecture Center",
+    "subtitle": "The Complete Journey of Building an Enterprise ERP System",
+    "subtitleEn": "The Complete Journey of Building an Enterprise ERP System",
     "skipToContent": "Skip to main content",
     "currentPhaseBadge": "Phase 5 — In Progress",
     "planningProgressNotice": "Indicators reflect planning, documentation, and architectural approval progress — not ERP software implementation completion."
@@ -26,6 +26,7 @@
       "platformFoundation": "Platform Foundation",
       "platformTenancy": "Platform & Tenancy",
       "deploymentDatabase": "Deployment & Database",
+      "knowledgeLibrary": "Knowledge Library",
       "decisionRegister": "Decision Register",
       "researchCenter": "Research Center",
       "futureConsiderations": "Future Considerations",
@@ -33,6 +34,7 @@
       "businessScenarios": "Business Scenarios",
       "interactiveDiagrams": "Interactive Diagrams",
       "glossary": "Glossary",
+      "engineeringJournal": "Engineering Journal",
       "changeHistory": "Change History",
       "about": "About"
     },
@@ -74,7 +76,12 @@
     "official": {
       "label": "Official Documentation",
       "shortLabel": "Official",
-      "description": "Approved official documentation and architectural decisions of Teranoo ERP."
+      "description": "Approved foundational and architectural documentation of Teranoo ERP."
+    },
+    "approved-decision": {
+      "label": "Approved Decision",
+      "shortLabel": "Approved Decision",
+      "description": "Formal architectural or functional decision recorded with an official identifier in the Teranoo ERP Decision Register."
     },
     "research": {
       "label": "Research & Evidence",
@@ -89,7 +96,22 @@
     "future": {
       "label": "Future Considerations",
       "shortLabel": "Future",
-      "description": "Forward-looking architectural topics that have not necessarily become approved decisions."
+      "description": "Forward-looking architectural topics registered for future exploration and not yet approved as decisions."
+    },
+    "educational": {
+      "label": "Educational Explanation",
+      "shortLabel": "Educational",
+      "description": "Conceptual and explanatory material authored to clarify architecture and governance — not an official ERP decision."
+    },
+    "illustrative": {
+      "label": "Illustrative Example",
+      "shortLabel": "Illustrative",
+      "description": "Non-binding examples, walkthroughs, or simulations illustrating concepts or workflows."
+    },
+    "engineering": {
+      "label": "Engineering Record",
+      "shortLabel": "Engineering",
+      "description": "Build-in-public implementation records, development tasks, technical issues, solutions, and lessons learned."
     }
   },
   "status": {
@@ -168,11 +190,17 @@
         "future": "Future Architecture Considerations"
       },
       "notes": {
-        "decisions": "Official metric from DECISION_REGISTER.md",
-        "research": "Reference research & benchmark packages",
+        "decisions": "Source-declared total from official DECISION_REGISTER.md",
+        "research": "Source-declared total of research & benchmark packages",
         "reviews": "Independent advisory review statistic — not an approved decision",
-        "future": "Forward-looking considerations not yet approved as decisions"
+        "future": "Source-declared total from the official future considerations register — not approved decisions"
       }
+    },
+    "publishedLibrary": {
+      "bannerTitle": "Source-Declared Totals vs. Locally Published Records",
+      "bannerBody": "The snapshot above displays aggregate totals declared in project planning sources, while the local Knowledge Library currently holds {count} explicitly authorized records ready for full reading.",
+      "openLibrary": "Browse Knowledge Library",
+      "openJournal": "Open Engineering Journal"
     },
     "identityStrip": {
       "productType": "Product Type",
@@ -235,7 +263,10 @@
       "database": "Authorized relational database engine"
     },
     "governanceSummary": "Project progression follows structured architectural planning and approval phases. Phases 1 through 4 are completed, while Phase 5 (Shared Platform Capabilities) is in progress with {completed} of {total} planning items approved within a reference snapshot of {decisions} approved architectural decisions.",
-    "approvedDecisionsHeading": "Approved Phase 5 Decision Identifiers:"
+    "approvedDecisionsHeading": "Approved Phase 5 Decision Identifiers:",
+    "libraryLinkTitle": "Structured Record in the Knowledge Library",
+    "libraryLinkBody": "A structured snapshot-derived reference document is also published in the Knowledge Library with full provenance metadata, relationships, and bilingual variants.",
+    "libraryLinkAction": "Read in Knowledge Library"
   },
   "sections": {
     "modules": {
@@ -256,8 +287,8 @@
       "metricNote": "Individual research packages, citations, and verified findings will be added in a subsequent task."
     },
     "future": {
-      "metricLabel": "Future Architecture Considerations (Independent Review Snapshot Statistic)",
-      "metricNote": "These items are not approved decisions; verified records will be populated in a later task."
+      "metricLabel": "Future Architecture Considerations (Official Future Considerations Register)",
+      "metricNote": "These items belong to the official future considerations register and are not approved decisions; verified records will be populated in a later task."
     },
     "reviews": {
       "metricLabel": "Independent Review Notes (Independent Advisory Review Statistic)",
@@ -266,23 +297,39 @@
   },
   "about": {
     "title": "About Teranoo ERP Knowledge Hub",
-    "subtitle": "A dedicated documentation, architecture, and knowledge management workspace for Teranoo ERP.",
+    "subtitle": "The Complete Journey of Building an Enterprise ERP System — an ERP encyclopedia, engineering guide, and living architecture platform for Teranoo ERP.",
+    "visionTitle": "Comprehensive Platform Vision & Six Complementary Concepts",
+    "visionBody": "Teranoo ERP Knowledge Hub is designed to document the complete lifecycle of building an enterprise ERP system — from discovery, research, and architecture through engineering, testing, deployment, operations, and continuous evolution — uniting six complementary concepts:",
+    "concepts": {
+      "c1Title": "1. ERP Encyclopedia",
+      "c1Body": "Structured reference covering ERP domain concepts, business processes, business rules, and structural models.",
+      "c2Title": "2. ERP Engineering Guide",
+      "c2Body": "Practical engineering guide explaining architectural patterns, domain modeling, and scalable platform design.",
+      "c3Title": "3. Living Architecture Documentation",
+      "c3Body": "Connected, evolving documentation of approved decisions, business modules, shared platform capabilities, and dependencies.",
+      "c4Title": "4. Research & Evidence Library",
+      "c4Body": "Repository of comparative benchmarks, research evidence, and independent reviews clearly separated from approved decisions.",
+      "c5Title": "5. Implementation Handbook",
+      "c5Body": "Extensible foundation ready for screen specifications, data models, integration contracts, test plans, and deployment guides.",
+      "c6Title": "6. Build-in-Public Engineering Journal",
+      "c6Body": "Transparent documentation of real Teranoo ERP implementation tasks, technical issues, solutions, and lessons learned."
+    },
     "purposeTitle": "Platform Purpose & Boundaries",
-    "purposeBody": "This application serves as an authoritative, structured workspace for understanding Teranoo ERP's vision, architecture, approved decisions, research evidence, and independent reviews. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.",
+    "purposeBody": "This application serves as an authoritative, structured workspace for understanding Teranoo ERP's vision, architecture, approved decisions, research evidence, independent reviews, and engineering journey. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.",
     "purposeHeaders": {
       "is": "What This Platform Is",
       "isNot": "What This Platform Is Not"
     },
     "purposeRows": {
-      "r1Is": "Structured documentation and architecture hub for Teranoo ERP",
+      "r1Is": "Structured encyclopedia, engineering guide, and architecture hub for Teranoo ERP",
       "r1IsNot": "Not an operational ERP system",
-      "r2Is": "Analytical workspace for decisions, research, and independent reviews",
+      "r2Is": "Interconnected knowledge workspace for decisions, research, reviews, and engineering journals",
       "r2IsNot": "Not a marketing website",
       "r3Is": "Public read-only knowledge platform built incrementally via governed tasks",
       "r3IsNot": "Not a plain Markdown viewer or disposable prototype"
     },
     "classificationTitle": "Content Classification & Integrity Governance",
-    "classificationBody": "The platform enforces an explicit visual and semantic distinction across four knowledge classifications so advisory recommendations, research evidence, and future considerations are never presented as approved decisions.",
+    "classificationBody": "The platform enforces an explicit visual and semantic distinction across eight authority classifications so research evidence, advisory reviews, educational guides, illustrative models, and engineering logs are never conflated with approved ERP decisions.",
     "publicAccessTitle": "Approved Product Direction — Public Read-Only Knowledge Platform & Publishing Governance",
     "publicAccessCalloutTitle": "Public Read-Only Knowledge Platform",
     "publicAccessBody": "By explicit approval of the project owner, Teranoo ERP Knowledge Hub operates as a publicly accessible read-only knowledge-sharing platform for authorized architectural documentation. User authentication is not required for public read-only access, and the application repository may remain public.",
@@ -291,6 +338,174 @@
       "noSecrets": "Secrets, API keys, credentials, access tokens, customer data, and sensitive operational information must never be published.",
       "attribution": "Source attribution and intellectual property notices must be preserved; public repository visibility does not automatically grant an open-source software license.",
       "separation": "Source repository visibility and deployed application access control are distinct security boundaries."
+    }
+  },
+  "knowledge": {
+    "searchDocBadge": "Doc",
+    "libraryTitle": "Knowledge Library",
+    "librarySubtitle": "Unified catalog of authorized, published knowledge records with multi-dimensional filtering, source provenance, and typed relationships.",
+    "snapshotVsPublishedTitle": "Locally Published Records vs. Source-Declared Snapshot Totals",
+    "snapshotVsPublishedBody": "This library currently publishes {published} authorized local records. Aggregate counts declared in the planning reference snapshot ({decisions} decisions, {research} research packages, {future} future considerations, {reviews} independent review notes) will be ingested progressively through authorized tasks without fabricating missing records.",
+    "searchPlaceholder": "Search by title, description, topic, or official ID such as D-PLAT-01...",
+    "filters": {
+      "type": "Content Type",
+      "classification": "Classification",
+      "phase": "Official Phase",
+      "module": "Business Module",
+      "domain": "Platform Domain",
+      "depth": "Knowledge Depth",
+      "language": "Document Language",
+      "allTypes": "All content types",
+      "allClassifications": "All classifications",
+      "allPhases": "All phases",
+      "allModules": "All modules",
+      "allDomains": "All domains",
+      "allDepths": "All depths",
+      "allLanguages": "All languages",
+      "clearFilters": "Clear filters"
+    },
+    "resultsCount": "Showing {shown} of {total} published records",
+    "emptyTitle": "No matching knowledge records",
+    "emptyDescription": "Adjust your search query or clear active filters to view all authorized published records.",
+    "openDocument": "Read document",
+    "backToLibrary": "Back to Knowledge Library",
+    "readingTime": "Estimated reading time: {minutes} min",
+    "revisionLabel": "Revision v{revision}",
+    "languages": {
+      "ar": "Arabic (العربية)",
+      "en": "English",
+      "mixed": "Mixed (Arabic / English)"
+    },
+    "languageBanner": {
+      "originalLanguage": "Original Document Language",
+      "differentFromUi": "This document is presented in its original language ({docLang}), independent of the interface language.",
+      "availableTranslations": "Linked translations available:",
+      "noTranslationAvailable": "No linked translation is currently available in the active interface language; displaying the original document."
+    },
+    "statusDimensions": {
+      "title": "Independent Record Statuses",
+      "editorial": "Editorial Status",
+      "approval": "Official Approval",
+      "publication": "Publication Status",
+      "implementation": "Implementation Status",
+      "editorialValues": {
+        "draft": "Draft",
+        "under-review": "Under Review",
+        "reference": "Reference",
+        "published": "Published",
+        "superseded": "Superseded",
+        "deprecated": "Deprecated",
+        "archived": "Archived"
+      },
+      "approvalValues": {
+        "not-applicable": "Not Applicable",
+        "proposed": "Proposed",
+        "under-review": "Under Review",
+        "approved": "Officially Approved",
+        "reference": "Snapshot Reference",
+        "superseded": "Superseded",
+        "deprecated": "Deprecated"
+      },
+      "publicationValues": {
+        "private": "Private",
+        "internal": "Internal",
+        "public": "Public (Authorized)"
+      },
+      "implementationValues": {
+        "not-applicable": "Not Applicable",
+        "not-started": "Not Started",
+        "in-progress": "In Progress",
+        "implemented": "Implemented",
+        "verified": "Verified",
+        "deprecated": "Deprecated"
+      }
+    },
+    "reader": {
+      "contentType": "Content Type",
+      "depth": "Knowledge Depth",
+      "officialIds": "Linked Official Identifiers",
+      "taxonomyTitle": "Discovery Taxonomy",
+      "phases": "Phases",
+      "modules": "Business Modules",
+      "domains": "Platform Domains",
+      "topics": "Topics",
+      "researchDisclaimerTitle": "Non-Binding Authority Notice",
+      "researchDisclaimerBody": "This record is presented strictly under its declared authority classification and does not constitute an officially approved Teranoo ERP architectural or functional decision.",
+      "provenanceTitle": "Source, Attribution & Dates",
+      "provenanceSummary": "Inspect provenance, dates, and authorization details",
+      "sourceKind": "Source Category",
+      "sourceKindValues": {
+        "official-source": "Official Project Source",
+        "snapshot-derived": "Snapshot-Derived Reference",
+        "knowledge-hub-authored": "Knowledge Hub Authored",
+        "external-reference": "External Reference",
+        "illustrative": "Illustrative Model"
+      },
+      "attribution": "Source Attribution",
+      "completeness": "Completeness Scope",
+      "completenessValues": {
+        "complete": "Complete Record",
+        "excerpt": "Reference Excerpt",
+        "reference-summary": "Snapshot-Derived Reference Summary (not a full reproduction of the original file)"
+      },
+      "sourceRepository": "Source Repository / URL",
+      "sourcePaths": "Source Paths",
+      "sourceSha": "Source Tree / Commit SHA",
+      "sourceDocumentDate": "Source Document Date",
+      "reviewDate": "Review Date",
+      "publicationDate": "Platform Publication Date",
+      "lastVerifiedDate": "Last Verified Date",
+      "notRecorded": "Not recorded in source",
+      "authorizationNote": "Publication Scope Note",
+      "relationshipsTitle": "Related Knowledge & Backlinks",
+      "outgoingTitle": "Outgoing Relationships",
+      "incomingTitle": "Incoming Backlinks (Referenced By)",
+      "noRelationships": "No knowledge relationships are currently registered for this record.",
+      "deferredBadge": "Deferred reference (not yet imported locally)",
+      "externalBadge": "External reference",
+      "missingBadge": "Reference unavailable locally",
+      "revisionsTitle": "Related Revisions",
+      "sequencePrev": "Previous in Collection",
+      "sequenceNext": "Next in Collection",
+      "rendererMode": "Viewer Mode",
+      "notFoundTitle": "Knowledge Record Unavailable",
+      "notFoundDescription": "This record either does not exist or is an unpublished draft/internal record outside the public publication boundary."
+    }
+  },
+  "engineeringJournal": {
+    "title": "Build-in-Public Engineering Journal",
+    "subtitle": "Dedicated engineering log for documenting real Teranoo ERP software development — implementation tasks, technical issues, solutions, and testing evidence.",
+    "emptyStatusTitle": "No Teranoo ERP Engineering Entries Yet",
+    "emptyStatusBody": "Active software implementation of the Teranoo ERP product has not begun yet; the project is currently in architectural planning (Phase 5). To uphold content integrity, zero fabricated tasks, commits, bugs, or test results are displayed here. Entries will be published once real ERP engineering begins.",
+    "distinctionTitle": "Critical Project Distinction: Teranoo ERP vs. Teranoo ERP Knowledge Hub",
+    "distinctionBody": "Development tasks for this documentation platform (such as TASK-001 and TASK-002) are strictly distinct from engineering work on the Teranoo ERP software product itself.",
+    "distinctionHeaders": {
+      "dimension": "Dimension",
+      "erpProduct": "Teranoo ERP Product",
+      "knowledgeHub": "Teranoo ERP Knowledge Hub"
+    },
+    "distinctionRows": {
+      "r1Dim": "System Nature",
+      "r1Erp": "Commercial modular enterprise ERP product (Finance, Inventory, Procurement, Sales)",
+      "r1Hub": "Public read-only documentation & knowledge platform chronicling the ERP journey",
+      "r2Dim": "Current State",
+      "r2Erp": "Architectural planning & approval stage (Phase 5) — software engineering not started",
+      "r2Hub": "Incremental platform implementation (TASK-001 approved, TASK-002 in progress)",
+      "r3Dim": "Where Work Is Recorded",
+      "r3Erp": "In this Engineering Journal (/engineering-journal) once real ERP engineering starts",
+      "r3Hub": "In Knowledge Hub task completion reports (docs/TASK-*-COMPLETION_REPORT.md)"
+    },
+    "anatomyTitle": "Planned Structure of Future Engineering Journal Entries",
+    "anatomyBody": "The content architecture already registers structured engineering types (engineering-journal-entry, development-task, technical-issue, solution-record, lesson-learned) designed around verifiable fields:",
+    "anatomyItems": {
+      "objective": "Engineering objective linked to official Decision and Requirement IDs.",
+      "actualDate": "Actual execution date (never fabricated or estimated).",
+      "workItem": "ERP work item reference and target business module or platform domain.",
+      "problemRootCause": "Technical issue description and documented root cause.",
+      "solution": "Evaluated alternatives, chosen solution, and engineering rationale.",
+      "commits": "Verified commit references only.",
+      "testing": "Actual test evidence and verification results.",
+      "lessons": "Lessons learned and architectural feedback."
     }
   },
   "states": {

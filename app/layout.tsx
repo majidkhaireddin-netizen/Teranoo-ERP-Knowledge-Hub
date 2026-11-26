@@ -14,6 +14,8 @@ import {
 } from '@/i18n/config';
 import { AppProviders } from '@/providers/AppProviders';
 import { AppShell } from '@/components/layout/AppShell';
+import { getContentRegistry } from '@/content/registry/contentRegistry';
+import { buildUnifiedSearchIndex } from '@/content/search/knowledgeSearch';
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   subsets: ['arabic', 'latin'],
@@ -42,18 +44,18 @@ export const metadata: Metadata = {
     template: '%s · Teranoo ERP Knowledge Hub',
   },
   description:
-    'Product Documentation & Architecture Center for Teranoo ERP — an enterprise-grade modular ERP knowledge, architecture, decisions, and research platform.',
+    'The Complete Journey of Building an Enterprise ERP System — ERP encyclopedia, engineering guide, living architecture documentation, research library, and build-in-public journal for Teranoo ERP.',
   openGraph: {
     title: 'Teranoo ERP Knowledge Hub',
     description:
-      'Product Documentation & Architecture Center for Teranoo ERP — an enterprise-grade modular ERP knowledge, architecture, decisions, and research platform.',
+      'The Complete Journey of Building an Enterprise ERP System — ERP encyclopedia, engineering guide, living architecture documentation, research library, and build-in-public journal for Teranoo ERP.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Teranoo ERP Knowledge Hub',
     description:
-      'Product Documentation & Architecture Center for Teranoo ERP — an enterprise-grade modular ERP knowledge, architecture, decisions, and research platform.',
+      'The Complete Journey of Building an Enterprise ERP System — ERP encyclopedia, engineering guide, living architecture documentation, research library, and build-in-public journal for Teranoo ERP.',
   },
 };
 
@@ -68,6 +70,8 @@ export default async function RootLayout({
     ? cookieLocale
     : DEFAULT_LOCALE;
   const dir = getDirection(initialLocale);
+  const registry = getContentRegistry();
+  const searchEntries = buildUnifiedSearchIndex(registry.getAllPublicMetadata());
 
   return (
     <html
@@ -78,7 +82,7 @@ export default async function RootLayout({
     >
       <body suppressHydrationWarning>
         <AppProviders initialLocale={initialLocale}>
-          <AppShell>{children}</AppShell>
+          <AppShell searchEntries={searchEntries}>{children}</AppShell>
         </AppProviders>
       </body>
     </html>

@@ -18,7 +18,9 @@ export type NavIconKey =
   | 'network'
   | 'book-open-text'
   | 'history'
-  | 'info';
+  | 'info'
+  | 'library'
+  | 'terminal-square';
 
 export interface NavItemConfig {
   id: string;
@@ -186,6 +188,20 @@ export const NAVIGATION_GROUPS: readonly NavGroupConfig[] = [
     label: { ar: 'المعرفة والقرارات', en: 'Knowledge & Decisions' },
     items: [
       {
+        id: 'knowledge-library',
+        href: '/knowledge',
+        labelKey: 'nav.items.knowledgeLibrary',
+        label: { ar: 'مكتبة المعرفة', en: 'Knowledge Library' },
+        description: {
+          ar: 'فهرس موحّد وقابل للتصفية لجميع الوثائق والسجلات المعرفية المصرح بنشرها.',
+          en: 'Unified, filterable catalog of all authorized published knowledge records.',
+        },
+        icon: 'library',
+        groupId: 'knowledge-decisions',
+        classification: 'official',
+        implementedInTask001: false,
+      },
+      {
         id: 'decision-register',
         href: '/decisions',
         labelKey: 'nav.items.decisionRegister',
@@ -219,8 +235,8 @@ export const NAVIGATION_GROUPS: readonly NavGroupConfig[] = [
         labelKey: 'nav.items.futureConsiderations',
         label: { ar: 'الاعتبارات المستقبلية', en: 'Future Considerations' },
         description: {
-          ar: 'الموضوعات المعمارية المستقبلية غير المعتمدة كقرارات بعد (24 اعتبارًا في اللقطة السابقة).',
-          en: 'Forward-looking architecture considerations not yet approved decisions (24 in prior snapshot).',
+          ar: 'الموضوعات المعمارية المستقبلية غير المعتمدة كقرارات بعد (24 اعتبارًا في السجل الرسمي للاعتبارات المستقبلية).',
+          en: 'Forward-looking architecture considerations not yet approved decisions (24 in the official future considerations register).',
         },
         icon: 'telescope',
         groupId: 'knowledge-decisions',
@@ -298,6 +314,20 @@ export const NAVIGATION_GROUPS: readonly NavGroupConfig[] = [
     label: { ar: 'المشروع', en: 'Project' },
     items: [
       {
+        id: 'engineering-journal',
+        href: '/engineering-journal',
+        labelKey: 'nav.items.engineeringJournal',
+        label: { ar: 'السجل الهندسي', en: 'Engineering Journal' },
+        description: {
+          ar: 'سجل البناء العلني لتوثيق مهام تنفيذ منتج Teranoo ERP والمشاكل التقنية والحلول والدروس المستفادة.',
+          en: 'Build-in-public engineering log documenting real Teranoo ERP implementation tasks, issues, solutions, and lessons learned.',
+        },
+        icon: 'terminal-square',
+        groupId: 'project',
+        classification: 'engineering',
+        implementedInTask001: false,
+      },
+      {
         id: 'change-history',
         href: '/change-history',
         labelKey: 'nav.items.changeHistory',
@@ -317,8 +347,8 @@ export const NAVIGATION_GROUPS: readonly NavGroupConfig[] = [
         labelKey: 'nav.items.about',
         label: { ar: 'حول التطبيق', en: 'About' },
         description: {
-          ar: 'تعريف المنصة المعرفية، نموذج تصنيف المحتوى، ونطاق المرحلة التأسيسية.',
-          en: 'Knowledge Hub purpose, content classification governance, and TASK-001 scope.',
+          ar: 'رؤية المنصة المعرفية الشاملة، المفاهيم الستة، نموذج تصنيف المحتوى، وحوكمة النشر.',
+          en: 'Comprehensive Knowledge Hub vision, six complementary concepts, classification model, and publishing governance.',
         },
         icon: 'info',
         groupId: 'project',

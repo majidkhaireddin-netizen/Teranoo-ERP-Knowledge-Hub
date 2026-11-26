@@ -28,15 +28,22 @@ import { Phase5CapabilitiesSection } from '@/features/platform/Phase5Capabilitie
 import { ArchitectureOverviewDiagram } from '@/features/architecture/ArchitectureOverviewDiagram';
 
 const QUICK_NAV_IDS = [
+  'knowledge-library',
   'product-vision',
   'roadmap',
   'architecture-overview',
   'decision-register',
   'research-center',
-  'independent-reviews',
+  'engineering-journal',
 ] as const;
 
-export function DashboardView() {
+export interface DashboardViewProps {
+  publishedRecordsCount?: number;
+}
+
+export function DashboardView({
+  publishedRecordsCount = 0,
+}: DashboardViewProps) {
   const t = useTranslations();
   const { locale } = useAppLocale();
 
@@ -255,6 +262,33 @@ export function DashboardView() {
                 </span>
               </Link>
             ))}
+          </div>
+
+          <div className="rounded-lg border border-border bg-surface-subtle/60 p-4 space-y-2.5 text-xs">
+            <p className="font-semibold text-text-primary">
+              {t('dashboard.publishedLibrary.bannerTitle')}
+            </p>
+            <p className="leading-relaxed text-text-secondary">
+              {t('dashboard.publishedLibrary.bannerBody', {
+                count: publishedRecordsCount,
+              })}
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Link
+                href="/knowledge"
+                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+              >
+                <span>{t('dashboard.publishedLibrary.openLibrary')}</span>
+                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/engineering-journal"
+                className="inline-flex items-center gap-1 font-medium text-text-secondary hover:text-primary transition-colors"
+              >
+                <span>{t('dashboard.publishedLibrary.openJournal')}</span>
+                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

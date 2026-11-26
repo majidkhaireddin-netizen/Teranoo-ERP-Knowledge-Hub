@@ -19,9 +19,11 @@ import {
   Info,
   Layers,
   LayoutDashboard,
+  Library,
   Map,
   Network,
   Telescope,
+  TerminalSquare,
   Workflow,
   X,
 } from 'lucide-react';
@@ -30,6 +32,7 @@ import {
   NAVIGATION_GROUPS,
   type NavIconKey,
 } from '@/config/navigation';
+import { SITE_CONFIG } from '@/config/site';
 import { useSidebar } from '@/providers/SidebarProvider';
 import { IconButton } from '@/components/ui/IconButton';
 import { Modal } from '@/components/ui/Modal';
@@ -54,6 +57,8 @@ const NAV_ICONS: Record<NavIconKey, React.ComponentType<{ className?: string }>>
   'book-open-text': BookOpenText,
   history: History,
   info: Info,
+  library: Library,
+  'terminal-square': TerminalSquare,
 };
 
 export function AppSidebar() {
@@ -152,7 +157,10 @@ export function AppSidebar() {
                       const Icon = NAV_ICONS[item.icon];
                       const normalizedPath =
                         pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
-                      const isActive = normalizedPath === item.href;
+                      const isActive =
+                        normalizedPath === item.href ||
+                        (item.href === '/knowledge' &&
+                          normalizedPath.startsWith('/knowledge/'));
                       const label = t(item.labelKey);
 
                       return (
@@ -199,7 +207,7 @@ export function AppSidebar() {
         {!isIconOnly ? (
           <div className="shrink-0 border-t border-border px-4 py-2.5 text-[11px] text-text-muted flex items-center justify-between gap-2">
             <span>Teranoo ERP</span>
-            <span className="font-mono bidi-ltr">TASK-001</span>
+            <span className="font-mono bidi-ltr">{SITE_CONFIG.taskScope}</span>
           </div>
         ) : null}
       </div>

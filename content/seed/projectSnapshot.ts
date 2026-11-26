@@ -25,8 +25,8 @@ export const PROJECT_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
       en: '2026-11-25 is the independent reference review date of this snapshot, not the individual approval date of each source document.',
     },
     metricsOriginNote: {
-      ar: 'التمييز المصدري: 120 قرارًا معتمدًا وتقدم المرحلة الخامسة (7 من 13 بندًا) مشتقة من المصادر الرسمية، بينما 57 ملاحظة مراجعة مستقلة و24 اعتبارًا مستقبليًا هي إحصاءات مراجعة استشارية مستقلة منفصلة عن القرارات المعتمدة.',
-      en: 'Source distinction: 120 approved decisions and Phase 5 progress (7 of 13 planning items) derive from official planning sources, whereas 57 independent review notes and 24 future considerations are separate independent review statistics.',
+      ar: 'التمييز المصدري: 120 قرارًا معماريًا معتمدًا من سجل القرارات الرسمي (DECISION_REGISTER.md)، وتقدم المرحلة الخامسة (7 من 13 بندًا) من خطة العمل الرسمية (PROJECT_WORK_PLAN.md)، و24 اعتبارًا معماريًا مستقبليًا من سجل الاعتبارات المستقبلية الرسمي للمشروع (وليست بالضرورة قرارات معتمدة)، و13 حزمة بحثية ضمن جرد أبحاث المشروع، بينما 57 ملاحظة مراجعة مستقلة تنتمي إلى جرد المراجعات الاستشارية المستقلة.',
+      en: 'Source classification: 120 approved architectural decisions derive from the official project decision register (DECISION_REGISTER.md); Phase 5 progress (7 of 13 planning items) derives from the official project work plan (PROJECT_WORK_PLAN.md); 24 Future Architecture Considerations belong to the official project future considerations register (not necessarily approved decisions); 13 architectural research packages belong to the project research inventory; and 57 independent review notes belong to the independent advisory review inventory.',
     },
   },
   snapshotScopeNote: {

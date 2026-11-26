@@ -2,9 +2,13 @@ import type { AppLocale } from '@/i18n/config';
 
 export type ContentClassificationType =
   | 'official'
+  | 'approved-decision'
   | 'research'
   | 'independent'
-  | 'future';
+  | 'future'
+  | 'educational'
+  | 'illustrative'
+  | 'engineering';
 
 export type PlanningPhaseStatus = 'completed' | 'in_progress';
 

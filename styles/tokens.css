@@ -65,6 +65,22 @@
   --color-class-future-bg: #f0f2f6;
   --color-class-future-border: #d0d7e2;
 
+  --color-class-decision: #1a5c46;
+  --color-class-decision-bg: #ebf6f1;
+  --color-class-decision-border: #bfe0d0;
+
+  --color-class-educational: #5b438a;
+  --color-class-educational-bg: #f3effa;
+  --color-class-educational-border: #d5c9ea;
+
+  --color-class-illustrative: #2f606e;
+  --color-class-illustrative-bg: #eef6f8;
+  --color-class-illustrative-border: #c2dce3;
+
+  --color-class-engineering: #3a4f66;
+  --color-class-engineering-bg: #edf1f5;
+  --color-class-engineering-border: #c6d2de;
+
   /* Focus Ring */
   --color-focus-ring: #244b73;
 
@@ -153,6 +169,22 @@
   --color-class-future: #a7b8cc;
   --color-class-future-bg: #1a2738;
   --color-class-future-border: #304258;
+
+  --color-class-decision: #5cc498;
+  --color-class-decision-bg: #122922;
+  --color-class-decision-border: #224c3e;
+
+  --color-class-educational: #bba3e8;
+  --color-class-educational-bg: #221a33;
+  --color-class-educational-border: #3d305c;
+
+  --color-class-illustrative: #76bfd1;
+  --color-class-illustrative-bg: #12272e;
+  --color-class-illustrative-border: #224854;
+
+  --color-class-engineering: #9cb4cc;
+  --color-class-engineering-bg: #172330;
+  --color-class-engineering-border: #2c3e52;
 
   /* Focus Ring */
   --color-focus-ring: #7fa8d3;

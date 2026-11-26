@@ -13,7 +13,15 @@ export function Breadcrumbs() {
   const t = useTranslations();
   const { direction } = useAppLocale();
 
-  const currentItem = findNavItemByPath(pathname);
+  const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
+  const isKnowledgeDocumentRoute = normalizedPath.startsWith('/knowledge/');
+  const knowledgeSlug = isKnowledgeDocumentRoute
+    ? decodeURIComponent(normalizedPath.slice('/knowledge/'.length))
+    : null;
+
+  const currentItem = isKnowledgeDocumentRoute
+    ? findNavItemByPath('/knowledge')
+    : findNavItemByPath(normalizedPath);
   const currentGroup = currentItem
     ? findNavGroupById(currentItem.groupId)
     : undefined;
@@ -23,7 +31,7 @@ export function Breadcrumbs() {
   return (
     <nav
       aria-label={t('nav.breadcrumbLabel')}
-      className="flex items-center gap-1.5 min-w-0 text-xs sm:text-sm"
+      className="flex items-center gap-1.5 min-w-0 overflow-hidden text-xs sm:text-sm"
     >
       <Link
         href="/"
@@ -35,22 +43,43 @@ export function Breadcrumbs() {
       {currentGroup && currentItem && currentItem.href !== '/' ? (
         <>
           <Separator
-            className="h-3.5 w-3.5 text-text-muted shrink-0"
+            className="hidden md:inline h-3.5 w-3.5 text-text-muted shrink-0"
             aria-hidden="true"
           />
           <span className="hidden md:inline text-text-muted whitespace-nowrap shrink-0">
             {t(currentGroup.labelKey)}
           </span>
           <Separator
-            className="hidden md:inline h-3.5 w-3.5 text-text-muted shrink-0"
+            className="h-3.5 w-3.5 text-text-muted shrink-0"
             aria-hidden="true"
           />
-          <span
-            aria-current="page"
-            className="font-medium text-text-primary truncate"
-          >
-            {t(currentItem.labelKey)}
-          </span>
+          {isKnowledgeDocumentRoute && knowledgeSlug ? (
+            <>
+              <Link
+                href="/knowledge"
+                className="hidden sm:inline text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap shrink-0"
+              >
+                {t(currentItem.labelKey)}
+              </Link>
+              <Separator
+                className="hidden sm:inline h-3.5 w-3.5 text-text-muted shrink-0"
+                aria-hidden="true"
+              />
+              <span
+                aria-current="page"
+                className="font-mono text-xs font-medium text-text-primary truncate min-w-0 bidi-ltr"
+              >
+                {knowledgeSlug}
+              </span>
+            </>
+          ) : (
+            <span
+              aria-current="page"
+              className="font-medium text-text-primary truncate min-w-0"
+            >
+              {t(currentItem.labelKey)}
+            </span>
+          )}
         </>
       ) : (
         <>

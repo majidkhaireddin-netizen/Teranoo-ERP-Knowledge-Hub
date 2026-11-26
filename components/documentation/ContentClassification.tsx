@@ -1,9 +1,13 @@
 import React from 'react';
 import {
   ShieldCheck,
+  CheckCircle2,
   FlaskConical,
   ClipboardCheck,
   Telescope,
+  BookOpen,
+  Sparkles,
+  Wrench,
 } from 'lucide-react';
 import type { ContentClassificationType } from '@/content/models/types';
 import { cn } from '@/lib/utils';
@@ -31,6 +35,12 @@ const CLASSIFICATION_META: Record<
     textClass: 'text-class-official',
     Icon: ShieldCheck,
   },
+  'approved-decision': {
+    bgClass: 'bg-class-decision-bg',
+    borderClass: 'border-class-decision-border',
+    textClass: 'text-class-decision',
+    Icon: CheckCircle2,
+  },
   research: {
     bgClass: 'bg-class-research-bg',
     borderClass: 'border-class-research-border',
@@ -48,6 +58,24 @@ const CLASSIFICATION_META: Record<
     borderClass: 'border-class-future-border',
     textClass: 'text-class-future',
     Icon: Telescope,
+  },
+  educational: {
+    bgClass: 'bg-class-educational-bg',
+    borderClass: 'border-class-educational-border',
+    textClass: 'text-class-educational',
+    Icon: BookOpen,
+  },
+  illustrative: {
+    bgClass: 'bg-class-illustrative-bg',
+    borderClass: 'border-class-illustrative-border',
+    textClass: 'text-class-illustrative',
+    Icon: Sparkles,
+  },
+  engineering: {
+    bgClass: 'bg-class-engineering-bg',
+    borderClass: 'border-class-engineering-border',
+    textClass: 'text-class-engineering',
+    Icon: Wrench,
   },
 };
 

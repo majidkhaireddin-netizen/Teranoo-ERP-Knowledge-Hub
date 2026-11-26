@@ -136,6 +136,16 @@ test('reference snapshot preserves exact authorized counts and explicit provenan
   );
   assert.equal(provenance.referenceReviewDate, '2026-11-25');
   assert.equal(provenance.isLiveSynced, false);
+  assert.ok(
+    provenance.metricsOriginNote.en.includes(
+      'official project future considerations register'
+    )
+  );
+  assert.ok(
+    provenance.metricsOriginNote.ar.includes(
+      'سجل الاعتبارات المستقبلية الرسمي'
+    )
+  );
 });
 
 test('searchKnowledgeHub matches official decision IDs without exposing fabricated codes', () => {
@@ -171,12 +181,14 @@ test('searchKnowledgeHub matches official decision IDs without exposing fabricat
   assert.equal(emptyMatches.length, 0);
 });
 
-test('navigation tree defines all 5 groups and 18 unique valid routes', () => {
+test('navigation tree defines all 5 groups and 20 unique valid routes including Knowledge Library and Engineering Journal', () => {
   assert.equal(NAVIGATION_GROUPS.length, 5);
-  assert.equal(ALL_NAV_ITEMS.length, 18);
+  assert.equal(ALL_NAV_ITEMS.length, 20);
 
   const hrefs = new Set(ALL_NAV_ITEMS.map((item) => item.href));
-  assert.equal(hrefs.size, 18);
+  assert.equal(hrefs.size, 20);
+  assert.ok(hrefs.has('/knowledge'));
+  assert.ok(hrefs.has('/engineering-journal'));
 
   for (const item of ALL_NAV_ITEMS) {
     assert.equal(findNavItemByPath(item.href)?.id, item.id);
