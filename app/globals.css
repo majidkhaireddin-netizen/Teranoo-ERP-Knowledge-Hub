@@ -18,6 +18,7 @@
   --color-app: var(--color-bg-app);
   --color-surface: var(--color-surface);
   --color-surface-secondary: var(--color-surface-secondary);
+  --color-surface-subtle: var(--color-surface-secondary);
   --color-surface-hover: var(--color-surface-hover);
 
   --color-border: var(--color-border);

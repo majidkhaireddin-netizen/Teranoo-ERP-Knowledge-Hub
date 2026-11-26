@@ -1,7 +1,7 @@
 # Teranoo ERP Knowledge Hub
 
 **Subtitle:** The Complete Journey of Building an Enterprise ERP System (`الرحلة الكاملة لبناء نظام ERP مؤسسي`)  
-**Current Scope:** TASK-003 (Official Knowledge Ingestion & Project Foundations) building upon approved TASK-001, TASK-001-FIX-01, and TASK-002 (with all 6 review corrections resolved)
+**Current Scope:** TASK-004 — Official Knowledge Population (`BATCH-001 — Project Foundations`, 6/6 verified official files published) building upon approved TASK-001, TASK-001-FIX-01, TASK-002, and TASK-003
 
 Teranoo ERP Knowledge Hub is a dedicated enterprise documentation, encyclopedia, engineering guide, living architecture, research library, and build-in-public knowledge platform for the **Teranoo ERP** product. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.
 
@@ -73,15 +73,17 @@ content/
   taxonomy/           # Controlled taxonomy (8 classifications, 35 types, 15 relationships, 5 discovery dimensions)
   models/             # Strict TypeScript domain & knowledge record contracts
   schemas/            # Zod frontmatter schema & URL protocol validators
-  manifest/           # Validated Official Source Manifest & readiness reporting (6 Project Foundations sources)
-  ingestion/          # Deterministic verbatim official Markdown envelope generator & SHA-256 hashing
+  manifest/           # Validated Official Source Manifest & readiness reporting (6/6 BATCH-001 published)
+  ingestion/          # Deterministic verbatim official Markdown envelope generator, Git blob SHA-1 & SHA-256
+  extractors/         # Pure deterministic extractors (126 Decisions + D-MKT-01, 24 FACs, 8 Guardrails, 14 Roadmap stages)
   loaders/            # Two-pass YAML-only loader, safe relative link/image resolver & sanitized Markdown pipeline
   validators/         # Build-enforced integrity validator & CLI (`npm run content:validate`)
   registry/           # Fail-loud Content Registry enforcing the Publication Boundary & derived metrics
-  search/             # Unified deterministic search (published records + navigation + snapshot)
+  search/             # Unified deterministic search (published records, 126 decisions, 24 FACs, 14 roadmap stages, 8 guardrails)
   renderers/          # Extensible specialized viewer descriptor registry
-  seed/               # Authorized static reference snapshot & Product Vision seed
+  seed/               # Authorized BATCH-001 reference snapshot & preserved historical 2026-11-25 snapshot
   repositories/       # Derived-metrics queries, runtime-capability selectors, and unit tests
+scripts/              # Repeatable BATCH-001 official source ingestion generator (`scripts/ingest-batch-001.ts`)
 features/             # Feature-oriented views (dashboard, knowledge, product-vision, roadmap, decisions, ...)
 i18n/                 # Locale configuration & ar/en translation dictionaries (100% key parity tested)
 lib/                  # Shared utilities (cn helper, pure modal focusTrap helper + unit tests)
@@ -113,6 +115,8 @@ docs/                 # Vision, architecture, ingestion, manifest, schema, autho
 - [`docs/TASK-001-FIX-01-COMPLETION_REPORT.md`](docs/TASK-001-FIX-01-COMPLETION_REPORT.md)
 - [`docs/TASK-002-COMPLETION_REPORT.md`](docs/TASK-002-COMPLETION_REPORT.md)
 - [`docs/TASK-003-COMPLETION_REPORT.md`](docs/TASK-003-COMPLETION_REPORT.md)
+- [`docs/BATCH-001-INGESTION_REPORT.md`](docs/BATCH-001-INGESTION_REPORT.md)
+- [`docs/TASK-004-COMPLETION_REPORT.md`](docs/TASK-004-COMPLETION_REPORT.md)
 
 ---
 

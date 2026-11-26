@@ -17,6 +17,14 @@ export const OFFICIAL_ERP_REPOSITORY_URL =
 export const KNOWLEDGE_HUB_REPOSITORY_URL =
   'https://github.com/majidkhaireddin-netizen/Teranoo-ERP-Knowledge-Hub';
 
+export const BATCH_001_SOURCE_REVISION = {
+  batchId: 'BATCH-001',
+  commitSha: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+  treeSha: 'db531de6b2ab452578a550e07c5fd80e4bfe6b64',
+  reviewDate: '2026-11-26',
+  publicationDate: '2026-11-26',
+} as const;
+
 export const SOURCE_IMPORT_STATUS_VALUES = [
   'expected',
   'awaiting-source',
@@ -35,8 +43,11 @@ export const SOURCE_AUTHORIZATION_STATUS_VALUES = [
 
 export const SOURCE_VERIFICATION_STATUS_VALUES = [
   'path-verified-awaiting-body',
-  'hash-verified',
-  'verified',
+  'source-received',
+  'digest-calculated',
+  'git-blob-verified',
+  'git-blob-verified-lf-normalized',
+  'git-blob-mismatch',
   'unverified',
 ] as const;
 
@@ -72,12 +83,31 @@ export const sourceManifestEntrySchema = z.object({
   title: localizedTextSchema,
   purpose: localizedTextSchema,
   sourceRevision: z.string().trim().min(7).nullable().optional(),
+  expectedGitBlobSha: z
+    .string()
+    .trim()
+    .regex(/^[0-9a-f]{40}$/i, 'expectedGitBlobSha must be a 40-character Git blob SHA-1')
+    .nullable()
+    .optional(),
+  actualGitBlobSha: z
+    .string()
+    .trim()
+    .regex(/^[0-9a-f]{40}$/i, 'actualGitBlobSha must be a 40-character Git blob SHA-1')
+    .nullable()
+    .optional(),
+  rawSourceSha256: z
+    .string()
+    .trim()
+    .regex(/^[0-9a-f]{64}$/i, 'rawSourceSha256 must be a SHA-256 hex digest')
+    .nullable()
+    .optional(),
   sourceFileHash: z
     .string()
     .trim()
     .regex(/^[0-9a-f]{64}$/i, 'sourceFileHash must be a SHA-256 hex digest')
     .nullable()
     .optional(),
+  lineEndingNormalization: z.enum(['none', 'crlf-to-lf']).optional(),
   classification: z.enum(CONTENT_CLASSIFICATION_VALUES),
   expectedContentType: z.enum(CONTENT_TYPE_VALUES),
   phaseRef: z.string().trim().refine(isValidOfficialPhaseRef, 'Invalid official phase ref'),
@@ -92,12 +122,12 @@ export const sourceManifestEntrySchema = z.object({
 });
 
 /**
- * Verified Project Foundations Official Source Inventory (TASK-003 Section 5).
+ * Verified Project Foundations Official Source Inventory — BATCH-001 (TASK-004).
  *
- * IMPORTANT: All 6 paths are verified in the official ERP repository, but their
- * full document bodies have NOT been delivered to the Knowledge Hub yet.
- * Therefore every entry is honestly marked "awaiting-source" with
- * publicationAuthorizationStatus="pending" and publishedContentId=null.
+ * All six authorized official source files were supplied by the project owner,
+ * verified byte-for-byte against their trusted Git blob SHAs (after lossless
+ * CRLF -> LF normalization explicitly documented per KH-021), wrapped verbatim
+ * in canonical frontmatter envelopes, and published through the Content Registry.
  */
 export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[] = [
   {
@@ -109,24 +139,28 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
       en: 'Product Vision (00_PROJECT_VISION.md)',
     },
     purpose: {
-      ar: 'رؤية المنتج، الأهداف، العملاء المستهدفون، التموضع التجاري، الأنظمة الأساسية، الامتدادات المستقبلية، حدود المنتج، ومعايير النجاح.',
-      en: 'Product vision, goals, target customers, positioning, core ERP modules, enterprise extensions, product boundaries, and success criteria.',
+      ar: 'رؤية المنتج الكاملة، المشاكل المستهدفة، العملاء والقطاعات الأربعة، التموضع التجاري، الأنظمة الأساسية الأربعة والمنصة المشتركة، الامتدادات المستقبلية، المبادئ السبع، حدود المنتج، ومعايير النجاح.',
+      en: 'Complete product vision, target problems, customers and four industries, commercial positioning, four core modules and platform foundation, future extensions, seven core principles, anti-goals, and success criteria.',
     },
-    sourceRevision: null,
-    sourceFileHash: null,
+    sourceRevision: BATCH_001_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '7206f4d747e8befc0d47400a666850aa259b7055',
+    actualGitBlobSha: '7206f4d747e8befc0d47400a666850aa259b7055',
+    rawSourceSha256: '64bc2e1a6333ae4d109101a3c1cdd202015b4c9cd29db7476bb2574a5db61fa7',
+    sourceFileHash: '69bce606580f28a6fc7a90bd743416ffc45ab26fe487c7630d5905c2a6e75aad',
+    lineEndingNormalization: 'crlf-to-lf',
     classification: 'official',
     expectedContentType: 'product-vision',
     phaseRef: 'phase-1',
-    importStatus: 'awaiting-source',
-    publicationAuthorizationStatus: 'pending',
-    publishedContentId: null,
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-project-vision-ar',
     referenceSummaryContentId: 'kh-doc-product-vision-ref-ar',
-    completeness: 'reference-summary-only',
-    availableLanguages: [],
-    sourceVerificationStatus: 'path-verified-awaiting-body',
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
     authorityNote: {
-      ar: 'يتوفر حاليًا ملخص مرجعي مشتق من اللقطة التخطيطية فقط؛ بانتظار تسليم الملف الرسمي الكامل.',
-      en: 'Only a snapshot-derived reference summary is currently published; awaiting full official source file delivery.',
+      ar: 'وثيقة رسمية معتمدة (Approved / Phase 1 Closed — محدثة بتاريخ 2026-10-02). يحل هذا الملف الكامل محل الملخص المرجعي التاريخي السابق مع الاحتفاظ بسجله.',
+      en: 'Approved official document (Approved / Phase 1 Closed — updated 2026-10-02). Supersedes the earlier snapshot-derived reference summary while preserving its history.',
     },
   },
   {
@@ -138,24 +172,28 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
       en: 'Project Work Plan (PROJECT_WORK_PLAN.md)',
     },
     purpose: {
-      ar: 'خارطة الطريق التخطيطية الكاملة، المراحل وبوابات الاعتماد، الحالة الحالية، المخرجات، الأعمال المؤجلة، والتخطيط المستقبلي بما في ذلك المراحل الوسيطة مثل المرحلة 6.5.',
-      en: 'Complete official planning roadmap, phases and gates, current status, deliverables, approved outcomes, deferred activities, and future phases including Phase 6.5.',
+      ar: 'خارطة الطريق التخطيطية الكاملة (المراحل 1 إلى 12 شاملة المرحلة 6.5 وبوابة القرار A ومسار جمع الأدلة السوقية المستمر)، المخرجات، الأعمال المؤجلة، والوضع الحالي.',
+      en: 'Complete official planning roadmap (Phases 1–12 including Phase 6.5, Decision Gate A, and Continuous Market Evidence Collection), deliverables, deferred activities, and current position.',
     },
-    sourceRevision: 'a922a69b54bc0cc611ae46d8e7434907cde0046a',
-    sourceFileHash: null,
+    sourceRevision: BATCH_001_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '14e0b4a2068d10d2ecb07d7e9bcf4364e824fd43',
+    actualGitBlobSha: '14e0b4a2068d10d2ecb07d7e9bcf4364e824fd43',
+    rawSourceSha256: 'cc4610cb685b679799bd09366171727787405ceaeedf0e1e28ff799485252ca9',
+    sourceFileHash: 'df43786d50640c5574b28b7930c068697a78cecf3422b69a8ff8058e6109fa06',
+    lineEndingNormalization: 'crlf-to-lf',
     classification: 'official',
     expectedContentType: 'roadmap',
     phaseRef: 'phase-1',
-    importStatus: 'awaiting-source',
-    publicationAuthorizationStatus: 'pending',
-    publishedContentId: null,
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-project-work-plan-ar',
     referenceSummaryContentId: null,
-    completeness: 'not-imported',
-    availableLanguages: [],
-    sourceVerificationStatus: 'path-verified-awaiting-body',
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
     authorityNote: {
-      ar: 'تعتمد اللقطة المرجعية على مراجعة محدودة للمراحل 1–5 فقط؛ تفاصيل بقية المراحل بانتظار تسليم الملف الكامل.',
-      en: 'The reference snapshot reflects reviewed Phases 1–5 counts only; remaining phases await delivery of the full file.',
+      ar: 'خطة عمل رسمية نشطة (Active Reference). يُحفظ السطر القديم الذي يذكر Phase 5 كـ Current حرفيًا في النص الأصلي مع ملاحظة توضيحية لأن الأقسام الختامية وسجل القرارات تؤكد اكتمال المرحلة 5 (13/13) واعتماد بوابة القرار A مشروطًا.',
+      en: 'Active official project work plan (reference). Preserves a stale line labeling Phase 5 as Current verbatim in the original body, alongside an explicit interpretation note because closing sections and DECISION_REGISTER.md confirm Phase 5 completion (13/13) and Decision Gate A conditional approval.',
     },
   },
   {
@@ -167,21 +205,29 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
       en: 'Working Rules (WORKING_RULES.md)',
     },
     purpose: {
-      ar: 'قواعد تخطيط مشروع ERP، انضباط القرارات، حدود الأبحاث، التدرج المرحلي، حوكمة التأجيل، ومنع التنفيذ المبكر أو تضخم التخطيط.',
-      en: 'ERP project planning rules, decision discipline, research boundaries, phase progression, deferral governance, and prevention of premature implementation.',
+      ar: 'منهجية التخطيط وقواعد العمل: التدرج المرحلي، دورة البحث ثم القرار ثم التوثيق ثم المراجعة، القاعدة العليا، اختبار الحاجة للقرار الآن، تصنيف A/B/C/D، ومنع تضخم التخطيط.',
+      en: 'Planning methodology and working rules: sequential phases, Research -> Decision -> Documentation -> Review cycle, Supreme Rule, Need-to-Decide-Now gate, A/B/C/D triage, and preventing planning inflation.',
     },
-    sourceRevision: null,
-    sourceFileHash: null,
+    sourceRevision: BATCH_001_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: 'e943101df8f21092d685fdda2af2e5bdad0166e5',
+    actualGitBlobSha: 'e943101df8f21092d685fdda2af2e5bdad0166e5',
+    rawSourceSha256: '3c29def6bb336784e2969df0ae9359de9560311174a4e6f3d55e648fbb31a21f',
+    sourceFileHash: 'e3919a78039d5f4135b5549c91133eb94a6bdc7612b2d4f810938262eebbd752',
+    lineEndingNormalization: 'crlf-to-lf',
     classification: 'official',
     expectedContentType: 'architecture-document',
     phaseRef: 'phase-1',
-    importStatus: 'awaiting-source',
-    publicationAuthorizationStatus: 'pending',
-    publishedContentId: null,
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-working-rules-ar',
     referenceSummaryContentId: null,
-    completeness: 'not-imported',
-    availableLanguages: [],
-    sourceVerificationStatus: 'path-verified-awaiting-body',
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة قواعد عمل ومنهجية تخطيطية رسمية نشطة (Active Reference) — ليست قرارًا معماريًا فرديًا.',
+      en: 'Active official working methodology and planning governance document (reference) — not a standalone architectural decision.',
+    },
   },
   {
     sourceRefId: 'src-pf-04-cross-phase-guardrails',
@@ -193,21 +239,29 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
       en: 'Cross-Phase Product Guardrails (CROSS_PHASE_PRODUCT_GUARDRAILS.md)',
     },
     purpose: {
-      ar: 'المبادئ المعمارية العابرة للمراحل: نواة المنتج الموحدة، التخصيص الآمن للترقية، حوكمة التهيئة، توافق عقود التكامل، الترحيل وخروج البيانات، المعالجة الخلفية، حدود أمان الذكاء الاصطناعي، والمعاملات المتصلة فقط.',
-      en: 'Cross-phase architectural principles: single product core, upgrade-safe customization, configuration governance, integration compatibility, data exit, background processing, AI safety boundaries, and online-only transactions.',
+      ar: 'الضوابط الثمانية المعتمدة العابرة لجميع المراحل: خط المنتج الموحد والتوسعات الآمنة للترقية، نقل التهيئة، عقود التكامل المرقّمة، ترحيل وخروج البيانات، المعالجة الخلفية، أمان وحوكمة الذكاء الاصطناعي، المعاملات المتصلة فقط، والتحكم بالتهيئة والميزات.',
+      en: 'Eight approved cross-phase product guardrails: Single Product Line & Upgrade-Safe Extensions, Configuration Transport, Versioned Public Contracts, Controlled Data Migration & Exit, Shared Background Processing, AI Safety & Governance, Online-Only Transactions, and Product Configuration & Feature Control.',
     },
-    sourceRevision: null,
-    sourceFileHash: null,
+    sourceRevision: BATCH_001_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '05dc98f61b79f0436c395de8c06650c723476e48',
+    actualGitBlobSha: '05dc98f61b79f0436c395de8c06650c723476e48',
+    rawSourceSha256: '839b15aef92b9a654a1d84ce539101d68e3b757f77aba6facef2cc9f63bc6081',
+    sourceFileHash: '9500f4d735d0f4c1abba2b648b883bcf515c11be86c22ca7b47c8d45334af1cd',
+    lineEndingNormalization: 'crlf-to-lf',
     classification: 'official',
     expectedContentType: 'architecture-document',
     phaseRef: 'phase-1',
-    importStatus: 'awaiting-source',
-    publicationAuthorizationStatus: 'pending',
-    publishedContentId: null,
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-cross-phase-guardrails-ar',
     referenceSummaryContentId: null,
-    completeness: 'not-imported',
-    availableLanguages: [],
-    sourceVerificationStatus: 'path-verified-awaiting-body',
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
+    authorityNote: {
+      ar: 'وثيقة حاكمة معتمدة (Approved — Governing Artifact بدون معرفات D-* منفصلة). تطبق عبر جميع مراحل التخطيط والمعمارية.',
+      en: 'Approved governing artifact without standalone D-* IDs. Applies across all remaining planning and architecture phases.',
+    },
   },
   {
     sourceRefId: 'src-pf-05-decision-register',
@@ -218,24 +272,28 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
       en: 'Official Decision Register (DECISION_REGISTER.md)',
     },
     purpose: {
-      ar: 'فهرس القرارات الرسمي (معرفات القرارات، عناوينها، الوثائق المصدر، المراحل المالكة، والأثر). يمثّل هذا الملف فهرسًا وليس النص المرجعي الكامل لكل قرار.',
-      en: 'Official decision index (IDs, titles, source documents, owning phases, and impact). Serves as an index; each decision’s authoritative full text remains in its owning document.',
+      ar: 'فهرس القرارات الرسمي الذي يفهرس 126 قرارًا معماريًا معتمدًا (المراحل 3 و4 و5)، بالإضافة إلى قرار بوابة السوق D-MKT-01 المنفصل والمشروط، والوثائق الحاكمة الست بدون معرفات D-*، والضوابط التفسيرية.',
+      en: 'Authoritative governance index of 126 approved architectural D-* decisions (Phases 3, 4, and 5), separate conditional market decision D-MKT-01, six governing artifacts without D-* IDs, and interpretive guardrails.',
     },
-    sourceRevision: 'a922a69b54bc0cc611ae46d8e7434907cde0046a',
-    sourceFileHash: null,
+    sourceRevision: BATCH_001_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: '0260f1469825ee45777be4bfd6460a45960108ea',
+    actualGitBlobSha: '0260f1469825ee45777be4bfd6460a45960108ea',
+    rawSourceSha256: '03996acde5d773d45df5907f1c346a88bdd105a3168ebea64482cdf39d64ff95',
+    sourceFileHash: '32f2586d1f757ffb9793872ffe4ddf42fdde7252e4100ca1e6b03389c639f32a',
+    lineEndingNormalization: 'crlf-to-lf',
     classification: 'official',
-    expectedContentType: 'architectural-decision',
+    expectedContentType: 'architecture-document',
     phaseRef: 'phase-1',
-    importStatus: 'awaiting-source',
-    publicationAuthorizationStatus: 'pending',
-    publishedContentId: null,
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-decision-register-ar',
     referenceSummaryContentId: null,
-    completeness: 'not-imported',
-    availableLanguages: [],
-    sourceVerificationStatus: 'path-verified-awaiting-body',
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
     authorityNote: {
-      ar: 'سجل القرارات فهرس رسمي فقط وليس بديلًا عن الوثيقة المالكة لكل قرار. يعلن المصدر عن 120 قرارًا، بينما تتوفر محليًا 7 مراجع موثّقة من المرحلة 5 فقط.',
-      en: 'The Decision Register is an official index, not the full authoritative text of every decision. The source declares 120 decisions while 7 verified Phase 5 references exist locally.',
+      ar: 'فهرس حوكمة رسمي (Governance Index — Reference) وليس النص المرجعي الكامل لكل قرار؛ النصوص التفصيلية والمبررات الكاملة تبقى في الوثائق المالكة بانتظار دفعات استيراد لاحقة.',
+      en: 'Authoritative governance index (reference), not the full authoritative text or rationale of every decision; full owning decision documents await future authorized batches.',
     },
   },
   {
@@ -248,24 +306,28 @@ export const PROJECT_FOUNDATIONS_SOURCE_MANIFEST: readonly SourceManifestEntry[]
       en: 'Future Architecture Considerations (FUTURE_ARCHITECTURE_CONSIDERATIONS.md)',
     },
     purpose: {
-      ar: 'الجرد الرسمي للاعتبارات المعمارية المستقبلية، الموضوعات التي تتطلب أبحاثًا، أسئلة التصميم المؤجلة، القدرات المستقبلية، والمخاطر المعمارية المحتملة.',
-      en: 'Official inventory of future architecture considerations, research-required topics, deferred design questions, future capabilities, and potential architectural risks.',
+      ar: 'السجل الرسمي للـ 24 اعتبارًا معماريًا مستقبليًا (FAC-001 إلى FAC-024) بحالاتها المعتمدة من المصدر (RESEARCH REQUIRED / REVIEW LATER / WATCH) والأفكار السبع التي رُقّيت بالفعل إلى ضوابط رسمية.',
+      en: 'Official inventory of 24 Future Architecture Considerations (FAC-001 through FAC-024) with source-defined statuses (RESEARCH REQUIRED / REVIEW LATER / WATCH) and seven ideas already promoted to official guardrails.',
     },
-    sourceRevision: null,
-    sourceFileHash: null,
+    sourceRevision: BATCH_001_SOURCE_REVISION.commitSha,
+    expectedGitBlobSha: 'f8158524f5cb44bd79f1f4c6d6e8bcc59853d7d5',
+    actualGitBlobSha: 'f8158524f5cb44bd79f1f4c6d6e8bcc59853d7d5',
+    rawSourceSha256: '247d5403057f25bc7ef9aafd4a5b4718d8cae46ee86c69be82416ddd739da8ea',
+    sourceFileHash: '127b56b9f6a5a230fc02ed3ccb46c6d4555ae12ddd201bfe982395448c682a25',
+    lineEndingNormalization: 'crlf-to-lf',
     classification: 'future',
     expectedContentType: 'future-consideration',
     phaseRef: 'phase-1',
-    importStatus: 'awaiting-source',
-    publicationAuthorizationStatus: 'pending',
-    publishedContentId: null,
+    importStatus: 'published',
+    publicationAuthorizationStatus: 'authorized',
+    publishedContentId: 'kh-doc-future-architecture-considerations-ar',
     referenceSummaryContentId: null,
-    completeness: 'not-imported',
-    availableLanguages: [],
-    sourceVerificationStatus: 'path-verified-awaiting-body',
+    completeness: 'complete',
+    availableLanguages: ['ar'],
+    sourceVerificationStatus: 'git-blob-verified-lf-normalized',
     authorityNote: {
-      ar: 'الاعتبارات المعمارية المستقبلية ليست قرارات ERP معتمدة تلقائيًا.',
-      en: 'Future architecture considerations are not automatically approved ERP decisions.',
+      ar: 'سجل اعتبارات مستقبلية غير معتمدة كقرارات ERP بعد (Not Approved Decisions). الملفات التفصيلية المنفصلة لـ FAC-019..FAC-024 غير مشمولة في BATCH-001 وتنتظر دفعة مستقبلية.',
+      en: 'Register of non-approved forward-looking considerations (not approved ERP decisions). Separate detailed files for FAC-019..FAC-024 are not included in BATCH-001 and await a future authorized batch.',
     },
   },
 ];
@@ -287,7 +349,8 @@ export interface SourceManifestValidationResult {
 /**
  * Validates a source manifest for schema integrity, unique sourceRefId,
  * unique repository+sourcePath, unique publishedContentId mapping,
- * provenance completeness, and publication authorization discipline.
+ * provenance completeness, Git blob verification integrity (KH-021),
+ * and publication authorization discipline.
  */
 export function validateSourceManifest(
   entries: readonly SourceManifestEntry[] = PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
@@ -359,6 +422,20 @@ export function validateSourceManifest(
       } else {
         seenPublishedIds.add(entry.publishedContentId);
       }
+    }
+
+    // KH-021: Never publish a source whose Git blob SHA mismatched the trusted reference
+    if (
+      entry.importStatus === 'published' &&
+      entry.sourceVerificationStatus === 'git-blob-mismatch'
+    ) {
+      errors.push({
+        severity: 'error',
+        code: 'SOURCE_GIT_BLOB_MISMATCH',
+        sourceRefId: entry.sourceRefId,
+        field: 'sourceVerificationStatus',
+        message: `Source "${entry.sourcePath}" failed Git blob verification and cannot be marked "published".`,
+      });
     }
 
     // Provenance required once a real source body is received/validated/imported/published

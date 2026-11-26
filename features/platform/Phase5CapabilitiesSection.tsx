@@ -93,7 +93,10 @@ export function Phase5CapabilitiesSection({
       widthClass: 'w-36',
       render: (row) =>
         row.decisionId ? (
-          <DecisionReference decisionId={row.decisionId} href="/decisions" />
+          <DecisionReference
+            decisionId={row.decisionId}
+            href={`/decisions?decision=${encodeURIComponent(row.decisionId)}`}
+          />
         ) : (
           <span className="font-mono text-xs text-text-muted">
             {t('dashboard.currentPhase.noDecision')}

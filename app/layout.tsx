@@ -15,6 +15,10 @@ import {
 import { AppProviders } from '@/providers/AppProviders';
 import { AppShell } from '@/components/layout/AppShell';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
+import { getExtractedDecisionRegister } from '@/content/extractors/decisionRegisterExtractor';
+import { getExtractedFacRegister } from '@/content/extractors/facRegisterExtractor';
+import { getExtractedGuardrails } from '@/content/extractors/guardrailsExtractor';
+import { getExtractedRoadmap } from '@/content/extractors/roadmapExtractor';
 import { buildUnifiedSearchIndex } from '@/content/search/knowledgeSearch';
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
@@ -71,7 +75,16 @@ export default async function RootLayout({
     : DEFAULT_LOCALE;
   const dir = getDirection(initialLocale);
   const registry = getContentRegistry();
-  const searchEntries = buildUnifiedSearchIndex(registry.getAllPublicMetadata());
+  const searchEntries = buildUnifiedSearchIndex(
+    registry.getAllPublicMetadata(),
+    undefined,
+    {
+      decisionRegister: getExtractedDecisionRegister(),
+      facRegister: getExtractedFacRegister(),
+      guardrails: getExtractedGuardrails(),
+      roadmap: getExtractedRoadmap(),
+    }
+  );
 
   return (
     <html

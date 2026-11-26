@@ -144,8 +144,8 @@ export const NAVIGATION_GROUPS: readonly NavGroupConfig[] = [
         labelKey: 'nav.items.platformFoundation',
         label: { ar: 'المنصة المشتركة', en: 'Platform Foundation' },
         description: {
-          ar: 'قدرات المنصة المشتركة للمرحلة الخامسة (13 قدرة معمارية).',
-          en: 'Phase 5 shared platform capabilities (13 foundational capabilities).',
+          ar: 'قدرات المنصة المشتركة للمرحلة الخامسة: 12 إطار قدرة تشغيلية معتمدًا + بوابة الاعتماد التجميعي #13 (D-PLAT-01..D-PLAT-13).',
+          en: 'Phase 5 shared platform capabilities: 12 approved runtime capability frameworks + item 13 adoption gate (D-PLAT-01..D-PLAT-13).',
         },
         icon: 'blocks',
         groupId: 'architecture',
@@ -207,8 +207,8 @@ export const NAVIGATION_GROUPS: readonly NavGroupConfig[] = [
         labelKey: 'nav.items.decisionRegister',
         label: { ar: 'سجل القرارات', en: 'Decision Register' },
         description: {
-          ar: 'السجل الرسمي للقرارات المعمارية والوظيفية المعتمدة (120 قرارًا في اللقطة المرجعية).',
-          en: 'Official register of approved architectural decisions (120 in reference snapshot).',
+          ar: 'السجل الرسمي المفهرس للقرارات المعمارية المعتمدة (126 قرارًا D-*) بالإضافة إلى قرار بوابة السوق المشروط D-MKT-01.',
+          en: 'Official indexed register of 126 approved architectural D-* decisions plus conditional Decision Gate A market decision D-MKT-01.',
         },
         icon: 'file-check-2',
         groupId: 'knowledge-decisions',

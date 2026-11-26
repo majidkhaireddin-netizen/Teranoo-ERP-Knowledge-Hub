@@ -1,0 +1,1050 @@
+# TASK-004 — Official Knowledge Population
+## BATCH-001 — Project Foundations
+
+**Application:** Teranoo ERP Knowledge Hub
+
+**Previous task:** TASK-003 — Approved with targeted notes.
+
+**Development mode:** Incremental implementation under independent supervision.
+
+---
+
+## 1. Mission
+
+Populate Teranoo ERP Knowledge Hub with its first substantial collection of genuine, official ERP project knowledge.
+
+The previous tasks established the application foundation, design system, knowledge architecture, content registry, document reader, search, publication governance, and official source ingestion workflow.
+
+This task must now deliver meaningful knowledge to readers.
+
+Do not spend this task creating additional empty architectural layers or placeholder pages.
+
+The objective is to transform the existing foundation into a professional educational and technical reference that documents the actual journey of building Teranoo ERP.
+
+The reader must be able to study the project vision, planning methodology, architectural guardrails, roadmap, decisions, and future considerations in substantial detail.
+
+Preserve the complete original authorized documents while adding structured navigation, visual explanations, and educational interpretation.
+
+---
+
+## 2. Attached Source Documents
+
+The project owner will provide the following six original Markdown files:
+
+1. `00_PROJECT_VISION.md`
+2. `PROJECT_WORK_PLAN.md`
+3. `WORKING_RULES.md`
+4. `CROSS_PHASE_PRODUCT_GUARDRAILS.md`
+5. `DECISION_REGISTER.md`
+6. `FUTURE_ARCHITECTURE_CONSIDERATIONS.md`
+
+All six belong to:
+
+    teranoo-erp-planning/00-project-foundation/
+
+Official ERP repository:
+
+    https://github.com/Alabasi1980/TeranooErp
+
+Verified source reference commit:
+
+    397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f
+
+Verified repository tree:
+
+    db531de6b2ab452578a550e07c5fd80e4bfe6b64
+
+This source batch is based on the repository revision reviewed on 2026-11-26.
+
+Do not confuse the review date with the original document creation or approval dates.
+
+### Verified Git blob identifiers
+
+| Source | Git blob SHA |
+|---|---|
+| 00_PROJECT_VISION.md | 7206f4d747e8befc0d47400a666850aa259b7055 |
+| PROJECT_WORK_PLAN.md | 14e0b4a2068d10d2ecb07d7e9bcf4364e824fd43 |
+| WORKING_RULES.md | e943101df8f21092d685fdda2af2e5bdad0166e5 |
+| CROSS_PHASE_PRODUCT_GUARDRAILS.md | 05dc98f61b79f0436c395de8c06650c723476e48 |
+| DECISION_REGISTER.md | 0260f1469825ee45777be4bfd6460a45960108ea |
+| FUTURE_ARCHITECTURE_CONSIDERATIONS.md | f8158524f5cb44bd79f1f4c6d6e8bcc59853d7d5 |
+
+Use these references to verify source identity and provenance.
+
+If any attached file is missing, incomplete, or does not match its expected source revision, report the discrepancy.
+
+Do not fabricate or reconstruct missing official source content.
+
+Do not attempt unauthorized access to the source repository.
+
+---
+
+## 3. Corrective Requirements from TASK-003 Review
+
+Complete these targeted corrections while processing the source batch.
+
+### A. Source Verification Integrity — KH-021
+
+Review `computeSourceSha256()` and `prepareCanonicalIngestionArtifact()`.
+
+Calculating a hash of received content does not establish that it matches the original official source.
+
+Distinguish between:
+
+- Source received.
+- Local content digest calculated.
+- Source identity verified.
+- Source content matched to a trusted expected hash or Git blob identifier.
+
+When original file bytes are available, verify their Git blob SHA using Git's blob hashing semantics:
+
+    SHA1("blob " + byteLength + "\0" + originalFileBytes)
+
+Do not compare an ordinary SHA-1 or SHA-256 digest directly to a Git blob SHA.
+
+Preserve the original document body, including line endings where possible.
+
+If the ingestion format normalizes line endings or otherwise changes presentation formatting, document the transformation and distinguish the original source hash from the stored body hash.
+
+Do not claim `hash-verified` merely because a hash was calculated.
+
+Do not claim verification where the original bytes could not be obtained.
+
+### B. Approval Status Integrity — KH-022
+
+The current ingestion helper derives approval status from content classification.
+
+Correct this behavior.
+
+Official documentation is not automatically an approved architectural decision.
+
+A roadmap may be active.
+
+A future considerations register may contain non-approved proposals.
+
+A decision index may be an authoritative governance artifact without being a standalone decision.
+
+Official approval status must be supplied from verified source evidence.
+
+Keep content authority, editorial status, publication authorization, and implementation status independent.
+
+Support the actual semantics of each source without inventing approval statuses.
+
+### C. Public Repository Safety — KH-023
+
+The Knowledge Hub repository is public.
+
+Correct authoring documentation that suggests placing unauthorized or confidential source bodies inside the public repository with an internal publication status.
+
+Application-level filtering does not make committed source files private.
+
+Requirements:
+
+- Never commit unauthorized or confidential source bodies to this repository.
+- Keep non-public staging outside the public repository.
+- Public application filtering remains an additional publication safeguard.
+- Test fixtures may remain in the repository only when they contain synthetic, non-sensitive data.
+
+Update the relevant publication and ingestion documentation.
+
+Do not introduce authentication or external infrastructure.
+
+---
+
+## 4. Import the Actual Source Batch
+
+Use the existing source ingestion pipeline and manifest.
+
+Do not implement a parallel content system.
+
+For each supplied and publication-authorized document:
+
+1. Verify source identity.
+2. Preserve its complete original body.
+3. Determine its actual authority classification and content type.
+4. Assign a stable Knowledge Hub content ID.
+5. Assign a canonical slug.
+6. Capture source provenance.
+7. Record its actual language.
+8. Record its approval status based on source evidence.
+9. Map relevant project phases, topics, and modules.
+10. Register verified relationships.
+11. Validate the record.
+12. Publish it through the existing Content Registry.
+
+Update the six existing source manifest entries.
+
+Do not create duplicate manifest entries for the same source path.
+
+Do not replace the original documents with summaries.
+
+A complete source document must be accessible from the Unified Document Reader.
+
+If publication authorization is incomplete, do not commit that source body. Record only the permitted non-sensitive source inventory information.
+
+---
+
+## 5. Preserve the Original Documents
+
+Original source documents are historical and architectural evidence.
+
+Preserve:
+
+- All original headings.
+- All sections and subsections.
+- Paragraphs.
+- Tables.
+- Lists.
+- Decision identifiers.
+- Requirement identifiers.
+- FAC identifiers.
+- Original dates.
+- Original status statements.
+- Constraints.
+- Research references.
+- Exceptions.
+- Deferred decisions.
+- Change notes.
+
+Add metadata through the existing frontmatter envelope.
+
+Do not silently correct spelling, change wording, reconcile inconsistencies, remove historical notes, or rewrite decisions.
+
+If a document contains outdated information or internal inconsistencies, preserve the original and add a separate, clearly labeled Knowledge Hub interpretation note.
+
+The original source and the curated presentation must remain distinguishable.
+
+Do not treat the official repository's internal development-system documentation as part of the ERP product knowledge collection.
+
+References to that system within authorized original ERP documents may be preserved as source context, but do not expand them into a separate documentation subject.
+
+---
+
+## 6. Update the Current ERP Project Snapshot
+
+The existing application still represents the older reference snapshot:
+
+- 120 architectural decisions.
+- Phase 5: 7 of 13 items.
+- Phase 5 in progress.
+
+The latest reviewed official source revision establishes:
+
+- 126 approved architectural decisions indexed in `DECISION_REGISTER.md`.
+- Phases 1–5 completed.
+- Phase 5: all 13 planning items approved.
+- All 12 runtime platform capability frameworks approved.
+- D-PLAT-01 through D-PLAT-13.
+- Platform Foundation Adoption completed.
+- Decision Gate A approved conditionally.
+- Phase 6 — Core Module Functional Blueprints identified as the next planning phase.
+
+Verify these facts against the supplied documents before updating the application.
+
+Do not infer that Phase 6 has started merely because it is identified as the next phase.
+
+Preserve historical snapshot information and its original provenance where appropriate.
+
+Update current metrics from the newly imported official source records.
+
+Do not overwrite historical records in a way that removes evidence of earlier project states.
+
+### Critical architectural distinction
+
+Phase 5 item 13 is an adoption and approval gate.
+
+It is not a thirteenth runtime platform capability.
+
+The platform architecture diagram must show:
+
+- 12 approved runtime capability frameworks.
+
+The roadmap must show:
+
+- 13 approved planning items.
+
+Both representations must be derived from consistent structured data.
+
+---
+
+## 7. Decision Gate A
+
+The latest official Decision Register includes:
+
+    D-MKT-01 — Primary Launch Market & First Industry Priority
+
+Its state is:
+
+    Approved (Conditional)
+
+Verified source facts:
+
+- Primary launch market: Jordan.
+- First industry priority: Trading & Wholesale Distribution.
+- The launch is not simultaneous across all target industries.
+- Condition O-2 requires field verification of willingness to pay through 5–10 interviews before pricing and Product Baseline.
+
+D-MKT-01 is explicitly outside the 126 architectural D-* decision counter.
+
+Do not increase the architectural decision count to 127 by including D-MKT-01.
+
+Present market decisions separately from architectural decisions.
+
+The authoritative source document is:
+
+    teranoo-erp-planning/02-erp-scope/DECISION_GATE_A_PRIMARY_LAUNCH_MARKET.md
+
+This source document is not included in BATCH-001.
+
+Only present the verified summary available in the supplied official Work Plan and Decision Register.
+
+Do not fabricate the complete market decision rationale or detailed ICP.
+
+Mark the authoritative market decision document as awaiting a future authorized source batch.
+
+---
+
+## 8. Product Vision — Complete Knowledge Experience
+
+Upgrade `/product-vision` into a substantial, source-backed educational experience.
+
+Use the actual `00_PROJECT_VISION.md` document.
+
+The page must explain the product through organized sections derived from the source.
+
+Possible sections include:
+
+- What Teranoo ERP is.
+- Why it is being built.
+- Business problems it addresses.
+- Target customers.
+- Target industries.
+- Product positioning.
+- Commercial modularity.
+- Core Business Modules.
+- Shared Platform Foundation.
+- Future Enterprise Modules.
+- Industry Extensions.
+- Configuration philosophy.
+- Product boundaries.
+- Success criteria.
+- Strategic architectural direction.
+
+Only include details supported by the original document or clearly identified newer authoritative sources.
+
+### Required presentation
+
+Provide:
+
+1. A meaningful educational overview.
+2. Detailed source-backed explanations.
+3. Relevant comparison tables.
+4. Visual architecture explanations where useful.
+5. Contextual source references.
+6. Related decisions.
+7. Access to the complete original Product Vision document.
+
+Do not make the page a short summary followed by a GitHub link.
+
+Readers must be able to study the knowledge directly within the application.
+
+Where the Product Vision document contains historical or stale information, show the current verified state separately and explain the source distinction.
+
+---
+
+## 9. Complete Project Roadmap
+
+Upgrade `/roadmap` using the complete official `PROJECT_WORK_PLAN.md`.
+
+Do not retain a roadmap limited to the first five phases.
+
+Represent the actual official planning structure, including:
+
+- Phase 1.
+- Phase 2.
+- Phase 3.
+- Phase 4.
+- Phase 5.
+- Decision Gate A.
+- Phase 6.
+- Phase 6.5.
+- Phase 7.
+- Phase 8.
+- Phase 9.
+- Phase 10.
+- Phase 11.
+- Phase 12.
+
+Use the exact titles and semantics from the supplied source document.
+
+Include any additional official gates or cross-phase activities when explicitly present in the source.
+
+Do not reinterpret continuous activities as independent planning phases.
+
+### Roadmap overview
+
+Provide a compact visual overview of the entire planning journey.
+
+Distinguish:
+
+- Completed.
+- Active.
+- Pending.
+- Conditionally approved.
+- Deferred.
+- Awaiting explicit authorization.
+
+### Phase details
+
+Each phase must support detailed exploration of:
+
+- Purpose.
+- Scope.
+- Work items.
+- Research requirements.
+- Expected deliverables.
+- Relevant decisions.
+- Dependencies.
+- Completion conditions.
+- Approval outcomes.
+- Deferred work.
+- Related source documentation.
+
+Provide expandable or dedicated detail views to avoid displaying the entire roadmap as one overwhelming list.
+
+Phase 6.5 must remain a distinct planning phase with its own semantics.
+
+### Source conflict handling
+
+The Work Plan contains a potentially stale statement describing Phase 5 as Current.
+
+Its closing sections and the Decision Register confirm Phase 5 completion.
+
+Preserve both original statements in the full source document.
+
+The curated roadmap must display the latest verified completed state and include a clear note explaining the discrepancy.
+
+Do not silently rewrite the official source.
+
+---
+
+## 10. Planning Methodology & Working Rules
+
+Use the complete `WORKING_RULES.md` document.
+
+Create a meaningful educational experience explaining the project's methodology.
+
+Cover actual source-supported topics such as:
+
+- Sequential phase progression.
+- Research before decision where required.
+- Decision approval.
+- Documentation and review.
+- Avoiding premature coding.
+- Deferring unnecessary details.
+- Need-to-Decide-Now discipline.
+- Preventing planning inflation.
+- Preserving architectural boundaries.
+
+Create an educational visualization of the planning cycle.
+
+The visualization must be derived from the source and must not suggest that the application is already implementing the ERP.
+
+Make the complete original Working Rules available.
+
+Integrate this content into the Project Foundations experience and roadmap context without duplicating canonical source records.
+
+---
+
+## 11. Cross-Phase Product Guardrails
+
+Import the complete `CROSS_PHASE_PRODUCT_GUARDRAILS.md` document.
+
+Create a professional Guardrails experience within the Architecture section.
+
+The reader must be able to understand each actual guardrail in detail.
+
+For every source-defined guardrail, present:
+
+- Original title.
+- Governing principle.
+- Why it matters.
+- Approved boundaries.
+- Prohibited approaches, where specified.
+- Owner phases.
+- Deferred implementation details.
+- Related knowledge.
+- Direct link to the corresponding original source section.
+
+Use the actual source structure.
+
+Do not invent guardrail IDs.
+
+Do not convert guardrails into standalone D-* decisions unless the source explicitly does so.
+
+### Educational diagrams
+
+Where useful, include source-backed diagrams explaining concepts such as:
+
+- Single canonical product core.
+- Upgrade-safe customization.
+- Environment configuration promotion.
+- Versioned integration contracts.
+- Controlled data migration.
+- Shared background processing.
+- AI safety boundaries.
+- Online-only transaction processing.
+- Feature control governance.
+
+Diagrams must be labeled as faithful conceptual representations or illustrative explanations as appropriate.
+
+Do not imply that these are already implemented runtime components.
+
+---
+
+## 12. Full Decision Register Experience
+
+Import the complete `DECISION_REGISTER.md` document.
+
+Extract the actual indexed architectural decision records into a validated structured catalog.
+
+Do not create decision descriptions from assumptions.
+
+Preserve the exact indexed values, including:
+
+- Decision ID.
+- Short Decision.
+- Official Source.
+- Owner Phase.
+- Primary Impact.
+- Approval status where established by the source.
+
+### Decision catalog
+
+Upgrade `/decisions` into a functional professional decision register.
+
+Provide:
+
+- Search by decision ID.
+- Search by decision title.
+- Filter by owner phase.
+- Filter by decision family or source document.
+- Compact readable table.
+- Exact decision counts.
+- Decision detail exploration.
+- Source availability indicator.
+- Related content links.
+
+The source currently indexes 126 architectural decisions.
+
+Validate the count by extracting actual records.
+
+Do not hardcode the count independently of the catalog.
+
+### Authority boundary
+
+The Decision Register is an index.
+
+It does not contain the full authoritative text or rationale of every decision.
+
+Until the owning document is imported, a decision detail view must explicitly indicate:
+
+- Indexed decision information available.
+- Full authoritative decision text awaiting source ingestion.
+
+Do not create fabricated rationale sections to fill the interface.
+
+When the owning source is later imported, the same decision record must be capable of linking to its exact authoritative section without changing its identity.
+
+### Separate decision categories
+
+Distinguish:
+
+- Architectural decisions included in the official counter.
+- D-MKT-01 market decision, outside that counter.
+- Governing artifacts without D-* identifiers.
+- Interpretive guardrails.
+- Future considerations.
+
+Do not count any category incorrectly.
+
+---
+
+## 13. Future Architecture Considerations Register
+
+Import the complete `FUTURE_ARCHITECTURE_CONSIDERATIONS.md` document.
+
+Upgrade `/future-considerations` into a functional exploration experience.
+
+Extract the actual FAC records.
+
+Preserve:
+
+- FAC identifier.
+- Original title.
+- Status.
+- Owner phase or trigger.
+- Research requirement.
+- Context.
+- Problem or opportunity.
+- Relevant boundaries.
+- Decision or deferral information where available.
+- Related source documents.
+
+Provide:
+
+- Search by FAC ID or title.
+- Filtering by status.
+- Filtering by owner phase where appropriate.
+- Overview list.
+- Detailed record presentation.
+- Direct source section links.
+- Clear indication of related detailed FAC documents not yet imported.
+
+Do not treat all FAC records as approved architecture.
+
+Use source-defined status values.
+
+The reference inventory contains 24 FAC records; verify the actual count against the supplied source.
+
+Do not import or fabricate the individual detailed FAC documents that are not part of this batch.
+
+The reader must be able to access the complete original register.
+
+---
+
+## 14. Knowledge Library Integration
+
+Integrate the six newly imported original documents into the existing `/knowledge` library.
+
+Each record must have:
+
+- Working canonical route.
+- Accurate title.
+- Correct authority classification.
+- Correct original language.
+- Content completeness indicator.
+- Source metadata.
+- Revision metadata.
+- Relevant phase and topic associations.
+- Related knowledge.
+- Functional search.
+
+Preserve the existing educational content.
+
+The existing Product Vision reference summary must remain distinguishable from the complete official Product Vision document.
+
+Avoid duplicate search results that misleadingly suggest that a source summary and the complete original source are two independent official documents.
+
+Where appropriate, mark the earlier reference summary as historical or superseded as the current reading entry point, without deleting its history.
+
+Do not count language variants as independently imported original source documents.
+
+---
+
+## 15. Source Attribution & Traceability
+
+Ensure that readers can move between:
+
+- Curated educational overview.
+- Original source document.
+- Relevant source section.
+- Indexed decision.
+- Related FAC record.
+- Related project phase.
+- Governing principle.
+- Future authoritative document.
+
+Use the existing stable content IDs and relationship mechanisms.
+
+Where structured records are extracted from an original document, preserve a reference to:
+
+- The original source document.
+- The exact section, heading, or row where available.
+- The source revision.
+
+Do not create a second authoritative version of the source.
+
+Structured catalogs and educational views are projections of the original knowledge.
+
+Preserve the original documents as the authoritative evidence.
+
+---
+
+## 16. Educational Content Requirements
+
+The application's purpose is to teach readers how an enterprise ERP is built.
+
+Do not limit the experience to raw Markdown or static metadata cards.
+
+For each major topic, provide useful source-backed educational context when the evidence supports it:
+
+- What is this concept?
+- What problem does it address?
+- Why does it matter in ERP?
+- What did Teranoo adopt?
+- What boundaries were established?
+- How does this affect the next stage?
+- What can another ERP engineering team learn from this?
+
+Clearly classify this material as educational interpretation.
+
+Do not label educational explanations as approved official decisions.
+
+Do not invent decision rationale that cannot be supported by the supplied documents.
+
+Use the complete source material to produce substantial explanations rather than superficial marketing language.
+
+All illustrative examples must be clearly labeled.
+
+---
+
+## 17. Visual Presentation Quality
+
+Preserve the approved design system.
+
+Improve content-specific presentation where genuinely necessary.
+
+Use:
+
+- Structured long-form articles.
+- Section navigation.
+- Compact comparison tables.
+- Expandable detailed sections.
+- Architecture diagrams.
+- Timelines.
+- Decision tables.
+- Source references.
+- Related knowledge.
+- Contextual status indicators.
+- Appropriate bilingual terminology.
+
+Avoid:
+
+- A collection of empty cards.
+- Repeated shallow summaries.
+- Giant unstructured text pages.
+- Unnecessary page duplication.
+- Excessive badges.
+- Decorative charts without meaningful data.
+- Artificial metrics.
+- A complete redesign of the application shell.
+
+Prioritize the experience of someone who is genuinely studying how to build an ERP system.
+
+All pages must remain usable in Arabic RTL and English LTR, in light and dark themes.
+
+---
+
+## 18. Dashboard Update
+
+Update the Dashboard to reflect the verified new project state and imported knowledge.
+
+Show separately:
+
+### ERP Project Planning
+
+- 126 indexed architectural decisions, subject to successful verification.
+- Five completed planning phases.
+- Phase 5 completed: 13/13.
+- Decision Gate A: conditionally approved.
+- Next authorized planning stage, as supported by the sources.
+
+### Knowledge Hub
+
+- Actual number of imported original sources.
+- Actual number of published documents.
+- Actual number of conceptual knowledge topics.
+- Available language variants.
+- Decision catalog coverage.
+- Future considerations catalog coverage.
+
+Distinguish:
+
+- Indexed decision information.
+- Full authoritative decision content.
+
+Do not claim that all 126 decision rationales have been imported merely because the decision index is available.
+
+Do not confuse ERP planning completion with ERP software implementation completion.
+
+Avoid hardcoded duplicated metrics.
+
+---
+
+## 19. Search Improvements
+
+Extend the existing search implementation to discover the real newly imported knowledge.
+
+Search must support:
+
+- Source document titles.
+- Arabic and English metadata.
+- Official decision IDs.
+- FAC identifiers.
+- Phase titles.
+- Guardrail titles.
+- Relevant project topics.
+
+Search results must navigate to the most specific available destination.
+
+For example:
+
+- D-PLAT-08 should navigate to the corresponding indexed decision detail.
+- FAC-024 should navigate to its FAC record.
+- Phase 6.5 should navigate to its roadmap detail.
+- A guardrail title should navigate to the corresponding guardrail section.
+
+Do not send users to generic pages when exact records or sections are available.
+
+Do not introduce external or AI search services.
+
+---
+
+## 20. Content Language
+
+Preserve original source language.
+
+The supplied official documents may contain Arabic narrative and English technical terminology.
+
+Do not automatically generate complete English translations of official documents in this task.
+
+Maintain bilingual navigation, interface labels, and metadata.
+
+Use explicit language indicators.
+
+Clearly identify untranslated source content.
+
+Any educational English translation added later must be labeled as such and must not be represented as an official source translation.
+
+---
+
+## 21. Historical Knowledge Integrity
+
+Maintain the historical distinction between:
+
+- The old 120-decision reference snapshot.
+- The new 126-decision official source revision.
+- The progression from 7/13 to 13/13 Phase 5 planning items.
+- The adoption of Decision Gate A.
+
+Do not invent historical dates or intermediate milestones.
+
+Use actual source dates where available.
+
+The Knowledge Hub should eventually document how the project evolved, not merely its latest state.
+
+Do not replace source history with silently updated values.
+
+---
+
+## 22. Data Extraction and Maintainability
+
+Use deterministic structured extraction where appropriate.
+
+For example:
+
+- Decision Register tables can be mapped into validated decision records.
+- FAC headings and source metadata can be mapped into structured FAC records.
+- Roadmap sections can be mapped into validated phase and item records.
+- Guardrail sections can be mapped into structured educational navigation.
+
+Avoid fragile parsing based on a single expected heading format without validation.
+
+If a source format cannot be extracted reliably, use a reviewed explicit structured mapping with references to original source sections.
+
+Fail clearly when required information cannot be mapped.
+
+Do not silently omit source records.
+
+Ensure extracted records can be regenerated or updated when a new authorized source revision is provided.
+
+Do not maintain multiple manually duplicated copies of the same authoritative values.
+
+Document the extraction process and update workflow.
+
+---
+
+## 23. Testing Requirements
+
+Preserve all existing automated tests.
+
+Add tests covering:
+
+### Source ingestion
+
+- Expected source identity.
+- Verified Git blob SHA when original bytes are available.
+- Source hash mismatch.
+- Complete source body preservation.
+- Missing source handling.
+- Incorrect source revision handling.
+- Duplicate source mapping.
+- Publication authorization.
+
+### Decision Register
+
+- Exact extraction of architectural decision records.
+- Unique decision IDs.
+- Correct separation of D-MKT-01.
+- No fabricated decision rationale.
+- Decision source availability.
+- Search by decision ID.
+
+### Roadmap
+
+- All verified official planning phases.
+- Phase 6.5 support.
+- Decision Gate A distinction.
+- Phase 5 completion.
+- Separation of planning gates and runtime capabilities.
+- No inference of ERP software implementation completion.
+
+### FAC Register
+
+- Actual FAC extraction.
+- Unique FAC identifiers.
+- Source-defined statuses.
+- Search by FAC identifier.
+- Preservation of non-approved status semantics.
+
+### Content and UI
+
+- Published original source documents are accessible.
+- Original and educational content remain distinguishable.
+- Source section links resolve.
+- Search results navigate to exact available records.
+- Source manifest counts match actual records.
+- RTL/LTR behavior.
+- Light/Dark themes.
+- Responsive presentation.
+
+Run the complete verification command.
+
+Do not report unexecuted checks as successful.
+
+---
+
+## 24. Acceptance Criteria
+
+TASK-004 is complete only when:
+
+1. The three targeted TASK-003 notes have been addressed.
+2. All actually supplied and authorized source files are ingested.
+3. Complete original source bodies remain available.
+4. Source provenance is accurate.
+5. Source verification claims are supported by actual evidence.
+6. Official approval status is no longer inferred solely from content classification.
+7. The full Product Vision experience is available.
+8. The complete official project roadmap is available.
+9. Phase 6.5 is correctly represented.
+10. The planning methodology is meaningfully documented.
+11. Cross-phase guardrails are accessible in detail.
+12. The decision register contains actual source-derived indexed decision records.
+13. The architectural decision count is verified against the source.
+14. D-MKT-01 is represented separately and conditionally.
+15. FAC records are extracted and navigable.
+16. Future considerations are not misrepresented as approved decisions.
+17. Phase 5 current status matches the verified official source revision.
+18. The architecture diagram contains 12 runtime capabilities, not 13.
+19. The roadmap contains all 13 approved Phase 5 planning items.
+20. Search navigates to specific available knowledge records.
+21. The original sources remain distinguishable from educational interpretation.
+22. Historical reference snapshots retain their meaning.
+23. No missing official source content has been fabricated.
+24. No unauthorized source body is committed to the public repository.
+25. Existing application functionality remains intact.
+26. Content validation succeeds.
+27. Type checking succeeds.
+28. ESLint succeeds.
+29. Automated tests pass.
+30. Production build succeeds.
+31. Production-mode document availability is verified.
+
+---
+
+## 25. Documentation
+
+Create:
+
+    docs/BATCH-001-INGESTION_REPORT.md
+    docs/TASK-004-COMPLETION_REPORT.md
+
+Update the existing technical documents where necessary.
+
+Preserve earlier completion reports.
+
+The batch ingestion report must list each source individually:
+
+- Original source path.
+- Expected Git blob SHA.
+- Actual verification result.
+- Local content digest.
+- Canonical content ID.
+- Publication status.
+- Content completeness.
+- Extracted record counts.
+- Source discrepancies.
+- Deferred relationships.
+- Known limitations.
+
+The completion report must distinguish:
+
+- Official source content.
+- Extracted structured knowledge.
+- Educational interpretation.
+- Historical snapshot data.
+- Current project status.
+- Unavailable authoritative documents.
+
+Include actual test results, changed files, architectural decisions, deviations, and remaining work.
+
+---
+
+## 26. Scope Restrictions
+
+Do not implement:
+
+- Database or CMS.
+- GitHub synchronization.
+- AI chatbot.
+- Full semantic search.
+- Full knowledge graph.
+- ERP operational functionality.
+- New ERP business rules.
+- ERP implementation code.
+- Full research library ingestion.
+- Full architecture module documentation.
+- Detailed FAC documents not supplied in this batch.
+- Full authoritative decision rationale from unavailable owning documents.
+- Internal Teranoo development system documentation.
+
+Do not start BATCH-002.
+
+Do not start TASK-005.
+
+---
+
+## Final Instructions
+
+This is the first substantial knowledge population task.
+
+The goal is not simply to report that six Markdown files were imported.
+
+The goal is to create a professional, comprehensive, source-backed educational experience from genuine project documents, allowing readers to study the foundations of an enterprise ERP product in meaningful depth.
+
+Preserve the original evidence.
+
+Make knowledge understandable.
+
+Make relationships navigable.
+
+Make source attribution precise.
+
+Never fabricate missing information.
+
+Do not hide limitations.
+
+Do not create more empty structures instead of useful knowledge.
+
+Implement TASK-004, execute all relevant verification checks, document the actual results, and stop for independent review.

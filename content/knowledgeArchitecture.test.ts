@@ -105,10 +105,10 @@ test('approved local collections load cleanly and pass full integrity validation
   const report = validateApprovedCollections();
   assert.equal(report.ok, true);
   assert.equal(report.errors.length, 0);
-  assert.equal(report.totalFilesScanned, 4);
-  assert.equal(report.validRecordsCount, 4);
-  assert.equal(report.publishedRecordsCount, 4);
-  // Explicit deferred reference in Product Vision reference produces non-blocking warning
+  assert.equal(report.totalFilesScanned, 10);
+  assert.equal(report.validRecordsCount, 10);
+  assert.equal(report.publishedRecordsCount, 10);
+  // Explicit deferred reference to DECISION_GATE_A_PRIMARY_LAUNCH_MARKET.md produces non-blocking warning
   assert.ok(report.warnings.some((w) => w.code === 'DEFERRED_REFERENCE'));
 });
 
@@ -201,8 +201,8 @@ test('content registry resolves outgoing relationships, incoming backlinks, defe
     rels.outgoing.some(
       (r) =>
         r.type === 'derived-from' &&
-        r.status === 'deferred' &&
-        r.deferredRef?.includes('00_PROJECT_VISION.md')
+        r.status === 'resolved' &&
+        r.targetSlug === 'project-vision'
     )
   );
   // Incoming backlink from educational governance article referencing Product Vision AR
@@ -289,8 +289,8 @@ test('publication boundary excludes unpublished drafts, approved-but-unauthorize
   resetContentRegistryCache();
   const prodRegistry = getContentRegistry();
 
-  // Production registry contains only the 4 authorized records, zero fixtures
-  assert.equal(prodRegistry.getStats().totalPublished, 4);
+  // Production registry contains only the 10 authorized records, zero fixtures
+  assert.equal(prodRegistry.getStats().totalPublished, 10);
   assert.equal(prodRegistry.getBySlug('unpublished-draft'), null);
   assert.equal(prodRegistry.getBySlug('unauthorized-approved-record'), null);
   assert.equal(prodRegistry.getBySlug('fixture-research-sample'), null);
@@ -357,7 +357,7 @@ test('unified search matches Arabic title, English title, official IDs, topics, 
       (m) => m.href === '/knowledge/teranoo-product-vision-reference'
     )
   );
-  assert.equal(registry.getByOfficialId('D-PLAT-01').length, 2);
+  assert.ok(registry.getByOfficialId('D-PLAT-01').length >= 2);
 
   // Topic & content type search
   const topicMatches = searchUnifiedKnowledge('governance', index);

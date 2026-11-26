@@ -5,8 +5,8 @@
     "subtitle": "The Complete Journey of Building an Enterprise ERP System",
     "subtitleEn": "The Complete Journey of Building an Enterprise ERP System",
     "skipToContent": "Skip to main content",
-    "currentPhaseBadge": "Phase 5 — In Progress",
-    "planningProgressNotice": "Indicators reflect planning, documentation, and architectural approval progress — not ERP software implementation completion."
+    "currentPhaseBadge": "Phase 5 Completed · Phase 6 Awaiting Authorization",
+    "planningProgressNotice": "Indicators reflect verified architectural planning and approval status from BATCH-001 — not ERP software implementation completion."
   },
   "nav": {
     "groups": {
@@ -46,11 +46,11 @@
     "breadcrumbLabel": "Breadcrumb"
   },
   "controls": {
-    "searchPlaceholder": "Search sections, modules, capabilities, or decision IDs...",
+    "searchPlaceholder": "Search docs, 126 decisions (D-PLAT-08 / D-MKT-01), 24 FACs (FAC-024), phases (Phase 6.5), or guardrails...",
     "searchTrigger": "Quick search",
     "searchShortcut": "Ctrl+K",
     "searchEmptyTitle": "No matching records",
-    "searchEmptyDescription": "Try searching for a section title, business module, platform capability, or decision ID such as D-PLAT-01.",
+    "searchEmptyDescription": "Try searching a decision ID (D-PLAT-08 or D-MKT-01), future consideration (FAC-024), phase (Phase 6.5), or product guardrail.",
     "searchModalTitle": "Search Knowledge Hub",
     "searchResultsCount": "{count} results",
     "clearSearch": "Clear search",
@@ -137,20 +137,20 @@
     "subtitle": "Structured overview of Teranoo ERP product identity, architectural planning progress, and the shared platform foundation.",
     "snapshotBanner": "Static reference snapshot of planning and architectural documentation status (not live-synced with the source repository).",
     "metrics": {
-      "approvedDecisions": "Approved Decisions",
-      "approvedDecisionsNote": "Derived from official DECISION_REGISTER.md",
+      "approvedDecisions": "Indexed Architectural Decisions (D-*)",
+      "approvedDecisionsNote": "126 in DECISION_REGISTER.md (+ D-MKT-01 tracked separately)",
       "completedPhases": "Completed Planning Phases",
-      "completedPhasesNote": "Phase 5 currently in progress",
+      "completedPhasesNote": "Phases 1–5 complete · Phase 6 awaiting authorization",
       "coreModules": "Core Business Modules",
       "coreModulesNote": "Finance, Inventory, Procurement, Sales",
-      "currentPhaseProgress": "Phase 5 Progress",
-      "currentPhaseProgressNote": "{completed} of {total} planning items approved"
+      "currentPhaseProgress": "Phase 5 Completion",
+      "currentPhaseProgressNote": "{completed} of {total} planning items approved (Completed)"
     },
     "currentPhase": {
-      "sectionTitle": "Current Phase — Shared Platform Capabilities Plan",
-      "sectionSubtitle": "Phase 5 planning tracker covering all 13 items (12 runtime platform capabilities plus item 13, Platform Foundation Adoption approval gate).",
+      "sectionTitle": "Phase 5 — Shared Platform Capabilities (Completed 13/13)",
+      "sectionSubtitle": "Phase 5 completed on 2026-10-02: 12 approved runtime capability frameworks (D-PLAT-01..D-PLAT-12) plus item 13 consolidated adoption gate (D-PLAT-13).",
       "progressLabel": "Phase 5 Architectural Approval Completion",
-      "planningGateBadge": "Planning review & approval gate — not a runtime capability",
+      "planningGateBadge": "Approved planning adoption gate (D-PLAT-13) — not a 13th runtime capability",
       "columns": {
         "index": "#",
         "capability": "Phase 5 Planning Item",
@@ -164,16 +164,16 @@
     },
     "architectureOverview": {
       "sectionTitle": "Layered Architecture Overview",
-      "sectionSubtitle": "Architectural view of runtime layers and capabilities (distinct from the 13-item Phase 5 planning tracker).",
+      "sectionSubtitle": "Architectural view of runtime layers and 12 approved runtime capabilities (distinct from the 13-item Phase 5 planning tracker).",
       "diagramTitle": "Teranoo ERP — Layered Architecture Blueprint",
-      "diagramCaption": "Foundational architectural capability view: positions the four core business modules above the 12 runtime shared platform capabilities (7 approved, 5 pending). Phase 5 item 13 (Platform Foundation Adoption) is excluded here because it is a planning approval gate rather than a runtime capability.",
+      "diagramCaption": "Foundational architectural capability view: positions the four core business modules above the 12 approved runtime shared platform capability frameworks (D-PLAT-01..D-PLAT-12). Phase 5 item 13 (D-PLAT-13 — Platform Foundation Adoption) is excluded here because it is a consolidated planning approval gate rather than a 13th runtime capability.",
       "sharedContractsLabel": "Shared Contracts & Platform Services",
       "businessLayerTitle": "Business Core Modules",
       "businessLayerMeta": "4 core modules defined",
       "platformLayerTitle": "Shared Platform Runtime Capabilities",
-      "platformLayerMeta": "{approved} approved · {pending} pending ({total} runtime capabilities)",
+      "platformLayerMeta": "{approved} of {total} runtime capabilities approved (Item #13 is a separate adoption gate)",
       "infrastructureLayerTitle": "Deployment & Database Profile",
-      "infrastructureLayerMeta": "SaaS-first with future Connected On-Premises profile"
+      "infrastructureLayerMeta": "SaaS-first with future Connected On-Premises profile and PostgreSQL"
     },
     "knowledgeNavigation": {
       "sectionTitle": "Knowledge Navigation",
@@ -197,10 +197,14 @@
       }
     },
     "publishedLibrary": {
-      "bannerTitle": "Source-Declared Totals vs. Locally Published Records",
-      "bannerBody": "The snapshot above displays aggregate totals declared in project planning sources, while the local Knowledge Library currently holds {count} explicitly authorized records ready for full reading.",
+      "bannerTitle": "Knowledge Library Status — BATCH-001 Fully Published",
+      "bannerBody": "The local Knowledge Library now holds {count} authorized published records, including all 6/6 official Project Foundations source files verified by Git blob SHA, while individual owning decision documents, research packages, and independent reviews remain scheduled for later authorized batches.",
       "openLibrary": "Browse Knowledge Library",
       "openJournal": "Open Engineering Journal"
+    },
+    "historicalEvolution": {
+      "title": "Planning Snapshot Evolution (Historical Provenance Preserved)",
+      "body": "Official planning documentation progressed from the preserved historical snapshot (2026-11-25: 120 decisions · Phase 5 7/13) to the BATCH-001 verified state (2026-11-26: 126 indexed architectural D-* decisions + separate conditional market decision D-MKT-01 · Phase 5 completed 13/13 · Phase 6 awaiting explicit authorization)."
     },
     "identityStrip": {
       "productType": "Product Type",
@@ -342,10 +346,16 @@
   },
   "knowledge": {
     "searchDocBadge": "Doc",
+    "searchDecisionBadge": "Decision",
+    "searchFacBadge": "FAC",
+    "searchPhaseBadge": "Phase",
+    "searchGuardrailBadge": "Guardrail",
+    "supersededShortBadge": "Superseded Historical Summary",
+    "fullSourceBadge": "Full Official Source",
     "libraryTitle": "Knowledge Library",
     "librarySubtitle": "Unified catalog of authorized, published knowledge records with multi-dimensional filtering, source provenance, and typed relationships.",
-    "snapshotVsPublishedTitle": "Locally Published Records vs. Source-Declared Snapshot Totals",
-    "snapshotVsPublishedBody": "This library currently publishes {published} authorized local records. Aggregate counts declared in the planning reference snapshot ({decisions} decisions, {research} research packages, {future} future considerations, {reviews} independent review notes) will be ingested progressively through authorized tasks without fabricating missing records.",
+    "snapshotVsPublishedTitle": "Locally Published Records (BATCH-001) vs. Future Authorized Batches",
+    "snapshotVsPublishedBody": "This library currently publishes {published} authorized local records (including all 6/6 full official Project Foundations files verified by Git blob SHA). The indexed register covers all {decisions} architectural decisions (D-*) and {future} FAC considerations, while individual owning decision documents, {research} research packages, and {reviews} independent review notes await future authorized batches.",
     "searchPlaceholder": "Search by title, description, topic, or official ID such as D-PLAT-01...",
     "filters": {
       "type": "Content Type",
@@ -451,6 +461,24 @@
       "sourceRepository": "Source Repository / URL",
       "sourcePaths": "Source Paths",
       "sourceSha": "Source Tree / Commit SHA",
+      "commitSha": "Reference Commit SHA",
+      "gitBlobSha": "Verified Git Blob SHA-1",
+      "rawSourceSha256": "Raw Received File SHA-256",
+      "storedBodySha256": "Stored LF Body SHA-256",
+      "verificationStatus": "Source Integrity Verification Status",
+      "verificationStatuses": {
+        "path-verified-awaiting-body": "Path Verified — Awaiting Body",
+        "source-received": "Source Received",
+        "digest-calculated": "Digest Calculated",
+        "git-blob-verified": "Git Blob SHA Verified (Exact Raw)",
+        "git-blob-verified-lf-normalized": "Git Blob SHA Verified (LF Normalized)",
+        "git-blob-mismatch": "Git Blob SHA Mismatch",
+        "unverified": "Unverified"
+      },
+      "interpretationNoteTitle": "Knowledge Hub Interpretation Note (Official Source Text Preserved Verbatim)",
+      "supersededBannerTitle": "Superseded Historical Reference Summary",
+      "supersededBannerBody": "This record is preserved as a historical reference summary from initial platform setup. The full authorized official source document is now imported and published.",
+      "supersededOpenCurrent": "Open Full Official Source",
       "sourceDocumentDate": "Source Document Date",
       "reviewDate": "Review Date",
       "publicationDate": "Platform Publication Date",
@@ -476,9 +504,9 @@
     "title": "Build-in-Public Engineering Journal",
     "subtitle": "Dedicated engineering log for documenting real Teranoo ERP software development — implementation tasks, technical issues, solutions, and testing evidence.",
     "emptyStatusTitle": "No Teranoo ERP Engineering Entries Yet",
-    "emptyStatusBody": "Active software implementation of the Teranoo ERP product has not begun yet; the project is currently in architectural planning (Phase 5). To uphold content integrity, zero fabricated tasks, commits, bugs, or test results are displayed here. Entries will be published once real ERP engineering begins.",
+    "emptyStatusBody": "Active software implementation of the Teranoo ERP product has not begun yet; Phases 1–5 are completed and Phase 6 awaits explicit authorization. To uphold content integrity, zero fabricated tasks, commits, bugs, or test results are displayed here. Entries will be published once real ERP engineering begins.",
     "distinctionTitle": "Critical Project Distinction: Teranoo ERP vs. Teranoo ERP Knowledge Hub",
-    "distinctionBody": "Development tasks for this documentation platform (such as TASK-001 and TASK-002) are strictly distinct from engineering work on the Teranoo ERP software product itself.",
+    "distinctionBody": "Development tasks for this documentation platform (TASK-001 through TASK-004) are strictly distinct from engineering work on the Teranoo ERP software product itself.",
     "distinctionHeaders": {
       "dimension": "Dimension",
       "erpProduct": "Teranoo ERP Product",
@@ -489,8 +517,8 @@
       "r1Erp": "Commercial modular enterprise ERP product (Finance, Inventory, Procurement, Sales)",
       "r1Hub": "Public read-only documentation & knowledge platform chronicling the ERP journey",
       "r2Dim": "Current State",
-      "r2Erp": "Architectural planning & approval stage (Phase 5) — software engineering not started",
-      "r2Hub": "Incremental platform implementation (TASK-001 approved, TASK-002 reviewed, TASK-003 in progress)",
+      "r2Erp": "Phases 1–5 & conditional Decision Gate A closed; Phase 6 awaiting authorization — software coding not started",
+      "r2Hub": "Incremental platform implementation (TASK-001..003 completed, TASK-004 BATCH-001 in progress)",
       "r3Dim": "Where Work Is Recorded",
       "r3Erp": "In this Engineering Journal (/engineering-journal) once real ERP engineering starts",
       "r3Hub": "In Knowledge Hub task completion reports (docs/TASK-*-COMPLETION_REPORT.md)"
@@ -510,11 +538,12 @@
   },
   "foundations": {
     "sourceManifest": {
-      "sectionTitle": "Official Project Foundations Source Inventory",
-      "sectionSubtitle": "Six verified official source paths registered in the ingestion manifest, tracked separately from locally published records.",
-      "boundaryNoticeTitle": "Source Availability Boundary",
-      "boundaryNoticeBody": "These six official file paths are verified in the ERP planning repository, but their full Markdown bodies have not been delivered to this Knowledge Hub yet. No official source content has been fabricated.",
+      "sectionTitle": "Official Project Foundations Source Inventory (BATCH-001)",
+      "sectionSubtitle": "All six official Project Foundations source files (6/6) are imported, published, and verified by Git blob SHA against the reference commit.",
+      "boundaryNoticeTitle": "BATCH-001 Completion & Downstream Source Availability Boundary",
+      "boundaryNoticeBody": "All six official Project Foundations Markdown files (00-project-foundation) have been imported verbatim and verified against their exact Git blob SHA-1 digests. Detailed owning decision documents, Decision Gate A, separate FAC-019..024 files, research packages, and independent reviews remain scheduled for later authorized batches.",
       "summaryStrip": "{total} expected official sources · {received} received · {imported} imported · {published} publicly available · {awaiting} awaiting delivery",
+      "openPublishedDoc": "Read full document",
       "headers": {
         "document": "Official Source Document",
         "sourcePath": "Official Repository Path",
@@ -553,82 +582,129 @@
       "emptyStageBody": "No authorized knowledge records are mapped to this stage yet. Content will appear here as official sources and engineering records are ingested in future tasks."
     },
     "productVision": {
-      "sourceStatusTitle": "Official Source Availability — 00_PROJECT_VISION.md",
-      "sourceStatusBody": "The full official source file (teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md) is registered in the ingestion manifest and currently awaiting delivery. Verified snapshot facts remain displayed below without assumptions.",
-      "readinessTitle": "Full-Source Section Structure (Ingestion Readiness)",
-      "readinessIntro": "This page is structured to host the complete official Product Vision alongside an educational overview once 00_PROJECT_VISION.md is supplied and authorized. Sections without verified source text are explicitly marked as awaiting ingestion.",
-      "statusVerified": "Verified Snapshot",
-      "statusAwaiting": "Awaiting 00_PROJECT_VISION.md",
+      "sourceStatusTitle": "Full Official Source Imported & Published — 00_PROJECT_VISION.md",
+      "sourceStatusBody": "This page is backed directly by the approved official document teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md verified by Git blob SHA, with an explicit boundary between official facts and educational explanations.",
+      "readFullSourceAction": "Read Full Official Source in Knowledge Library",
+      "readinessTitle": "Official Vision Coverage (All 10 Source Sections Populated)",
+      "readinessIntro": "All ten sections of 00_PROJECT_VISION.md are represented here with clear historical context notes and explicit separation between approved scope and deferred items.",
+      "statusVerified": "Backed by Official Source",
+      "statusAwaiting": "Deferred to Later Phases",
       "sections": {
         "identity": "Product Identity & Core Strategy",
         "problem": "Problem Statement & Market Need",
-        "audience": "Target Audience & Target Industries",
-        "objectives": "Product Objectives & Success Criteria",
-        "coreModules": "Core Business ERP Modules (4 Verified)",
-        "platform": "Shared Platform Capabilities (Phase 5)",
+        "audience": "Target Customers & Four Primary Industries",
+        "objectives": "Product Objectives & Ten Success Criteria",
+        "coreModules": "Core Modules & Mandatory Platform Foundation",
+        "platform": "Seven Core Architectural Principles",
         "futureExtensions": "Future Enterprise Modules & Industry Extensions",
-        "boundaries": "Product Positioning & Strategic Boundaries"
+        "boundaries": "Strategic Boundaries & Product Anti-Goals"
       }
     },
     "roadmap": {
-      "title": "Project Roadmap & Complete Planning Foundation",
-      "subtitle": "Structured roadmap supporting Phases 1–5 verified snapshot data, future phases, intermediate phases (such as Phase 6.5), and formal decision gates.",
+      "title": "Complete Project Roadmap & Planning Methodology",
+      "subtitle": "Full official roadmap from Phase 1 through Phase 12 (including intermediate Phase 6.5 and Decision Gate A), paired with the official working rules from WORKING_RULES.md.",
       "tracksTitle": "Four Distinct Progress Dimensions (Never Combined)",
       "tracksSubtitle": "ERP planning, ERP software engineering, Knowledge Hub platform tasks, and operational readiness are tracked independently.",
       "tracks": {
         "erpPlanning": "1. ERP Product Planning",
-        "erpPlanningValue": "Phases 1–4 Complete · Phase 5: 7/13 (54%)",
-        "erpPlanningNote": "Official architectural planning progress from reviewed snapshot; later phases await PROJECT_WORK_PLAN.md.",
+        "erpPlanningValue": "Phases 1–5 Complete (13/13) · Gate A Conditional · Phase 6 Awaiting Auth",
+        "erpPlanningNote": "Phases 1–5 and Decision Gate A (D-MKT-01) are closed; Phase 6 has NOT started and requires explicit separate authorization.",
         "erpEngineering": "2. ERP Engineering Implementation",
         "erpEngineeringValue": "Not Started",
         "erpEngineeringNote": "Active ERP software coding has not begun; tracked separately from architectural planning.",
         "hubDevelopment": "3. Knowledge Hub Platform Development",
-        "hubDevelopmentValue": "TASK-003 (Ingestion Foundation)",
+        "hubDevelopmentValue": "TASK-004 (BATCH-001 — Project Foundations)",
         "hubDevelopmentNote": "Documentation platform milestones — never represents ERP product implementation progress.",
         "operationalReadiness": "4. ERP Operational Readiness",
         "operationalReadinessValue": "Not Started",
         "operationalReadinessNote": "Production deployment and enterprise operations readiness begin only after implementation and verification."
       },
-      "verifiedPhasesTitle": "Verified Planning Phases (Snapshot: Phases 1–5)",
-      "futureSupportTitle": "Future Official Phases, Intermediate Phases (Phase 6.5) & Decision Gates",
-      "futureSupportBody": "The roadmap data model natively supports non-integer intermediate phases (such as Phase 6.5), decision gates (such as Phase 5 Item 13: Platform Foundation Adoption), deliverables, research prerequisites, and deferred items. Detailed titles, deliverables, and dates beyond Phase 5 will be populated strictly from teranoo-erp-planning/00-project-foundation/PROJECT_WORK_PLAN.md once delivered — no future phase titles or timelines have been invented."
+      "verifiedPhasesTitle": "Complete Official Roadmap (Phase 1 — Phase 12 + Decision Gate A + Phase 6.5)",
+      "futureSupportTitle": "Source Discrepancy Note (PROJECT_WORK_PLAN.md Preserved Verbatim)",
+      "futureSupportBody": "PROJECT_WORK_PLAN.md is stored verbatim without silently editing its wording. Its stale # Current Position line still shows Phase 5 🔄 Current, whereas closing bullets and DECISION_REGISTER.md explicitly confirm Phase 5 completion (13/13 on 2026-10-02) with Phase 6 awaiting explicit authorization.",
+      "stageStatuses": {
+        "completed": "Completed",
+        "conditionally_approved": "Approved (Conditional)",
+        "awaiting_authorization": "Next — Awaiting Auth",
+        "pending": "Pending / Future",
+        "deferred": "Deferred",
+        "ongoing_track": "Ongoing Track (Not a Phase)"
+      },
+      "readWorkPlan": "Read full PROJECT_WORK_PLAN.md",
+      "readWorkingRules": "Read full WORKING_RULES.md"
     },
     "decisions": {
       "title": "Architectural Decision Register",
-      "subtitle": "Source-backed foundation for searching and inspecting official Teranoo ERP architectural and functional decisions.",
-      "indexNoticeTitle": "Official Index vs. Owning Authoritative Document",
-      "indexNoticeBody": "DECISION_REGISTER.md (currently awaiting source delivery) serves as the official decision index. Each decision’s complete authoritative text remains in its owning planning document. Currently 7 verified Phase 5 references are registered locally out of 120 source-declared decisions; zero missing decisions have been fabricated.",
-      "sourceDeclaredLabel": "Source-Declared Decisions (DECISION_REGISTER.md)",
-      "locallyAvailableLabel": "Locally Registered Decision References",
-      "locallyAvailableNote": "Verified Phase 5 platform capability decisions (D-PLAT-01 through D-PLAT-07) from the reviewed reference snapshot.",
-      "searchPlaceholder": "Search by decision ID (e.g. D-PLAT-03), title, or owning phase...",
+      "subtitle": "Complete official index deterministically extracted from DECISION_REGISTER.md: all 126 approved architectural D-* decisions plus separate conditional Decision Gate A (D-MKT-01) and Governing Artifacts.",
+      "indexNoticeTitle": "Authority Boundary: Official Index vs. Owning Authoritative Document",
+      "indexNoticeBody": "This register indexes all 126 approved architectural D-* decisions from DECISION_REGISTER.md (Phase 3: 103, Phase 4: 10, Phase 5: 13) plus conditional market decision D-MKT-01 separately. Complete authoritative decision texts and full rationales reside in their owning planning documents not yet imported in BATCH-001 — zero rationale or full decision prose has been fabricated.",
+      "sourceDeclaredLabel": "Indexed Architectural Decisions (D-*)",
+      "locallyAvailableLabel": "Owning Decision Docs Imported",
+      "locallyAvailableNote": "0 individual owning decision documents imported in BATCH-001 — all 126 official index records are extracted from DECISION_REGISTER.md awaiting later batches.",
+      "searchPlaceholder": "Search by Decision ID (e.g. D-PLAT-08, D-TEN-01, D-MKT-01), summary, or owning source...",
       "phaseFilterAll": "All Phases",
-      "resultsCount": "Showing {shown} of {total} locally verified decision references",
-      "emptyTitle": "No matching locally verified decisions",
-      "emptyDescription": "Only D-PLAT-01 through D-PLAT-07 are currently verified locally. Remaining decisions await official DECISION_REGISTER.md delivery.",
+      "familyFilterAll": "All Families (11)",
+      "resultsCount": "Showing {shown} of {total} indexed architectural decisions",
+      "emptyTitle": "No matching indexed decisions",
+      "emptyDescription": "Adjust your search query or phase/family filters to inspect all 126 officially indexed architectural decisions.",
       "headers": {
         "decisionId": "Decision ID",
-        "title": "Decision Title",
-        "phase": "Owning Phase",
+        "title": "Short Decision (Official Index)",
+        "phase": "Owner Phase",
         "status": "Status",
-        "source": "Source Reference",
-        "impact": "Scope / Impact"
+        "source": "Official Owning Source",
+        "impact": "Primary Impact"
       },
-      "defaultImpact": "Approved Phase 5 Shared Platform Capability"
+      "defaultImpact": "Approved Phase 5 Shared Platform Capability",
+      "detailPanelTitle": "Indexed Decision Record",
+      "detailAwaitingOwningDoc": "Indexed decision information is available from DECISION_REGISTER.md. Full authoritative decision text and rationale await ingestion of the owning source document:",
+      "openInRegisterDoc": "Open section in DECISION_REGISTER.md",
+      "marketDecisionSectionTitle": "Decision Gate A — Primary Launch Market (D-MKT-01 · Outside 126 Counter)",
+      "governingArtifactsTitle": "Governing Artifacts Without D-* IDs (6 Official Documents)",
+      "interpretiveGuardrailsTitle": "Interpretive Guardrails & Notes (C-AUTH-01..03 & C-ISO-01..03)"
+    },
+    "futureConsiderations": {
+      "title": "Future Architecture Considerations Register (FAC-001 — FAC-024)",
+      "subtitle": "Complete official register deterministically extracted from FUTURE_ARCHITECTURE_CONSIDERATIONS.md tracking deferred architectural topics and required research.",
+      "nonApprovedTitle": "Mandatory Governance Notice: Future Considerations Are NOT Approved ERP Decisions",
+      "nonApprovedBody": "All items FAC-001 through FAC-024 are forward-looking, deferred topics requiring future research, later review, or ongoing watch. They are NOT approved architectural decisions and must never be treated as approved product behavior.",
+      "searchPlaceholder": "Search by FAC ID (e.g. FAC-024), title, or owning phase...",
+      "statusAll": "All Statuses ({count})",
+      "resultsCount": "Showing {shown} of {total} future considerations",
+      "detailedDocUnavailable": "Separate detailed FAC file not yet imported in BATCH-001:",
+      "promotedTitle": "Ideas Already Promoted to Official Product Guardrails (7 Items)",
+      "promotedSubtitle": "These former future considerations were formally promoted into CROSS_PHASE_PRODUCT_GUARDRAILS.md.",
+      "reviewRulesTitle": "Official Review Rules (from FUTURE_ARCHITECTURE_CONSIDERATIONS.md)",
+      "openFullDoc": "Read full FUTURE_ARCHITECTURE_CONSIDERATIONS.md"
+    },
+    "guardrails": {
+      "sectionTitle": "Cross-Phase Product Guardrails",
+      "sectionSubtitle": "All eight approved guardrails extracted from CROSS_PHASE_PRODUCT_GUARDRAILS.md protecting single product core integrity, upgrades, configuration promotion, public contracts, and AI safety across every phase.",
+      "openFullDoc": "Read full CROSS_PHASE_PRODUCT_GUARDRAILS.md",
+      "principleLabel": "Governing Principle (Official Source)",
+      "whyItMattersLabel": "Why It Matters (Educational Context)",
+      "approvedRulesLabel": "Approved Rules & Boundaries",
+      "prohibitedLabel": "Prohibited Approaches",
+      "deferredLabel": "Deferred Details",
+      "educationalLabel": "Educational Takeaway (Knowledge Hub Interpretation — Not Official Source Text)",
+      "ownerPhasesLabel": "Owner / Affected Phases",
+      "openSectionInDoc": "Open section in official document",
+      "diagramsTitle": "Conceptual Illustrative Diagrams for Product Guardrails",
+      "diagramsSubtitle": "Educational visual models grounded in the approved guardrails — explicitly illustrative and not implemented runtime components."
     },
     "dashboardHubMetrics": {
-      "erpStatusHeading": "ERP Project Status (Official Planning Reference Snapshot)",
+      "erpStatusHeading": "ERP Project Status (Updated from Official BATCH-001 Sources)",
       "hubStatusHeading": "Knowledge Hub Content & Ingestion Status (Derived from Registry & Manifest)",
-      "hubStatusSubtitle": "Strictly separated from ERP product planning counts; distinguishes language variants from unique conceptual topics.",
-      "publishedVariants": "Published Language Records",
-      "publishedVariantsNote": "{ar} Arabic · {en} English (includes linked bilingual variants)",
+      "hubStatusSubtitle": "Strictly separated from ERP product planning counts; distinguishes active full sources, superseded historical summaries, and unimported owning docs.",
+      "publishedVariants": "Published Local Records",
+      "publishedVariantsNote": "{ar} Arabic · {en} English (includes 6 full official sources + 2 historical summaries)",
       "conceptualTopics": "Unique Conceptual Topics",
       "conceptualTopicsNote": "Linked Arabic/English translations counted once as a single topic across {collections} active collections",
-      "importedOfficialSources": "Imported Official Full Sources",
-      "importedOfficialSourcesNote": "{published} published / {total} expected Project Foundations sources ({awaiting} awaiting delivery)",
-      "ingestionReadiness": "Official Sources Awaiting Delivery",
-      "ingestionReadinessValue": "Manifest & Validator Active",
-      "ingestionReadinessNote": "Deterministic ingestion & validation pipeline active and ready for the first authorized batch"
+      "importedOfficialSources": "BATCH-001 Official Full Sources",
+      "importedOfficialSourcesNote": "{published} published / {total} Project Foundations sources Git-blob verified",
+      "ingestionReadiness": "Individual Owning Decision Docs",
+      "ingestionReadinessValue": "0 / 126 (Index Complete)",
+      "ingestionReadinessNote": "All 126 decisions & 24 FACs indexed from BATCH-001; owning decision docs await later batches"
     }
   },
   "states": {

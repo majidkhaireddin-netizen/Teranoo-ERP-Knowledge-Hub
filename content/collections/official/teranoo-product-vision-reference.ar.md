@@ -14,7 +14,7 @@ language: ar
 translationGroupId: tg-product-vision-ref
 type: product-vision
 classification: official
-editorialStatus: reference
+editorialStatus: superseded
 publicationStatus: public
 approvalStatus: reference
 implementationStatus: not-applicable
@@ -69,10 +69,10 @@ relationships:
   - type: related-to
     targetId: kh-edu-classification-governance-ar
   - type: derived-from
-    deferredRef: teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md
+    targetId: kh-doc-project-vision-ar
     label:
-      ar: "ملف رؤية المنتج الأصلي (00_PROJECT_VISION.md — بانتظار تسليم المصدر للاستيراد الكامل)"
-      en: "Original Product Vision source file (00_PROJECT_VISION.md — awaiting source delivery for full ingestion)"
+      ar: "الوثيقة الرسمية الكاملة لرؤية المنتج (00_PROJECT_VISION.md — تحل محل هذا الملخص المرجعي التاريخي)"
+      en: "Complete official Product Vision document (00_PROJECT_VISION.md — supersedes this historical reference summary)"
 source:
   kind: snapshot-derived
   repository: https://github.com/Alabasi1980/TeranooErp

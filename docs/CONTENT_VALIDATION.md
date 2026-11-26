@@ -27,7 +27,7 @@ In addition, `createContentRegistry()` and `getContentRegistry()` enforce fatal 
 | `DUPLICATE_SLUG` | Two records sharing the same canonical `/knowledge/[slug]` slug. |
 | `INVALID_STATUS_COMBINATION` | `editorialStatus: "draft"` combined with `publicationStatus: "public"`. |
 | `UNAUTHORIZED_PUBLICATION` | `publicationStatus: "public"` without `publicationAuthorization.authorized: true`. |
-| `INCONSISTENT_APPROVAL_STATUS` | `classification: "approved-decision"` with `approvalStatus` other than `approved` or `superseded`. |
+| `INCONSISTENT_APPROVAL_STATUS` | `classification: "approved-decision"` with `approvalStatus` other than `approved` or `superseded`; or `classification: "future"` with `approvalStatus: "approved"` (KH-022). |
 | `INCONSISTENT_SOURCE_ATTRIBUTION` | `official` or `approved-decision` record using `source.kind: "illustrative"`. |
 | `INVALID_TAXONOMY_REF` | Unknown `moduleRefs` entry not registered in `content/taxonomy/registry.ts`. |
 | `DUPLICATE_TRANSLATION_VARIANT` | Duplicate `language` inside the same `translationGroupId`. |
@@ -35,18 +35,20 @@ In addition, `createContentRegistry()` and `getContentRegistry()` enforce fatal 
 | `SELF_RELATIONSHIP` | Record declaring a relationship targeting its own `id`. |
 | `BROKEN_INTERNAL_REFERENCE` | Relationship `targetId` pointing to a nonexistent record. |
 | `PUBLIC_TO_UNPUBLISHED_REFERENCE` | Publicly published record referencing an unpublished/draft/unauthorized internal target. |
-| `INVALID_MANIFEST_ENTRY` / `DUPLICATE_SOURCE_*` / `MISSING_SOURCE_PROVENANCE` / `UNAUTHORIZED_SOURCE_PUBLICATION` / `UNRESOLVED_PUBLISHED_CONTENT_ID` | Source Manifest schema, uniqueness, provenance, or publication-gating failures validated by `validateSourceManifest()`. |
+| `INVALID_MANIFEST_ENTRY` / `DUPLICATE_SOURCE_*` / `MISSING_SOURCE_PROVENANCE` / `UNAUTHORIZED_SOURCE_PUBLICATION` / `UNRESOLVED_PUBLISHED_CONTENT_ID` | Source Manifest schema, uniqueness, provenance, Git blob verification, or publication-gating failures validated by `validateSourceManifest()`. |
 
 ## 3. Non-Blocking Warnings (Exit Code 0)
 
-- `DEFERRED_REFERENCE`: Explicitly declared frontmatter `deferredRef` pointing to a real artifact scheduled for a future ingestion task.
+- `DEFERRED_REFERENCE`: Explicitly declared frontmatter `deferredRef` pointing to a real artifact scheduled for a future ingestion task (for example, `DECISION_GATE_A_PRIMARY_LAUNCH_MARKET.md`).
 - `DEFERRED_MARKDOWN_LINK`: Relative Markdown link inside a document body pointing to an unimported official source file (safely neutralized into `.kh-deferred-link`).
 - `DEFERRED_MARKDOWN_ASSET`: Relative image path inside a document body pointing to an unimported source image (safely neutralized into `.kh-deferred-asset`).
 - `SOURCE_AWAITING_DELIVERY`: Official source file registered in `PROJECT_FOUNDATIONS_SOURCE_MANIFEST` whose full body has not yet been delivered.
 - `UNRESOLVED_PREVIOUS_REVISION`: `versioning.previousRevisionId` referencing an earlier revision not present in local collections.
 
-## 4. Runtime Security Invariants
+## 4. Runtime & Repository Security Invariants
 
+- **Public Repository Staging Boundary (KH-023):** Never commit unauthorized or confidential official source bodies to this public repository — even with `publicationStatus: "internal"` or `authorized: false`. Non-public staging must live outside this public repository; application-level filtering is defense-in-depth only. Test fixtures in `content/fixtures/` must remain strictly synthetic and non-sensitive.
+- **Git Blob SHA Verification (KH-021):** Official ingested files are verified against their trusted 40-character Git blob SHA-1 digest (`git-blob-verified` or `git-blob-verified-lf-normalized`), failing closed on mismatch.
 - **Path Confinement:** `resolveSafeContentPath` enforces `path.resolve` + trailing `path.sep` boundary checks and rejects `..`, absolute escapes, and null bytes with `ContentPathSecurityError`.
 - **Safe Markdown Pipeline & DOM-Clobbering Prevention:** `remark-rehype` runs with `allowDangerousHtml: false`, `rehype-sanitize` uses strict allowlisting with `clobberPrefix: 'kh-user-'`, and all heading anchors are allocated globally unique `kh-h-*` IDs (`allocateUniqueHeadingId`).
 - **Safe Relative Links & Governed Assets:** `content/loaders/relativeLinkResolver.ts` maps published sibling `.md` links to `/knowledge/[slug]#kh-h-...`, neutralizes unimported relative references, restricts local raster images strictly to `/assets/knowledge/*`, and blocks traversal or unsafe schemes.

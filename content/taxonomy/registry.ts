@@ -197,13 +197,19 @@ export const JOURNEY_STAGES: readonly TaxonomyEntry<JourneyStageId>[] = [
 export const OFFICIAL_PHASE_PATTERN = /^phase-\d+(?:\.\d+)?$/;
 
 export const KNOWN_OFFICIAL_PHASES: readonly TaxonomyEntry[] = [
-  { id: 'phase-1', label: { ar: 'المرحلة 1', en: 'Phase 1' } },
-  { id: 'phase-2', label: { ar: 'المرحلة 2', en: 'Phase 2' } },
-  { id: 'phase-3', label: { ar: 'المرحلة 3', en: 'Phase 3' } },
-  { id: 'phase-4', label: { ar: 'المرحلة 4', en: 'Phase 4' } },
+  { id: 'phase-1', label: { ar: 'المرحلة 1 — رؤية المنتج والتموضع', en: 'Phase 1 — Project Vision & Positioning' } },
+  { id: 'phase-2', label: { ar: 'المرحلة 2 — نطاق ERP وخريطة الوحدات والاعتماديات', en: 'Phase 2 — ERP Scope, Module Map & Dependencies' } },
+  { id: 'phase-3', label: { ar: 'المرحلة 3 — المعمارية الأساسية ونموذج المنصة', en: 'Phase 3 — Core Architecture & Platform Model' } },
+  { id: 'phase-4', label: { ar: 'المرحلة 4 — استراتيجية النشر وقواعد البيانات', en: 'Phase 4 — Deployment & Database Strategy' } },
   { id: 'phase-5', label: { ar: 'المرحلة 5 — قدرات المنصة المشتركة', en: 'Phase 5 — Shared Platform Capabilities' } },
-  { id: 'phase-6', label: { ar: 'المرحلة 6', en: 'Phase 6' } },
-  { id: 'phase-6.5', label: { ar: 'المرحلة 6.5', en: 'Phase 6.5' } },
+  { id: 'phase-6', label: { ar: 'المرحلة 6 — المخططات الوظيفية للوحدات الأساسية', en: 'Phase 6 — Core Module Functional Blueprints' } },
+  { id: 'phase-6.5', label: { ar: 'المرحلة 6.5 — التحقق من عقود التكامل البيني الأساسية', en: 'Phase 6.5 — Core Cross-Module Contract Validation' } },
+  { id: 'phase-7', label: { ar: 'المرحلة 7 — الوحدات المؤسسية الاستراتيجية', en: 'Phase 7 — Strategic Enterprise Modules' } },
+  { id: 'phase-8', label: { ar: 'المرحلة 8 — الامتدادات القطاعية', en: 'Phase 8 — Industry Extensions' } },
+  { id: 'phase-9', label: { ar: 'المرحلة 9 — العمليات التجارية الممتدة عبر الوحدات', en: 'Phase 9 — Extended Cross-Module Business Processes' } },
+  { id: 'phase-10', label: { ar: 'المرحلة 10 — المتطلبات على مستوى المؤسسة', en: 'Phase 10 — Enterprise-Wide Requirements' } },
+  { id: 'phase-11', label: { ar: 'المرحلة 11 — توحيد النطاق وخط الأساس للمنتج', en: 'Phase 11 — Scope Consolidation & Product Baseline' } },
+  { id: 'phase-12', label: { ar: 'المرحلة 12 — التحضير للتسليم إلى دورة Teranoo الرسمية', en: 'Phase 12 — Teranoo Handoff Preparation' } },
 ];
 
 export const BUSINESS_MODULES_TAXONOMY: readonly TaxonomyEntry[] = [

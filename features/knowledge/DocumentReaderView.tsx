@@ -379,6 +379,42 @@ export function DocumentReaderView({
         ) : null}
       </section>
 
+      {/* Superseded Historical Reference Summary Banner */}
+      {metadata.editorialStatus === 'superseded' ? (
+        <InformationCallout title={t('knowledge.reader.supersededBannerTitle')}>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <span>{t('knowledge.reader.supersededBannerBody')}</span>
+            {(() => {
+              const currentTarget =
+                incomingRelationships.find(
+                  (r) => r.type === 'supersedes' && r.targetSlug
+                ) ??
+                outgoingRelationships.find(
+                  (r) => r.type === 'derived-from' && r.targetSlug
+                );
+              if (!currentTarget?.targetSlug) return null;
+              return (
+                <Link
+                  href={`/knowledge/${currentTarget.targetSlug}`}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-primary hover:bg-surface-hover transition-colors"
+                >
+                  <span>{t('knowledge.reader.supersededOpenCurrent')}</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+              );
+            })()}
+          </div>
+        </InformationCallout>
+      ) : null}
+
+      {/* Official Source Knowledge Hub Interpretation Note (Official Text Preserved Verbatim) */}
+      {metadata.source.kind === 'official-source' &&
+      metadata.source.interpretationNote ? (
+        <InformationCallout title={t('knowledge.reader.interpretationNoteTitle')}>
+          {resolveLocalizedText(metadata.source.interpretationNote, locale)}
+        </InformationCallout>
+      ) : null}
+
       {/* Non-Binding Authority / Research Disclaimer */}
       {showAuthorityDisclaimer ? (
         <InformationCallout title={t('knowledge.reader.researchDisclaimerTitle')}>
@@ -644,16 +680,90 @@ export function DocumentReaderView({
                     </div>
                   </>
                 ) : metadata.source.kind === 'official-source' ? (
-                  <div className="space-y-0.5 sm:col-span-2">
-                    <dt className="text-text-muted">
-                      {t('knowledge.reader.sourcePaths')}
-                    </dt>
-                    <dd>
-                      <code className="font-mono text-xs bidi-ltr break-all text-text-secondary">
-                        {metadata.source.sourcePath}
-                      </code>
-                    </dd>
-                  </div>
+                  <>
+                    <div className="space-y-0.5 sm:col-span-2">
+                      <dt className="text-text-muted">
+                        {t('knowledge.reader.sourcePaths')}
+                      </dt>
+                      <dd>
+                        <code className="font-mono text-xs bidi-ltr break-all text-text-secondary">
+                          {metadata.source.sourcePath}
+                        </code>
+                      </dd>
+                    </div>
+                    {metadata.source.commitSha ? (
+                      <div className="space-y-0.5 sm:col-span-2">
+                        <dt className="text-text-muted">
+                          {t('knowledge.reader.commitSha')}
+                        </dt>
+                        <dd>
+                          <code className="font-mono text-xs bidi-ltr break-all text-text-primary">
+                            {metadata.source.commitSha}
+                          </code>
+                        </dd>
+                      </div>
+                    ) : null}
+                    {metadata.source.treeSha ? (
+                      <div className="space-y-0.5 sm:col-span-2">
+                        <dt className="text-text-muted">
+                          {t('knowledge.reader.sourceSha')}
+                        </dt>
+                        <dd>
+                          <code className="font-mono text-xs bidi-ltr break-all text-text-primary">
+                            {metadata.source.treeSha}
+                          </code>
+                        </dd>
+                      </div>
+                    ) : null}
+                    {metadata.source.gitBlobSha ? (
+                      <div className="space-y-0.5 sm:col-span-2">
+                        <dt className="text-text-muted">
+                          {t('knowledge.reader.gitBlobSha')}
+                        </dt>
+                        <dd>
+                          <code className="font-mono text-xs bidi-ltr break-all text-success">
+                            {metadata.source.gitBlobSha}
+                          </code>
+                        </dd>
+                      </div>
+                    ) : null}
+                    {metadata.source.verificationStatus ? (
+                      <div className="space-y-0.5 sm:col-span-2">
+                        <dt className="text-text-muted">
+                          {t('knowledge.reader.verificationStatus')}
+                        </dt>
+                        <dd className="font-medium text-text-primary">
+                          {t(
+                            `knowledge.reader.verificationStatuses.${metadata.source.verificationStatus}`
+                          )}
+                        </dd>
+                      </div>
+                    ) : null}
+                    {metadata.source.rawSourceSha256 ? (
+                      <div className="space-y-0.5">
+                        <dt className="text-text-muted">
+                          {t('knowledge.reader.rawSourceSha256')}
+                        </dt>
+                        <dd>
+                          <code className="font-mono text-[11px] bidi-ltr break-all text-text-secondary">
+                            {metadata.source.rawSourceSha256}
+                          </code>
+                        </dd>
+                      </div>
+                    ) : null}
+                    {metadata.source.storedBodySha256 ? (
+                      <div className="space-y-0.5">
+                        <dt className="text-text-muted">
+                          {t('knowledge.reader.storedBodySha256')}
+                        </dt>
+                        <dd>
+                          <code className="font-mono text-[11px] bidi-ltr break-all text-text-secondary">
+                            {metadata.source.storedBodySha256}
+                          </code>
+                        </dd>
+                      </div>
+                    ) : null}
+                  </>
                 ) : null}
 
                 <div className="space-y-0.5">

@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { resolveLocalizedText } from '@/content/models/types';
 import type {
@@ -87,9 +89,37 @@ export function SourceInventorySection({
                         `classification.${entry.classification}.shortLabel`
                       )}
                     />
-                    <span className="font-semibold text-text-primary">
-                      {resolveLocalizedText(entry.title, locale)}
-                    </span>
+                    {(() => {
+                      const slugMap: Readonly<Record<string, string>> = {
+                        'kh-doc-project-vision-ar': 'project-vision',
+                        'kh-doc-project-work-plan-ar': 'project-work-plan',
+                        'kh-doc-working-rules-ar': 'working-rules',
+                        'kh-doc-cross-phase-guardrails-ar':
+                          'cross-phase-product-guardrails',
+                        'kh-doc-decision-register-ar': 'decision-register',
+                        'kh-doc-future-architecture-considerations-ar':
+                          'future-architecture-considerations',
+                      };
+                      const slug = entry.publishedContentId
+                        ? slugMap[entry.publishedContentId]
+                        : undefined;
+                      if (entry.importStatus === 'published' && slug) {
+                        return (
+                          <Link
+                            href={`/knowledge/${slug}`}
+                            className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+                          >
+                            <span>{resolveLocalizedText(entry.title, locale)}</span>
+                            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                          </Link>
+                        );
+                      }
+                      return (
+                        <span className="font-semibold text-text-primary">
+                          {resolveLocalizedText(entry.title, locale)}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <p className="text-[11px] leading-relaxed text-text-secondary">
                     {resolveLocalizedText(entry.purpose, locale)}
@@ -100,10 +130,19 @@ export function SourceInventorySection({
                     </p>
                   ) : null}
                 </td>
-                <td className="px-3.5 py-3 min-w-[220px]">
-                  <code className="font-mono text-[11px] text-text-secondary bidi-ltr break-all">
+                <td className="px-3.5 py-3 min-w-[220px] space-y-1">
+                  <code className="block font-mono text-[11px] text-text-secondary bidi-ltr break-all">
                     {entry.sourcePath}
                   </code>
+                  {entry.actualGitBlobSha ?? entry.expectedGitBlobSha ? (
+                    <code className="block font-mono text-[10px] text-success bidi-ltr">
+                      git-blob:{' '}
+                      {(entry.actualGitBlobSha ?? entry.expectedGitBlobSha)!.slice(
+                        0,
+                        12
+                      )}
+                    </code>
+                  ) : null}
                 </td>
                 <td className="px-3.5 py-3 whitespace-nowrap">
                   <span className="font-mono rounded-sm bg-surface-subtle px-1.5 py-0.5 text-[11px] text-text-secondary bidi-ltr">
@@ -111,7 +150,13 @@ export function SourceInventorySection({
                   </span>
                 </td>
                 <td className="px-3.5 py-3 whitespace-nowrap">
-                  <span className="inline-flex items-center rounded-sm border border-border bg-surface-subtle px-2 py-0.5 text-[11px] font-medium text-text-primary">
+                  <span
+                    className={`inline-flex items-center rounded-sm border px-2 py-0.5 text-[11px] font-medium ${
+                      entry.importStatus === 'published'
+                        ? 'border-success-border bg-success-bg text-success'
+                        : 'border-border bg-surface-subtle text-text-primary'
+                    }`}
+                  >
                     {t(
                       `foundations.sourceManifest.importStatuses.${entry.importStatus}`
                     )}

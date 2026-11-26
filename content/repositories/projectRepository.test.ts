@@ -15,6 +15,7 @@ import {
   derivePlanningSummary,
   deriveRuntimeCapabilitiesSummary,
   filterPhase5Capabilities,
+  getHistoricalReferenceSnapshot,
   getPhase5Capabilities,
   getProjectSnapshot,
   getRuntimePlatformCapabilities,
@@ -36,15 +37,35 @@ function collectKeys(obj: Record<string, unknown>, prefix = ''): string[] {
   return keys.sort();
 }
 
-test('derivePhase5Progress derives 7 approved and 6 pending out of 13 planning items', () => {
+test('derivePhase5Progress derives 13 approved and 0 pending out of 13 planning items in current BATCH-001 snapshot', () => {
   const progress = derivePhase5Progress();
   assert.equal(progress.totalCount, 13);
-  assert.equal(progress.completedCount, 7);
-  assert.equal(progress.pendingCount, 6);
-  assert.equal(progress.completionPercentage, 54);
+  assert.equal(progress.completedCount, 13);
+  assert.equal(progress.pendingCount, 0);
+  assert.equal(progress.completionPercentage, 100);
 });
 
-test('getRuntimePlatformCapabilities returns 12 runtime capabilities and excludes item 13 planning gate', () => {
+test('historical 2026-11-25 reference snapshot preserves 7/13 Phase 5 progress and 120 decisions without rewriting history', () => {
+  const historical = getHistoricalReferenceSnapshot();
+  const histProgress = derivePhase5Progress(historical.phase5Capabilities);
+  const histSummary = derivePlanningSummary(historical.planningPhases);
+  const histProvenance = getSnapshotProvenance(historical);
+
+  assert.equal(historical.referenceCounts.approvedArchitecturalDecisions, 120);
+  assert.equal(histProgress.completedCount, 7);
+  assert.equal(histProgress.pendingCount, 6);
+  assert.equal(histProgress.completionPercentage, 54);
+  assert.equal(histSummary.completedPhasesCount, 4);
+  assert.equal(histSummary.activePhase?.phaseNumber, 5);
+  assert.equal(histSummary.activePhase?.status, 'in_progress');
+  assert.equal(histProvenance.referenceReviewDate, '2026-11-25');
+  assert.equal(
+    histProvenance.reviewedTreeSha,
+    'a922a69b54bc0cc611ae46d8e7434907cde0046a'
+  );
+});
+
+test('getRuntimePlatformCapabilities returns 12 approved runtime capabilities and excludes item 13 planning gate (D-PLAT-13)', () => {
   const allPhase5 = getPhase5Capabilities();
   const runtime = getRuntimePlatformCapabilities();
   const runtimeSummary = deriveRuntimeCapabilitiesSummary(runtime);
@@ -52,8 +73,8 @@ test('getRuntimePlatformCapabilities returns 12 runtime capabilities and exclude
   assert.equal(allPhase5.length, 13);
   assert.equal(runtime.length, 12);
   assert.equal(runtimeSummary.totalCount, 12);
-  assert.equal(runtimeSummary.approvedCount, 7);
-  assert.equal(runtimeSummary.pendingCount, 5);
+  assert.equal(runtimeSummary.approvedCount, 12);
+  assert.equal(runtimeSummary.pendingCount, 0);
   assert.ok(runtime.every((item) => item.kind === 'runtime_capability'));
   assert.ok(
     !runtime.some((item) => item.id === 'platform-foundation-adoption')
@@ -65,35 +86,34 @@ test('getRuntimePlatformCapabilities returns 12 runtime capabilities and exclude
   assert.ok(gateItem);
   assert.equal(gateItem.itemNumber, 13);
   assert.equal(gateItem.kind, 'planning_gate');
-  assert.equal(gateItem.status, 'pending');
-  assert.equal(gateItem.decisionId, null);
+  assert.equal(gateItem.status, 'approved');
+  assert.equal(gateItem.decisionId, 'D-PLAT-13');
 });
 
-test('derivePlanningSummary identifies 4 completed phases and Phase 5 in progress', () => {
+test('derivePlanningSummary identifies all 5 foundational phases (Phases 1-5) as completed', () => {
   const summary = derivePlanningSummary();
   assert.equal(summary.totalPhasesCount, 5);
-  assert.equal(summary.completedPhasesCount, 4);
-  assert.equal(summary.activePhase?.phaseNumber, 5);
-  assert.equal(summary.activePhase?.status, 'in_progress');
+  assert.equal(summary.completedPhasesCount, 5);
+  assert.equal(summary.activePhase, null);
 });
 
-test('deriveDashboardMetrics computes all dashboard metrics from authoritative snapshot', () => {
+test('deriveDashboardMetrics computes all dashboard metrics from authoritative BATCH-001 snapshot', () => {
   const metrics = deriveDashboardMetrics();
-  assert.equal(metrics.approvedDecisionsCount, 120);
-  assert.equal(metrics.completedPhasesCount, 4);
+  assert.equal(metrics.approvedDecisionsCount, 126);
+  assert.equal(metrics.completedPhasesCount, 5);
   assert.equal(metrics.totalPhasesCount, 5);
   assert.equal(metrics.coreModulesCount, 4);
-  assert.equal(metrics.phase5.completedCount, 7);
+  assert.equal(metrics.phase5.completedCount, 13);
   assert.equal(metrics.phase5.totalCount, 13);
 });
 
-test('filterPhase5Capabilities filters accurately by status and preserves decision IDs', () => {
+test('filterPhase5Capabilities filters accurately by status and preserves all 13 D-PLAT decision IDs', () => {
   const approved = filterPhase5Capabilities('approved');
   const pending = filterPhase5Capabilities('pending');
   const all = filterPhase5Capabilities('all');
 
-  assert.equal(approved.length, 7);
-  assert.equal(pending.length, 6);
+  assert.equal(approved.length, 13);
+  assert.equal(pending.length, 0);
   assert.equal(all.length, 13);
   assert.deepEqual(
     approved.map((c) => c.decisionId),
@@ -105,18 +125,23 @@ test('filterPhase5Capabilities filters accurately by status and preserves decisi
       'D-PLAT-05',
       'D-PLAT-06',
       'D-PLAT-07',
+      'D-PLAT-08',
+      'D-PLAT-09',
+      'D-PLAT-10',
+      'D-PLAT-11',
+      'D-PLAT-12',
+      'D-PLAT-13',
     ]
   );
-  assert.ok(pending.every((c) => c.decisionId === null));
 });
 
-test('reference snapshot preserves exact authorized counts and explicit provenance metadata', () => {
+test('reference snapshot preserves exact authorized BATCH-001 counts and explicit provenance metadata', () => {
   const snapshot = getProjectSnapshot();
   const provenance = getSnapshotProvenance(snapshot);
 
   assert.equal(snapshot.identity.productName, 'Teranoo ERP');
   assert.equal(snapshot.identity.databaseEngine, 'PostgreSQL');
-  assert.equal(snapshot.referenceCounts.approvedArchitecturalDecisions, 120);
+  assert.equal(snapshot.referenceCounts.approvedArchitecturalDecisions, 126);
   assert.equal(snapshot.referenceCounts.futureArchitectureConsiderations, 24);
   assert.equal(snapshot.referenceCounts.architecturalResearchPackages, 13);
   assert.equal(snapshot.referenceCounts.independentReviewNotes, 57);
@@ -126,29 +151,25 @@ test('reference snapshot preserves exact authorized counts and explicit provenan
     provenance.sourceRepository,
     'https://github.com/Alabasi1980/TeranooErp'
   );
-  assert.deepEqual(provenance.officialSources, [
-    'teranoo-erp-planning/00-project-foundation/PROJECT_WORK_PLAN.md',
-    'teranoo-erp-planning/00-project-foundation/DECISION_REGISTER.md',
-  ]);
+  assert.equal(
+    provenance.reviewedCommitSha,
+    '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f'
+  );
   assert.equal(
     provenance.reviewedTreeSha,
-    'a922a69b54bc0cc611ae46d8e7434907cde0046a'
+    'db531de6b2ab452578a550e07c5fd80e4bfe6b64'
   );
-  assert.equal(provenance.referenceReviewDate, '2026-11-25');
+  assert.equal(provenance.referenceReviewDate, '2026-11-26');
   assert.equal(provenance.isLiveSynced, false);
   assert.ok(
-    provenance.metricsOriginNote.en.includes(
-      'official project future considerations register'
-    )
+    provenance.metricsOriginNote.en.includes('BATCH-001')
   );
   assert.ok(
-    provenance.metricsOriginNote.ar.includes(
-      'سجل الاعتبارات المستقبلية الرسمي'
-    )
+    provenance.metricsOriginNote.ar.includes('BATCH-001')
   );
 });
 
-test('searchKnowledgeHub matches official decision IDs without exposing fabricated codes', () => {
+test('searchKnowledgeHub matches all 13 official D-PLAT IDs without exposing fabricated codes', () => {
   const index = buildSearchIndex();
   assert.ok(index.length >= 35);
 
@@ -163,12 +184,18 @@ test('searchKnowledgeHub matches official decision IDs without exposing fabricat
       'D-PLAT-05',
       'D-PLAT-06',
       'D-PLAT-07',
+      'D-PLAT-08',
+      'D-PLAT-09',
+      'D-PLAT-10',
+      'D-PLAT-11',
+      'D-PLAT-12',
+      'D-PLAT-13',
     ]
   );
 
-  const byDecisionId = searchKnowledgeHub('D-PLAT-03', index);
+  const byDecisionId = searchKnowledgeHub('D-PLAT-08', index);
   assert.equal(byDecisionId.length, 1);
-  assert.equal(byDecisionId[0]?.code, 'D-PLAT-03');
+  assert.equal(byDecisionId[0]?.code, 'D-PLAT-08');
   assert.equal(byDecisionId[0]?.href, '/platform');
 
   const byArabic = searchKnowledgeHub('رؤية المنتج', index);

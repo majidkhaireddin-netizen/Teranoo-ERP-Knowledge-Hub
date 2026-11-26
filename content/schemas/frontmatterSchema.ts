@@ -91,6 +91,22 @@ const sourceProvenanceSchema = z.discriminatedUnion('kind', [
     sourceTitle: z.string().trim().min(1).optional(),
     commitSha: z.string().regex(SHA_PATTERN, 'Invalid SHA format').optional(),
     treeSha: z.string().regex(SHA_PATTERN, 'Invalid SHA format').optional(),
+    gitBlobSha: z.string().regex(/^[0-9a-f]{40}$/i, 'Invalid Git blob SHA-1 format').optional(),
+    rawSourceSha256: z.string().regex(/^[0-9a-f]{64}$/i, 'Invalid SHA-256 format').optional(),
+    storedBodySha256: z.string().regex(/^[0-9a-f]{64}$/i, 'Invalid SHA-256 format').optional(),
+    verificationStatus: z
+      .enum([
+        'path-verified-awaiting-body',
+        'source-received',
+        'digest-calculated',
+        'git-blob-verified',
+        'git-blob-verified-lf-normalized',
+        'git-blob-mismatch',
+        'unverified',
+      ])
+      .optional(),
+    lineEndingNormalization: z.enum(['none', 'crlf-to-lf']).optional(),
+    interpretationNote: localizedTextSchema.optional(),
     ...sourceBaseFields,
   }),
   z.object({

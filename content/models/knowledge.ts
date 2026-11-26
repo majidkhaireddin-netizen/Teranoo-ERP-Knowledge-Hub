@@ -33,6 +33,8 @@ interface SourceProvenanceBase {
   readonly copyrightNotice?: string;
 }
 
+export type LineEndingNormalization = 'none' | 'crlf-to-lf';
+
 export interface OfficialSourceProvenance extends SourceProvenanceBase {
   readonly kind: 'official-source';
   readonly repository: string;
@@ -40,6 +42,12 @@ export interface OfficialSourceProvenance extends SourceProvenanceBase {
   readonly sourceTitle?: string;
   readonly commitSha?: string;
   readonly treeSha?: string;
+  readonly gitBlobSha?: string;
+  readonly rawSourceSha256?: string;
+  readonly storedBodySha256?: string;
+  readonly verificationStatus?: SourceVerificationStatus;
+  readonly lineEndingNormalization?: LineEndingNormalization;
+  readonly interpretationNote?: LocalizedText;
 }
 
 export interface SnapshotDerivedProvenance extends SourceProvenanceBase {
@@ -205,8 +213,11 @@ export type SourceAuthorizationStatus =
 
 export type SourceVerificationStatus =
   | 'path-verified-awaiting-body'
-  | 'hash-verified'
-  | 'verified'
+  | 'source-received'
+  | 'digest-calculated'
+  | 'git-blob-verified'
+  | 'git-blob-verified-lf-normalized'
+  | 'git-blob-mismatch'
   | 'unverified';
 
 export type SourceCompletenessStatus =
@@ -222,7 +233,11 @@ export interface SourceManifestEntry {
   readonly title: LocalizedText;
   readonly purpose: LocalizedText;
   readonly sourceRevision?: string | null;
+  readonly expectedGitBlobSha?: string | null;
+  readonly actualGitBlobSha?: string | null;
+  readonly rawSourceSha256?: string | null;
   readonly sourceFileHash?: string | null;
+  readonly lineEndingNormalization?: LineEndingNormalization;
   readonly classification: ContentClassificationType;
   readonly expectedContentType: ContentTypeId;
   readonly phaseRef: string;

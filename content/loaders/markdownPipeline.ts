@@ -318,10 +318,23 @@ export function renderSafeMarkdown(
   // align same-document fragment links, enforce rel/target on external links,
   // and wrap tables in .kh-table-wrap.
   const rehypePostSanitizeFinalize = () => (tree: HastNode) => {
-    // Pass 1: Heading IDs (H2 & H3 included in TOC; H1/H4-H6 also get unique safe IDs if present)
+    // Pass 1: Heading IDs (assign kh-h-* IDs to h1, h2, h3; include h1 in TOC
+    // when a document uses multiple top-level H1 sections such as PROJECT_WORK_PLAN.md)
+    let h1Count = 0;
+    walkTree(tree, (node) => {
+      if (node.type === 'element' && node.tagName === 'h1') {
+        h1Count += 1;
+      }
+    });
+    const isMultiH1Document = h1Count > 1;
+
     walkTree(tree, (node) => {
       if (node.type !== 'element' || !node.tagName) return;
-      if (node.tagName === 'h2' || node.tagName === 'h3') {
+      if (
+        node.tagName === 'h1' ||
+        node.tagName === 'h2' ||
+        node.tagName === 'h3'
+      ) {
         const title = extractText(node).trim();
         const baseSlug = createHeadingSlug(title);
         const uniqueId = allocateUniqueHeadingId(baseSlug, usedHeadingIds);
@@ -335,11 +348,19 @@ export function renderSafeMarkdown(
           id: uniqueId,
         };
 
-        headings.push({
-          id: uniqueId,
-          title,
-          level: node.tagName === 'h2' ? 2 : 3,
-        });
+        if (isMultiH1Document) {
+          if (node.tagName === 'h1') {
+            headings.push({ id: uniqueId, title, level: 2 });
+          } else if (node.tagName === 'h2') {
+            headings.push({ id: uniqueId, title, level: 3 });
+          }
+        } else if (node.tagName === 'h2' || node.tagName === 'h3') {
+          headings.push({
+            id: uniqueId,
+            title,
+            level: node.tagName === 'h2' ? 2 : 3,
+          });
+        }
       }
     });
 

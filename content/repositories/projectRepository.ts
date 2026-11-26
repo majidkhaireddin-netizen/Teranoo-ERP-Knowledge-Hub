@@ -14,10 +14,17 @@ import type {
   SnapshotProvenance,
   SnapshotReferenceCounts,
 } from '@/content/models/types';
-import { PROJECT_REFERENCE_SNAPSHOT } from '@/content/seed/projectSnapshot';
+import {
+  HISTORICAL_REFERENCE_SNAPSHOT,
+  PROJECT_REFERENCE_SNAPSHOT,
+} from '@/content/seed/projectSnapshot';
 
 export function getProjectSnapshot(): ProjectReferenceSnapshot {
   return PROJECT_REFERENCE_SNAPSHOT;
+}
+
+export function getHistoricalReferenceSnapshot(): ProjectReferenceSnapshot {
+  return HISTORICAL_REFERENCE_SNAPSHOT;
 }
 
 export function getSnapshotProvenance(
@@ -169,20 +176,26 @@ export function buildSearchIndex(
     id: `cap-${cap.id}`,
     href: '/platform',
     title: cap.name,
-    subtitle: cap.decisionId
-      ? {
-          ar: `المرحلة 5 — قدرة منصة معتمدة (${cap.decisionId})`,
-          en: `Phase 5 — Approved platform capability (${cap.decisionId})`,
-        }
-      : cap.kind === 'planning_gate'
-        ? {
-            ar: 'المرحلة 5 — بوابة مراجعة واعتماد تخطيطية',
-            en: 'Phase 5 — Planning review & approval gate',
-          }
-        : {
-            ar: 'المرحلة 5 — قدرة منصة قيد الاستكمال',
-            en: 'Phase 5 — Pending platform capability',
-          },
+    subtitle:
+      cap.kind === 'planning_gate'
+        ? cap.decisionId
+          ? {
+              ar: `المرحلة 5 — بوابة مراجعة واعتماد تخطيطية معتمدة (${cap.decisionId})`,
+              en: `Phase 5 — Approved planning review & adoption gate (${cap.decisionId})`,
+            }
+          : {
+              ar: 'المرحلة 5 — بوابة مراجعة واعتماد تخطيطية',
+              en: 'Phase 5 — Planning review & approval gate',
+            }
+        : cap.decisionId
+          ? {
+              ar: `المرحلة 5 — قدرة منصة معتمدة (${cap.decisionId})`,
+              en: `Phase 5 — Approved platform capability (${cap.decisionId})`,
+            }
+          : {
+              ar: 'المرحلة 5 — قدرة منصة قيد الاستكمال',
+              en: 'Phase 5 — Pending platform capability',
+            },
     category: cap.decisionId ? 'decision' : 'capability',
     classification: 'official',
     code: cap.decisionId ?? undefined,

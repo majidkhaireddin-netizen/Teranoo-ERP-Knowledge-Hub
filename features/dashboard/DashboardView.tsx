@@ -39,9 +39,18 @@ const QUICK_NAV_IDS = [
   'engineering-journal',
 ] as const;
 
+export interface DashboardExtractedSummary {
+  readonly indexedArchitecturalDecisionsCount: number;
+  readonly importedOwningDecisionDocsCount: number;
+  readonly facRecordsCount: number;
+  readonly completedOfficialPhasesCount: number;
+  readonly totalOfficialPhasesCount: number;
+}
+
 export interface DashboardViewProps {
   registryStats?: ContentRegistryStats;
   manifestSummary?: SourceManifestSummary;
+  extractedSummary?: DashboardExtractedSummary;
 }
 
 const DEFAULT_REGISTRY_STATS: ContentRegistryStats = {
@@ -70,6 +79,7 @@ const DEFAULT_MANIFEST_SUMMARY: SourceManifestSummary = {
 export function DashboardView({
   registryStats = DEFAULT_REGISTRY_STATS,
   manifestSummary = DEFAULT_MANIFEST_SUMMARY,
+  extractedSummary,
 }: DashboardViewProps) {
   const t = useTranslations();
   const { locale } = useAppLocale();
@@ -101,8 +111,10 @@ export function DashboardView({
       href: '/decisions',
       title: t('dashboard.snapshotLedger.items.decisions'),
       note: t('dashboard.snapshotLedger.notes.decisions'),
-      count: counts.approvedArchitecturalDecisions,
-      classification: 'official',
+      count:
+        extractedSummary?.indexedArchitecturalDecisionsCount ??
+        counts.approvedArchitecturalDecisions,
+      classification: 'approved-decision',
     },
     {
       key: 'research',
@@ -125,7 +137,9 @@ export function DashboardView({
       href: '/future-considerations',
       title: t('dashboard.snapshotLedger.items.future'),
       note: t('dashboard.snapshotLedger.notes.future'),
-      count: counts.futureArchitectureConsiderations,
+      count:
+        extractedSummary?.facRecordsCount ??
+        counts.futureArchitectureConsiderations,
       classification: 'future',
     },
   ];
@@ -142,7 +156,7 @@ export function DashboardView({
             />
             <span aria-hidden="true" className="text-text-muted">·</span>
             <StatusIndicator
-              status="in_progress"
+              status="completed"
               label={t('app.currentPhaseBadge')}
             />
           </>
@@ -182,15 +196,24 @@ export function DashboardView({
         <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             label={t('dashboard.metrics.approvedDecisions')}
-            value={metrics.approvedDecisionsCount}
+            value={
+              extractedSummary?.indexedArchitecturalDecisionsCount ??
+              metrics.approvedDecisionsCount
+            }
             note={t('dashboard.metrics.approvedDecisionsNote')}
             emphasis="primary"
             className="bg-surface"
           />
           <MetricCard
             label={t('dashboard.metrics.completedPhases')}
-            value={metrics.completedPhasesCount}
-            suffix={`/ ${metrics.totalPhasesCount}`}
+            value={
+              extractedSummary?.completedOfficialPhasesCount ??
+              metrics.completedPhasesCount
+            }
+            suffix={`/ ${
+              extractedSummary?.totalOfficialPhasesCount ??
+              metrics.totalPhasesCount
+            }`}
             note={t('dashboard.metrics.completedPhasesNote')}
             className="bg-surface"
           />
@@ -212,6 +235,11 @@ export function DashboardView({
             className="bg-surface"
           />
         </div>
+
+        {/* Preserved Historical Snapshot Evolution Note (120/7-of-13 -> 126/13-of-13) */}
+        <InformationCallout title={t('dashboard.historicalEvolution.title')}>
+          {t('dashboard.historicalEvolution.body')}
+        </InformationCallout>
       </section>
 
       {/* 2B. Knowledge Hub Content & Ingestion Status Strip (Strictly Derived from Registry & Manifest) */}
@@ -252,19 +280,16 @@ export function DashboardView({
             note={t('foundations.dashboardHubMetrics.importedOfficialSourcesNote', {
               published: manifestSummary.publishedCount,
               total: manifestSummary.totalSources,
-              awaiting:
-                manifestSummary.awaitingSourceCount +
-                manifestSummary.expectedCount,
             })}
             className="bg-surface"
           />
           <MetricCard
             label={t('foundations.dashboardHubMetrics.ingestionReadiness')}
-            value={
-              manifestSummary.awaitingSourceCount +
-              manifestSummary.expectedCount
-            }
-            suffix={`/ ${manifestSummary.totalSources}`}
+            value={extractedSummary?.importedOwningDecisionDocsCount ?? 0}
+            suffix={`/ ${
+              extractedSummary?.indexedArchitecturalDecisionsCount ??
+              metrics.approvedDecisionsCount
+            }`}
             note={t('foundations.dashboardHubMetrics.ingestionReadinessNote')}
             className="bg-surface"
           />
@@ -399,9 +424,16 @@ export function DashboardView({
             {
               label: t('provenance.reviewedTreeSha'),
               value: (
-                <code className="font-mono text-xs bidi-ltr break-all">
-                  {provenance.reviewedTreeSha}
-                </code>
+                <div className="space-y-1">
+                  {provenance.reviewedCommitSha ? (
+                    <code className="block font-mono text-xs bidi-ltr break-all text-text-primary">
+                      commit: {provenance.reviewedCommitSha}
+                    </code>
+                  ) : null}
+                  <code className="block font-mono text-xs bidi-ltr break-all text-text-secondary">
+                    tree: {provenance.reviewedTreeSha}
+                  </code>
+                </div>
               ),
             },
             {

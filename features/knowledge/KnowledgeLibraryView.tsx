@@ -172,6 +172,17 @@ export function KnowledgeLibraryView({
       }
 
       return true;
+    }).sort((a, b) => {
+      const aSup = a.editorialStatus === 'superseded' ? 1 : 0;
+      const bSup = b.editorialStatus === 'superseded' ? 1 : 0;
+      if (aSup !== bSup) return aSup - bSup;
+      const aOfficial = a.source.kind === 'official-source' ? 0 : 1;
+      const bOfficial = b.source.kind === 'official-source' ? 0 : 1;
+      if (aOfficial !== bOfficial) return aOfficial - bOfficial;
+      return (
+        (a.collectionSequence?.order ?? 999) -
+        (b.collectionSequence?.order ?? 999)
+      );
     });
   }, [
     records,
@@ -506,6 +517,16 @@ export function KnowledgeLibraryView({
                         {depthLabel ? (
                           <span className="font-mono text-[11px] text-text-muted bidi-ltr">
                             {record.depth}
+                          </span>
+                        ) : null}
+                        {record.editorialStatus === 'superseded' ? (
+                          <span className="rounded-sm border border-warning-border bg-warning-bg px-2 py-0.5 text-[11px] font-medium text-warning">
+                            {t('knowledge.supersededShortBadge')}
+                          </span>
+                        ) : record.source.kind === 'official-source' &&
+                          record.publicationAuthorization.completeness === 'complete' ? (
+                          <span className="rounded-sm border border-success-border bg-success-bg px-2 py-0.5 text-[11px] font-medium text-success">
+                            {t('knowledge.fullSourceBadge')}
                           </span>
                         ) : null}
                         <span className="font-mono text-[11px] text-text-muted bidi-ltr">

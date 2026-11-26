@@ -185,37 +185,35 @@ test('getContentRegistry fails loudly on invalid files in a collection root whil
   }
 });
 
-test('approved repository collections validate cleanly and preserve corrected 00_PROJECT_VISION.md identity', () => {
+test('approved repository collections validate cleanly with all 6 BATCH-001 official sources plus 4 foundational records', () => {
   resetContentRegistryCache();
   const report = validateApprovedCollections();
   assert.equal(report.ok, true);
   assert.equal(report.errors.length, 0);
-  assert.equal(report.validRecordsCount, 4);
-  assert.equal(report.publishedRecordsCount, 4);
+  assert.equal(report.validRecordsCount, 10);
+  assert.equal(report.publishedRecordsCount, 10);
   assert.equal(report.unpublishedValidRecordsCount, 0);
 
   const registry = getContentRegistry();
   const visionAr = registry.getBySlug('teranoo-product-vision-reference');
   const visionEn = registry.getBySlug('teranoo-product-vision-reference-en');
-  assert.ok(visionAr && visionEn);
+  const fullVision = registry.getBySlug('project-vision');
+  assert.ok(visionAr && visionEn && fullVision);
 
-  // Removed invented DOC-TERANOO-VISION-REF officialDocumentId
+  // Historical summaries remain superseded and point cleanly to full official source
+  assert.equal(visionAr.metadata.editorialStatus, 'superseded');
+  assert.equal(visionEn.metadata.editorialStatus, 'superseded');
   assert.equal(visionAr.metadata.traceability.officialDocumentId, undefined);
   assert.equal(visionEn.metadata.traceability.officialDocumentId, undefined);
 
-  // Corrected official deferred path
   assert.ok(
     visionAr.metadata.relationships.some(
-      (r) =>
-        r.deferredRef ===
-        'teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md'
+      (r) => r.type === 'derived-from' && r.targetId === 'kh-doc-project-vision-ar'
     )
   );
   assert.ok(
     visionEn.metadata.relationships.some(
-      (r) =>
-        r.deferredRef ===
-        'teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md'
+      (r) => r.type === 'derived-from' && r.targetId === 'kh-doc-project-vision-ar'
     )
   );
 });
@@ -416,27 +414,31 @@ test('governed local images allow /assets/knowledge/*, defer relative source ima
 // 4. Official Source Manifest & Ingestion Pipeline Tests
 // ============================================================================
 
-test('Project Foundations Source Manifest registers all 6 verified official source paths honestly as awaiting-source', () => {
+test('Project Foundations Source Manifest registers all 6 verified official BATCH-001 sources as published with Git blob verification', () => {
   assert.equal(PROJECT_FOUNDATIONS_SOURCE_MANIFEST.length, 6);
 
   const summary = deriveSourceManifestSummary();
   assert.equal(summary.totalSources, 6);
-  assert.equal(summary.awaitingSourceCount, 6);
+  assert.equal(summary.awaitingSourceCount, 0);
   assert.equal(summary.importedCount, 0);
-  assert.equal(summary.publishedCount, 0);
+  assert.equal(summary.publishedCount, 6);
 
   const visionEntry = getSourceManifestEntryByPath(
     'teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md'
   );
   assert.ok(visionEntry);
-  assert.equal(visionEntry.importStatus, 'awaiting-source');
-  assert.equal(visionEntry.publicationAuthorizationStatus, 'pending');
-  assert.equal(visionEntry.publishedContentId, null);
+  assert.equal(visionEntry.importStatus, 'published');
+  assert.equal(visionEntry.publicationAuthorizationStatus, 'authorized');
+  assert.equal(visionEntry.publishedContentId, 'kh-doc-project-vision-ar');
+  assert.equal(
+    visionEntry.sourceVerificationStatus,
+    'git-blob-verified-lf-normalized'
+  );
 
   const report = generateSourceReadinessReport();
   assert.equal(report.summary.totalSources, 6);
-  assert.equal(report.awaitingDelivery.length, 6);
-  assert.equal(report.readyForPublicDisplay.length, 0);
+  assert.equal(report.awaitingDelivery.length, 0);
+  assert.equal(report.readyForPublicDisplay.length, 6);
 });
 
 test('validateSourceManifest rejects duplicate source paths, missing provenance on received sources, and unauthorized published entries', () => {
@@ -487,7 +489,7 @@ test('canonical ingestion pipeline preserves original Markdown verbatim, compute
 
   // Without explicit public authorization -> internal / under-review (NOT published)
   const internalArtifact = prepareCanonicalIngestionArtifact({
-    manifestEntry: visionEntry,
+    manifestEntry: { ...visionEntry, expectedGitBlobSha: null },
     internalContentId: 'kh-official-project-vision-ar',
     slug: 'official-project-vision',
     language: 'ar',
@@ -496,6 +498,8 @@ test('canonical ingestion pipeline preserves original Markdown verbatim, compute
       en: 'Official Teranoo ERP product vision document.',
     },
     rawBodyMarkdown: sampleOfficialBody,
+    approvalStatus: 'approved',
+    expectedGitBlobSha: null,
     sourceCommitSha: 'a922a69b54bc0cc611ae46d8e7434907cde0046a',
     reviewDate: '2026-11-26',
     authorizedForPublic: false,
@@ -529,7 +533,7 @@ test('canonical ingestion pipeline preserves original Markdown verbatim, compute
 
   // With explicit public authorization -> public / published
   const publicArtifact = prepareCanonicalIngestionArtifact({
-    manifestEntry: visionEntry,
+    manifestEntry: { ...visionEntry, expectedGitBlobSha: null },
     internalContentId: 'kh-official-project-vision-ar',
     slug: 'official-project-vision',
     language: 'ar',
@@ -538,6 +542,8 @@ test('canonical ingestion pipeline preserves original Markdown verbatim, compute
       en: 'Official Teranoo ERP product vision document.',
     },
     rawBodyMarkdown: sampleOfficialBody,
+    approvalStatus: 'approved',
+    expectedGitBlobSha: null,
     sourceCommitSha: 'a922a69b54bc0cc611ae46d8e7434907cde0046a',
     reviewDate: '2026-11-26',
     publicationDate: '2026-11-26',
@@ -565,21 +571,21 @@ test('registry stats separate published variants from unique conceptual topics a
   const registry = getContentRegistry();
   const stats = registry.getStats();
 
-  assert.equal(stats.totalPublished, 4);
-  assert.equal(stats.uniqueConceptualTopics, 2);
-  assert.equal(stats.officialImportedCount, 0);
-  assert.equal(stats.activeCollectionsCount, 2);
+  assert.equal(stats.totalPublished, 10);
+  assert.equal(stats.uniqueConceptualTopics, 8);
+  assert.equal(stats.officialImportedCount, 6);
+  assert.equal(stats.activeCollectionsCount, 3);
 });
 
-test('decision metrics transparently separate source-declared count (120) from locally verified Phase 5 references (7) and support phase-6.5', () => {
+test('decision metrics transparently track 126 indexed decisions, 13 Phase 5 decisions (D-PLAT-01..13), and phase-6.5 support', () => {
   const counts = getReferenceCounts();
   const verifiedPhase5DecisionIds = new Set(
     getPhase5Capabilities()
       .map((cap) => cap.decisionId)
       .filter((id): id is string => id !== null)
   );
-  assert.equal(counts.approvedArchitecturalDecisions, 120);
-  assert.equal(verifiedPhase5DecisionIds.size, 7);
+  assert.equal(counts.approvedArchitecturalDecisions, 126);
+  assert.equal(verifiedPhase5DecisionIds.size, 13);
   assert.equal(isValidOfficialPhaseRef('phase-6.5'), true);
 });
 

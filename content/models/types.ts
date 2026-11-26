@@ -29,6 +29,7 @@ export interface LocalizedText {
 export interface SnapshotProvenance {
   sourceRepository: string;
   officialSources: readonly string[];
+  reviewedCommitSha?: string;
   reviewedTreeSha: string;
   referenceReviewDate: string;
   isLiveSynced: false;

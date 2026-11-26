@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { getSourceManifestEntryByRefId } from '@/content/manifest/sourceManifest';
+import { getExtractedFacRegister } from '@/content/extractors/facRegisterExtractor';
 import { FutureConsiderationsView } from '@/features/future-considerations/FutureConsiderationsView';
 
 export const metadata: Metadata = {
@@ -6,5 +8,15 @@ export const metadata: Metadata = {
 };
 
 export default function FutureConsiderationsPage() {
-  return <FutureConsiderationsView />;
+  const facSourceEntry = getSourceManifestEntryByRefId(
+    'src-pf-06-future-architecture-considerations'
+  );
+  const extractedFac = getExtractedFacRegister();
+
+  return (
+    <FutureConsiderationsView
+      facSourceEntry={facSourceEntry}
+      extractedFac={extractedFac}
+    />
+  );
 }

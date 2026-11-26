@@ -204,6 +204,20 @@ export function validateLoadedEntries(
       });
     }
 
+    if (
+      fm.classification === 'future' &&
+      fm.approvalStatus === 'approved'
+    ) {
+      errors.push({
+        severity: 'error',
+        code: 'INCONSISTENT_APPROVAL_STATUS',
+        file,
+        field: 'approvalStatus',
+        message:
+          'KH-022: Future consideration records (classification="future") cannot have approvalStatus="approved".',
+      });
+    }
+
     // 5. Source attribution consistency
     if (
       (fm.classification === 'official' ||
