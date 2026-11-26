@@ -25,9 +25,7 @@ export async function generateMetadata({
   const doc = registry.getBySlug(slug);
 
   if (!doc) {
-    return {
-      title: 'Document Unavailable',
-    };
+    notFound();
   }
 
   return {

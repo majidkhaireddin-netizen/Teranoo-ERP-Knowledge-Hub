@@ -1,7 +1,7 @@
 # Teranoo ERP Knowledge Hub
 
 **Subtitle:** The Complete Journey of Building an Enterprise ERP System (`الرحلة الكاملة لبناء نظام ERP مؤسسي`)  
-**Current Scope:** TASK-002 (Comprehensive Knowledge Architecture & Content Foundation) building upon approved TASK-001 & TASK-001-FIX-01
+**Current Scope:** TASK-003 (Official Knowledge Ingestion & Project Foundations) building upon approved TASK-001, TASK-001-FIX-01, and TASK-002 (with all 6 review corrections resolved)
 
 Teranoo ERP Knowledge Hub is a dedicated enterprise documentation, encyclopedia, engineering guide, living architecture, research library, and build-in-public knowledge platform for the **Teranoo ERP** product. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.
 
@@ -45,7 +45,7 @@ npm run content:validate
 # Run unit tests (uses local tsx devDependency)
 npm run test
 
-# Production build (runs Next.js compilation, type validation, and linting)
+# Production build (automatically runs content:validate, Next.js compilation, type validation, and linting)
 npm run build
 
 # Start production server
@@ -73,20 +73,22 @@ content/
   taxonomy/           # Controlled taxonomy (8 classifications, 35 types, 15 relationships, 5 discovery dimensions)
   models/             # Strict TypeScript domain & knowledge record contracts
   schemas/            # Zod frontmatter schema & URL protocol validators
-  loaders/            # Path-confined YAML-only Markdown loader & safe sanitized remark/rehype pipeline
-  validators/         # Content integrity validator & CLI (`npm run content:validate`)
-  registry/           # Centralized Content Registry enforcing the Publication Boundary
+  manifest/           # Validated Official Source Manifest & readiness reporting (6 Project Foundations sources)
+  ingestion/          # Deterministic verbatim official Markdown envelope generator & SHA-256 hashing
+  loaders/            # Two-pass YAML-only loader, safe relative link/image resolver & sanitized Markdown pipeline
+  validators/         # Build-enforced integrity validator & CLI (`npm run content:validate`)
+  registry/           # Fail-loud Content Registry enforcing the Publication Boundary & derived metrics
   search/             # Unified deterministic search (published records + navigation + snapshot)
   renderers/          # Extensible specialized viewer descriptor registry
   seed/               # Authorized static reference snapshot & Product Vision seed
   repositories/       # Derived-metrics queries, runtime-capability selectors, and unit tests
-features/             # Feature-oriented views (dashboard, knowledge, engineering-journal, product-vision, about, ...)
+features/             # Feature-oriented views (dashboard, knowledge, product-vision, roadmap, decisions, ...)
 i18n/                 # Locale configuration & ar/en translation dictionaries (100% key parity tested)
 lib/                  # Shared utilities (cn helper, pure modal focusTrap helper + unit tests)
 providers/            # AppProviders (next-themes, next-intl LocaleProvider, SidebarProvider)
-public/               # Static assets (favicon.ico)
+public/               # Static assets (favicon.ico; governed knowledge raster images under /assets/knowledge/)
 styles/               # Centralized semantic design tokens (tokens.css)
-docs/                 # Vision, architecture, schema, authoring, relationships, publication policy, validation & reports
+docs/                 # Vision, architecture, ingestion, manifest, schema, authoring, policy, validation & reports
 ```
 
 ---
@@ -95,6 +97,10 @@ docs/                 # Vision, architecture, schema, authoring, relationships, 
 
 - [`docs/KNOWLEDGE_PLATFORM_VISION.md`](docs/KNOWLEDGE_PLATFORM_VISION.md)
 - [`docs/KNOWLEDGE_ARCHITECTURE.md`](docs/KNOWLEDGE_ARCHITECTURE.md)
+- [`docs/OFFICIAL_SOURCE_INGESTION.md`](docs/OFFICIAL_SOURCE_INGESTION.md)
+- [`docs/SOURCE_MANIFEST.md`](docs/SOURCE_MANIFEST.md)
+- [`docs/SOURCE_BATCH_AUTHORING_GUIDE.md`](docs/SOURCE_BATCH_AUTHORING_GUIDE.md)
+- [`docs/PROJECT_FOUNDATIONS_STRUCTURE.md`](docs/PROJECT_FOUNDATIONS_STRUCTURE.md)
 - [`docs/CONTENT_SCHEMA.md`](docs/CONTENT_SCHEMA.md)
 - [`docs/CONTENT_AUTHORING_GUIDE.md`](docs/CONTENT_AUTHORING_GUIDE.md)
 - [`docs/CONTENT_RELATIONSHIPS.md`](docs/CONTENT_RELATIONSHIPS.md)
@@ -106,6 +112,7 @@ docs/                 # Vision, architecture, schema, authoring, relationships, 
 - [`docs/TASK-001-COMPLETION_REPORT.md`](docs/TASK-001-COMPLETION_REPORT.md)
 - [`docs/TASK-001-FIX-01-COMPLETION_REPORT.md`](docs/TASK-001-FIX-01-COMPLETION_REPORT.md)
 - [`docs/TASK-002-COMPLETION_REPORT.md`](docs/TASK-002-COMPLETION_REPORT.md)
+- [`docs/TASK-003-COMPLETION_REPORT.md`](docs/TASK-003-COMPLETION_REPORT.md)
 
 ---
 

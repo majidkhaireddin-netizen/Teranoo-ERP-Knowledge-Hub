@@ -1,10 +1,14 @@
 import { BUSINESS_MODULES_TAXONOMY } from '@/content/taxonomy/registry';
-import type { KnowledgeDocument } from '@/content/models/knowledge';
+import type { KnowledgeDocument, SourceManifestEntry } from '@/content/models/knowledge';
 import {
   CONTENT_COLLECTIONS_ROOT,
   loadApprovedCollections,
   type LoadedContentEntry,
 } from '@/content/loaders/contentLoader';
+import {
+  PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
+  validateSourceManifest,
+} from '@/content/manifest/sourceManifest';
 
 export type ValidationSeverity = 'error' | 'warning';
 
@@ -23,6 +27,17 @@ export interface ContentValidationReport {
   readonly totalFilesScanned: number;
   readonly validRecordsCount: number;
   readonly publishedRecordsCount: number;
+  readonly unpublishedValidRecordsCount: number;
+}
+
+export class ContentIntegrityError extends Error {
+  readonly diagnostics: readonly ValidationDiagnostic[];
+
+  constructor(message: string, diagnostics: readonly ValidationDiagnostic[]) {
+    super(message);
+    this.name = 'ContentIntegrityError';
+    this.diagnostics = diagnostics;
+  }
 }
 
 const OFFICIAL_ID_PREFIX_PATTERN = /^(d|r|ir|fac)-[a-z0-9-]+$/i;
@@ -43,10 +58,14 @@ export function isPubliclyPublishableRecord(
 /**
  * Validates a collection of loaded Markdown entries for schema integrity,
  * unique IDs/slugs, publication governance, taxonomy membership, URL safety,
- * translation uniqueness, and relationship referential integrity.
+ * deferred relative source links, translation uniqueness, relationship
+ * referential integrity, and optional source manifest alignment.
  */
 export function validateLoadedEntries(
-  entries: readonly LoadedContentEntry[]
+  entries: readonly LoadedContentEntry[],
+  options?: {
+    readonly manifestEntries?: readonly SourceManifestEntry[];
+  }
 ): ContentValidationReport {
   const errors: ValidationDiagnostic[] = [];
   const warnings: ValidationDiagnostic[] = [];
@@ -68,14 +87,31 @@ export function validateLoadedEntries(
 
     validDocs.push(entry.document);
 
-    // Unsafe URLs inside Markdown content
+    // Unsafe URLs inside Markdown content (fatal)
     for (const unsafeUrl of entry.unsafeUrlsFound) {
       errors.push({
         severity: 'error',
         code: 'UNSAFE_URL',
         file: entry.document.sourceFileRelativePath,
         field: 'body',
-        message: `Unsafe link or image protocol rejected: "${unsafeUrl}"`,
+        message: `Unsafe link or image protocol/path rejected: "${unsafeUrl}"`,
+      });
+    }
+
+    // Explicitly deferred relative source links or unimported local assets (non-blocking warnings)
+    for (const ref of entry.document.deferredReferences) {
+      warnings.push({
+        severity: 'warning',
+        code:
+          ref.kind === 'link'
+            ? 'DEFERRED_MARKDOWN_LINK'
+            : 'DEFERRED_MARKDOWN_ASSET',
+        file: entry.document.sourceFileRelativePath,
+        field: 'body',
+        message:
+          ref.kind === 'link'
+            ? `Relative source link "${ref.rawRef}" resolves to "${ref.normalizedSourcePath}" which is not yet published in the Knowledge Hub.`
+            : `Relative source image "${ref.rawRef}" resolves to "${ref.normalizedSourcePath}" which is not yet packaged under /assets/knowledge/.`,
       });
     }
   }
@@ -100,7 +136,7 @@ export function validateLoadedEntries(
       });
     }
 
-    // 2. Duplicate IDs
+    // 2. Duplicate IDs (fatal)
     const existingById = byId.get(fm.id);
     if (existingById) {
       errors.push({
@@ -114,7 +150,7 @@ export function validateLoadedEntries(
       byId.set(fm.id, doc);
     }
 
-    // 3. Duplicate canonical slugs
+    // 3. Duplicate canonical slugs (fatal)
     const existingBySlug = bySlug.get(fm.slug);
     if (existingBySlug) {
       errors.push({
@@ -280,8 +316,10 @@ export function validateLoadedEntries(
       }
     }
 
-    // Check revision/supersedes target references if present
-    if (fm.versioning.previousRevisionId && !byId.has(fm.versioning.previousRevisionId)) {
+    if (
+      fm.versioning.previousRevisionId &&
+      !byId.has(fm.versioning.previousRevisionId)
+    ) {
       warnings.push({
         severity: 'warning',
         code: 'UNRESOLVED_PREVIOUS_REVISION',
@@ -292,7 +330,34 @@ export function validateLoadedEntries(
     }
   }
 
-  const publishedRecordsCount = validDocs.filter(isPubliclyPublishableRecord).length;
+  const publishedDocs = validDocs.filter(isPubliclyPublishableRecord);
+  const publishedIds = new Set(publishedDocs.map((d) => d.metadata.id));
+
+  // 10. Official Source Manifest integrity (when provided)
+  if (options?.manifestEntries) {
+    const manifestReport = validateSourceManifest(
+      options.manifestEntries,
+      publishedIds
+    );
+    for (const err of manifestReport.errors) {
+      errors.push({
+        severity: 'error',
+        code: err.code,
+        file: `content/manifest/sourceManifest.ts (${err.sourceRefId})`,
+        field: err.field,
+        message: err.message,
+      });
+    }
+    for (const warn of manifestReport.warnings) {
+      warnings.push({
+        severity: 'warning',
+        code: warn.code,
+        file: `content/manifest/sourceManifest.ts (${warn.sourceRefId})`,
+        field: warn.field,
+        message: warn.message,
+      });
+    }
+  }
 
   return {
     ok: errors.length === 0,
@@ -300,13 +365,18 @@ export function validateLoadedEntries(
     warnings,
     totalFilesScanned: entries.length,
     validRecordsCount: validDocs.length,
-    publishedRecordsCount,
+    publishedRecordsCount: publishedDocs.length,
+    unpublishedValidRecordsCount: validDocs.length - publishedDocs.length,
   };
 }
 
 export function validateApprovedCollections(
-  collectionsRoot: string = CONTENT_COLLECTIONS_ROOT
+  collectionsRoot: string = CONTENT_COLLECTIONS_ROOT,
+  manifestEntries: readonly SourceManifestEntry[] | undefined =
+    collectionsRoot === CONTENT_COLLECTIONS_ROOT
+      ? PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+      : undefined
 ): ContentValidationReport {
   const entries = loadApprovedCollections(collectionsRoot);
-  return validateLoadedEntries(entries);
+  return validateLoadedEntries(entries, { manifestEntries });
 }

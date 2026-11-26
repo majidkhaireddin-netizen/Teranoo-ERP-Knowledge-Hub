@@ -12,16 +12,16 @@ export interface ProductVisionDocumentData {
 
 export const PRODUCT_VISION_DOC: ProductVisionDocumentData = {
   metadata: {
-    documentId: 'DOC-VISION-REF',
+    documentId: 'kh-doc-product-vision-ref',
     classification: 'official',
     approvalStatus: 'reference_snapshot',
     sourceReference: {
-      ar: 'اللقطة المرجعية المعتمدة لمهمة TASK-001 (القسم 13)',
-      en: 'Authorized TASK-001 Reference Snapshot (Section 13)',
+      ar: 'اللقطة المرجعية المعتمدة (بانتظار تسليم ملف \u206600_PROJECT_VISION.md\u2069 الكامل)',
+      en: 'Authorized Reference Snapshot (awaiting full 00_PROJECT_VISION.md source delivery)',
     },
     scopeNote: {
-      ar: 'صفحة مرجعية أولية لاختبار قالب التوثيق باستخدام الحقائق المعتمدة فقط؛ ستُستكمل التفاصيل الكاملة للوثيقة الرسمية في مهمة لاحقة.',
-      en: 'Initial reference page validating the documentation template using exclusively authorized snapshot facts; full official product vision prose will be populated in a later task.',
+      ar: 'يعرض هذا القسم الحقائق المعتمدة من اللقطة التخطيطية المراجعة فقط، ومهيأ لاستقبال النص الكامل لوثيقة \u206600_PROJECT_VISION.md\u2069 عند تسليمها واعتماد نشرها دون أي افتراضات.',
+      en: 'This page presents verified facts from the reviewed planning snapshot only and is structured to host the full 00_PROJECT_VISION.md document once supplied and authorized, without fabricated prose.',
     },
   },
   headings: [

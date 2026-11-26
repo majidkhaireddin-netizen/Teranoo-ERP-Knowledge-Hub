@@ -11,17 +11,21 @@ import {
 import type {
   DocumentLanguage,
   KnowledgeRecordMetadata,
+  SourceManifestEntry,
+  SourceManifestSummary,
 } from '@/content/models/knowledge';
 import {
   BUSINESS_MODULES_TAXONOMY,
   CONTENT_CLASSIFICATION_VALUES,
   CONTENT_TYPES,
+  JOURNEY_STAGES,
   KNOWLEDGE_DEPTHS,
   KNOWN_OFFICIAL_PHASES,
   PLATFORM_DOMAINS,
   getContentTypeDefinition,
   getTaxonomyLabel,
   type ContentTypeId,
+  type JourneyStageId,
   type KnowledgeDepth,
   type PlatformDomainId,
 } from '@/content/taxonomy/registry';
@@ -29,22 +33,33 @@ import { getReferenceCounts } from '@/content/repositories/projectRepository';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 import { ContentClassification } from '@/components/documentation/ContentClassification';
 import { InformationCallout } from '@/components/documentation/InformationCallout';
+import { SourceInventorySection } from '@/components/documentation/SourceInventorySection';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 
 export interface KnowledgeLibraryViewProps {
   records: readonly KnowledgeRecordMetadata[];
+  sourceManifest?: readonly SourceManifestEntry[];
+  sourceManifestSummary?: SourceManifestSummary;
 }
 
-export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
+export function KnowledgeLibraryView({
+  records,
+  sourceManifest = [],
+  sourceManifestSummary,
+}: KnowledgeLibraryViewProps) {
   const t = useTranslations();
   const { locale } = useAppLocale();
   const snapshotCounts = useMemo(() => getReferenceCounts(), []);
 
   const [query, setQuery] = useState('');
+  const [selectedJourneyStage, setSelectedJourneyStage] = useState<
+    JourneyStageId | 'all'
+  >('all');
   const [selectedType, setSelectedType] = useState<ContentTypeId | 'all'>('all');
   const [selectedClassification, setSelectedClassification] = useState<
     ContentClassificationType | 'all'
@@ -61,8 +76,19 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
     DocumentLanguage | 'all'
   >('all');
 
+  const stageCounts = useMemo(() => {
+    const counts: Partial<Record<JourneyStageId, number>> = {};
+    for (const rec of records) {
+      for (const stage of rec.journeyStages) {
+        counts[stage] = (counts[stage] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }, [records]);
+
   const hasActiveFilters =
     query.trim().length > 0 ||
+    selectedJourneyStage !== 'all' ||
     selectedType !== 'all' ||
     selectedClassification !== 'all' ||
     selectedPhase !== 'all' ||
@@ -73,6 +99,7 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
 
   const clearFilters = () => {
     setQuery('');
+    setSelectedJourneyStage('all');
     setSelectedType('all');
     setSelectedClassification('all');
     setSelectedPhase('all');
@@ -86,6 +113,12 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
     const normalizedQuery = query.trim().toLowerCase();
 
     return records.filter((rec) => {
+      if (
+        selectedJourneyStage !== 'all' &&
+        !rec.journeyStages.includes(selectedJourneyStage)
+      ) {
+        return false;
+      }
       if (selectedType !== 'all' && rec.type !== selectedType) return false;
       if (
         selectedClassification !== 'all' &&
@@ -119,6 +152,7 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
           rec.description.en,
           rec.type,
           rec.classification,
+          ...rec.journeyStages,
           ...rec.topics,
           ...rec.tags,
           ...rec.phaseRefs,
@@ -142,6 +176,7 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
   }, [
     records,
     query,
+    selectedJourneyStage,
     selectedType,
     selectedClassification,
     selectedPhase,
@@ -176,6 +211,58 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
           reviews: snapshotCounts.independentReviewNotes,
         })}
       </InformationCallout>
+
+      {/* Project Journey Navigation (Educational Exploration Dimensions) */}
+      <section
+        aria-label={t('foundations.journeyNav.sectionTitle')}
+        className="space-y-3"
+      >
+        <SectionHeader
+          title={t('foundations.journeyNav.sectionTitle')}
+          subtitle={t('foundations.journeyNav.sectionSubtitle')}
+        />
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSelectedJourneyStage('all')}
+            aria-pressed={selectedJourneyStage === 'all'}
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              selectedJourneyStage === 'all'
+                ? 'border-primary bg-primary-subtle text-primary'
+                : 'border-border bg-surface text-text-secondary hover:bg-surface-hover hover:text-text-primary'
+            }`}
+          >
+            <span>{t('foundations.journeyNav.allStages')}</span>
+            <span className="font-mono text-[11px] tabular-nums opacity-80">
+              {records.length}
+            </span>
+          </button>
+          {JOURNEY_STAGES.map((stage) => {
+            const count = stageCounts[stage.id] ?? 0;
+            const isSelected = selectedJourneyStage === stage.id;
+            return (
+              <button
+                key={stage.id}
+                type="button"
+                onClick={() => setSelectedJourneyStage(stage.id)}
+                aria-pressed={isSelected}
+                className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  isSelected
+                    ? 'border-primary bg-primary-subtle text-primary'
+                    : count > 0
+                      ? 'border-border bg-surface text-text-primary hover:bg-surface-hover'
+                      : 'border-border bg-surface-subtle/50 text-text-muted hover:bg-surface-hover hover:text-text-secondary'
+                }`}
+              >
+                <span>{resolveLocalizedText(stage.label, locale)}</span>
+                <span className="font-mono text-[11px] tabular-nums opacity-75">
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Filter Toolbar */}
       <section
@@ -344,8 +431,32 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
       <section aria-label={t('knowledge.libraryTitle')}>
         {filteredRecords.length === 0 ? (
           <EmptyState
-            title={t('knowledge.emptyTitle')}
-            description={t('knowledge.emptyDescription')}
+            title={
+              selectedJourneyStage !== 'all' &&
+              !query.trim() &&
+              selectedType === 'all' &&
+              selectedClassification === 'all' &&
+              selectedPhase === 'all' &&
+              selectedModule === 'all' &&
+              selectedDomain === 'all' &&
+              selectedDepth === 'all' &&
+              selectedLanguage === 'all'
+                ? t('foundations.journeyNav.emptyStageTitle')
+                : t('knowledge.emptyTitle')
+            }
+            description={
+              selectedJourneyStage !== 'all' &&
+              !query.trim() &&
+              selectedType === 'all' &&
+              selectedClassification === 'all' &&
+              selectedPhase === 'all' &&
+              selectedModule === 'all' &&
+              selectedDomain === 'all' &&
+              selectedDepth === 'all' &&
+              selectedLanguage === 'all'
+                ? t('foundations.journeyNav.emptyStageBody')
+                : t('knowledge.emptyDescription')
+            }
             icon={<BookOpen className="h-5 w-5" aria-hidden="true" />}
             action={
               hasActiveFilters ? (
@@ -453,6 +564,13 @@ export function KnowledgeLibraryView({ records }: KnowledgeLibraryViewProps) {
           </div>
         )}
       </section>
+
+      {sourceManifest.length > 0 && sourceManifestSummary ? (
+        <SourceInventorySection
+          entries={sourceManifest}
+          summary={sourceManifestSummary}
+        />
+      ) : null}
     </PageContainer>
   );
 }

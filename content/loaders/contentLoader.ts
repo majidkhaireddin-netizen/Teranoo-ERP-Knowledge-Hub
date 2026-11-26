@@ -5,9 +5,13 @@ import {
   APPROVED_COLLECTION_DIRS,
   type ApprovedCollectionDir,
 } from '@/content/taxonomy/registry';
-import type { KnowledgeDocument, KnowledgeRecordMetadata } from '@/content/models/knowledge';
+import type {
+  KnowledgeDocument,
+  KnowledgeRecordMetadata,
+} from '@/content/models/knowledge';
 import { frontmatterSchema } from '@/content/schemas/frontmatterSchema';
 import { renderSafeMarkdown } from '@/content/loaders/markdownPipeline';
+import type { MarkdownLinkContext } from '@/content/loaders/relativeLinkResolver';
 
 export class ContentPathSecurityError extends Error {
   constructor(message: string) {
@@ -80,6 +84,7 @@ export function parseMarkdownDocument(
     sourceFileRelativePath: string;
     collection: ApprovedCollectionDir | 'fixtures';
     isFixture: boolean;
+    linkContext?: MarkdownLinkContext;
   }
 ): LoadedContentEntry {
   let parsedMatter: matter.GrayMatterFile<string>;
@@ -104,7 +109,9 @@ export function parseMarkdownDocument(
         {
           field: 'frontmatter',
           message:
-            err instanceof Error ? err.message : 'Failed to parse YAML frontmatter',
+            err instanceof Error
+              ? err.message
+              : 'Failed to parse YAML frontmatter',
         },
       ],
     };
@@ -124,7 +131,14 @@ export function parseMarkdownDocument(
   }
 
   const fm = validation.data;
-  const rendered = renderSafeMarkdown(parsedMatter.content);
+  const inferredSourcePath =
+    options.linkContext?.currentSourcePath ??
+    (fm.source.kind === 'official-source' ? fm.source.sourcePath : undefined);
+
+  const rendered = renderSafeMarkdown(parsedMatter.content, {
+    ...options.linkContext,
+    currentSourcePath: inferredSourcePath,
+  });
 
   const metadata: KnowledgeRecordMetadata = {
     id: fm.id,
@@ -165,6 +179,7 @@ export function parseMarkdownDocument(
       bodyMarkdown: parsedMatter.content,
       renderedHtml: rendered.html,
       headings: rendered.headings,
+      deferredReferences: rendered.deferredReferences,
       readingTimeMinutes: rendered.readingTimeMinutes,
       sourceFileRelativePath: options.sourceFileRelativePath,
     },
@@ -189,14 +204,23 @@ function collectMarkdownFiles(dirPath: string): string[] {
   return files.sort();
 }
 
+interface RawCollectionFile {
+  readonly raw: string;
+  readonly sourceFileRelativePath: string;
+  readonly collection: ApprovedCollectionDir;
+}
+
 /**
  * Loads Markdown documents exclusively from approved collection directories.
+ * Performs a lightweight first pass to build the map of published official
+ * source paths -> canonical slugs so relative Markdown links between published
+ * official source documents resolve automatically to /knowledge/[slug].
  * Never loads test fixtures or arbitrary paths outside content/collections.
  */
 export function loadApprovedCollections(
   collectionsRoot: string = CONTENT_COLLECTIONS_ROOT
 ): readonly LoadedContentEntry[] {
-  const results: LoadedContentEntry[] = [];
+  const rawFiles: RawCollectionFile[] = [];
   const normalizedRoot = path.resolve(collectionsRoot);
 
   for (const collection of APPROVED_COLLECTION_DIRS) {
@@ -208,17 +232,59 @@ export function loadApprovedCollections(
       const safePath = resolveSafeContentPath(normalizedRoot, relativeFromRoot);
       const raw = fs.readFileSync(safePath, 'utf8');
 
-      results.push(
-        parseMarkdownDocument(raw, {
-          sourceFileRelativePath: path.join('content/collections', relativeFromRoot),
-          collection,
-          isFixture: false,
-        })
-      );
+      rawFiles.push({
+        raw,
+        sourceFileRelativePath: path.join('content/collections', relativeFromRoot),
+        collection,
+      });
     }
   }
 
-  return results;
+  // Pass 1: discover published official source paths -> canonical Knowledge Hub slugs
+  const publishedSourcePathToSlug = new Map<string, string>();
+  for (const file of rawFiles) {
+    try {
+      const prelim = matter(file.raw, {
+        language: 'yaml',
+        engines: {
+          js: () => {
+            throw new Error('JavaScript frontmatter execution is prohibited');
+          },
+          javascript: () => {
+            throw new Error('JavaScript frontmatter execution is prohibited');
+          },
+        },
+      });
+      const parsed = frontmatterSchema.safeParse(prelim.data);
+      if (
+        parsed.success &&
+        parsed.data.publicationStatus === 'public' &&
+        parsed.data.editorialStatus !== 'draft' &&
+        parsed.data.publicationAuthorization.authorized &&
+        parsed.data.source.kind === 'official-source' &&
+        !publishedSourcePathToSlug.has(parsed.data.source.sourcePath)
+      ) {
+        publishedSourcePathToSlug.set(
+          parsed.data.source.sourcePath,
+          parsed.data.slug
+        );
+      }
+    } catch {
+      // Handled authoritatively in pass 2 with full diagnostic failure output
+    }
+  }
+
+  // Pass 2: parse, validate, and render with cross-document relative link resolution
+  return rawFiles.map((file) =>
+    parseMarkdownDocument(file.raw, {
+      sourceFileRelativePath: file.sourceFileRelativePath,
+      collection: file.collection,
+      isFixture: false,
+      linkContext: {
+        publishedSourcePathToSlug,
+      },
+    })
+  );
 }
 
 /**

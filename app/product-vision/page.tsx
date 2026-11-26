@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getSourceManifestEntryByRefId } from '@/content/manifest/sourceManifest';
 import { ProductVisionView } from '@/features/product-vision/ProductVisionView';
 
 export const metadata: Metadata = {
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function ProductVisionPage() {
-  return <ProductVisionView />;
+  const visionSourceEntry = getSourceManifestEntryByRefId(
+    'src-pf-01-project-vision'
+  );
+
+  return <ProductVisionView visionSourceEntry={visionSourceEntry} />;
 }

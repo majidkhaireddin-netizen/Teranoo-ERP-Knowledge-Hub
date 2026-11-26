@@ -131,11 +131,19 @@ versioning:
 
 - Increment `versioning.revision` for updates, or create a new record pointing `versioning.previousRevisionId` / `versioning.supersedesId` to the prior record ID and set the old record's `editorialStatus: superseded`.
 
-## 14. Validating Before Publication
+## 14. Relative Source Links & Governed Local Images (`TASK-003`)
+
+- Relative Markdown links (`./PROJECT_WORK_PLAN.md#goals`) resolve automatically to `/knowledge/[slug]#kh-h-goals` once the target official file is published; unimported targets render safely as non-navigating deferred references (`.kh-deferred-link`) with non-blocking `DEFERRED_MARKDOWN_LINK` warnings.
+- Local images referenced in Markdown must be safe raster formats (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.avif`) placed strictly under `public/assets/knowledge/` and referenced via `/assets/knowledge/<file>`.
+- For repeatable official source batch ingestion, follow [`docs/SOURCE_BATCH_AUTHORING_GUIDE.md`](./SOURCE_BATCH_AUTHORING_GUIDE.md) and [`docs/OFFICIAL_SOURCE_INGESTION.md`](./OFFICIAL_SOURCE_INGESTION.md).
+
+## 15. Validating Before Publication
 
 Run:
 ```bash
 npm run content:validate
 npm run test
+NODE_ENV=production npm run verify
 ```
-Every error reported by `content:validate` must be resolved before a record is merged or published.
+Every fatal error reported by `content:validate` fails `npm run build` automatically and must be resolved before a record is merged or published.
+

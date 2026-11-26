@@ -8,14 +8,15 @@ Key architectural boundaries:
 
 1. **Routing Layer (`app/`)**: Thin route files (`page.tsx`) export page metadata and render the corresponding feature view. Global App Router states (`loading.tsx`, `error.tsx`, `not-found.tsx`) provide consistent feedback across all routes.
 2. **Feature Layer (`features/`)**: Self-contained domain views (`dashboard`, `product-vision`, `roadmap`, `architecture`, `modules`, `platform`, `decisions`, `research`, `future-considerations`, `independent-reviews`, `business-scenarios`, `glossary`, `change-history`, `about`). Feature views read data exclusively through repository functions and compose reusable UI, layout, documentation, and visualization components.
-3. **Content, Knowledge Pipeline & Repository Layer (`content/`)**:
+3. **Content, Official Ingestion & Repository Layer (`content/`)**:
    - `content/taxonomy/registry.ts`, `content/models/knowledge.ts`, `content/schemas/frontmatterSchema.ts`: Controlled taxonomy (8 classifications, 35 content types, 15 typed relationships, 5 discovery dimensions) and strict Zod schema.
-   - `content/loaders/`, `content/validators/`, `content/registry/`, `content/search/`, `content/renderers/`: Server-only local Markdown + YAML frontmatter loading, sanitized remark/rehype HTML rendering, integrity validation (`npm run content:validate`), Publication Boundary enforcement, unified search, and extensible specialized viewer descriptors (see `docs/KNOWLEDGE_ARCHITECTURE.md`).
+   - `content/manifest/sourceManifest.ts`, `content/ingestion/ingestionPipeline.ts`: Validated Official Source Manifest (6 verified Project Foundations paths) and repeatable verbatim SHA-256 ingestion helper with explicit publication authorization gating (see `docs/OFFICIAL_SOURCE_INGESTION.md`, `docs/SOURCE_MANIFEST.md`).
+   - `content/loaders/`, `content/validators/`, `content/registry/`, `content/search/`, `content/renderers/`: Server-only two-pass Markdown + YAML frontmatter loading, safe relative link & governed local image resolution, DOM-clobbering-safe `kh-h-*` heading IDs, build-enforced validation (`npm run content:validate`), fail-loud `ContentIntegrityError` enforcement, Publication Boundary filtering, unified search, and extensible specialized viewer descriptors (see `docs/KNOWLEDGE_ARCHITECTURE.md`).
    - `content/models/types.ts`, `content/seed/`, `content/repositories/projectRepository.ts`: Authoritative static reference snapshot (`projectSnapshot.ts`, `productVisionDoc.ts`) and pure derived-metric selectors.
 4. **Presentation Layer (`components/`)**:
    - `components/ui/`: Domain-agnostic enterprise primitives, including the accessibility-hardened portal `Modal` (dialog & drawer variants).
    - `components/layout/`: Application Shell (`AppShell`, `AppSidebar`, `AppHeader`, `Breadcrumbs`, `PageContainer`, `PageHeader`, `SectionHeader`, `ContentLayout`, `TableOfContents`, `GlobalSearchModal`).
-   - `components/documentation/`: Long-form reading, classification banners, callouts, references, metadata panels, comparison tables, and planned-section templates.
+   - `components/documentation/`: Long-form reading, classification banners, callouts, references, metadata panels, comparison tables, `SourceInventorySection`, `EducationalGuideFrame`, and planned-section templates.
    - `components/visualization/`: Metric cards, phase progress bars, timelines, and composable layered architecture diagram blocks.
 5. **Configuration, Utilities & Providers (`config/`, `lib/`, `providers/`, `i18n/`)**: Centralized navigation tree (`config/navigation.ts`), site constants (`config/site.ts`), pure focus-trap helpers (`lib/focusTrap.ts`), theme management (`next-themes`), and localization (`next-intl`).
 
@@ -24,12 +25,13 @@ Key architectural boundaries:
 ## 2. Environment, Dependency, and Build Governance
 
 - **App Router Root:** Next.js App Router resides at `/app` at project root (matching `tsconfig.json` `"@/*": ["./*"]`).
-- **Platform-Retained Configuration:**
-  - `next.config.ts` preserves `output: 'standalone'` and the `DISABLE_HMR` webpack watch guard required by Google AI Studio, while enforcing TypeScript and ESLint validation during builds (no `eslint.ignoreDuringBuilds` bypass and no unused remote image host allowlists).
+- **Platform-Retained & Standalone Configuration:**
+  - `next.config.ts` preserves `output: 'standalone'` and the `DISABLE_HMR` webpack watch guard required by Google AI Studio, explicitly traces `./content/collections/**/*` via `outputFileTracingIncludes` while excluding `./content/fixtures/**/*` via `outputFileTracingExcludes`, and enforces TypeScript and ESLint validation during builds.
+  - `package.json` enforces `npm run content:validate` inside `npm run build` (`npm run content:validate && next build`).
   - `postcss.config.mjs` references `@tailwindcss/postcss` and `autoprefixer`, so `postcss` and `autoprefixer` remain declared in `package.json`.
   - `eslint.config.mjs` uses ESLint 9 flat config with `eslint-config-next@16.0.8` (which declares `peerDependencies: { eslint: ">=9.0.0", typescript: ">=3.3.1" }` and runs cleanly alongside Next.js `15.5.x`); redundant legacy `.eslintrc.json` has been removed.
   - `metadata.json` retains AI Studio platform metadata without introducing any runtime Gemini dependency or API key requirement (`.env.example` requires no `GEMINI_API_KEY`).
-- **Package Manager Consistency:** `bun.lock` is kept synchronized with `package.json`. All quality checks are exposed via `package.json` scripts (`dev`, `build`, `start`, `lint`, `typecheck`, `test`, `verify`) using a locally declared `tsx` devDependency.
+- **Package Manager Consistency:** `bun.lock` is kept synchronized with `package.json`. All quality checks are exposed via `package.json` scripts (`dev`, `build`, `start`, `lint`, `typecheck`, `content:validate`, `test`, `verify`) using a locally declared `tsx` devDependency.
 
 ---
 

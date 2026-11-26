@@ -26,6 +26,8 @@ import { MetadataPanel } from '@/components/documentation/MetadataPanel';
 import { MetricCard } from '@/components/visualization/MetricCard';
 import { Phase5CapabilitiesSection } from '@/features/platform/Phase5CapabilitiesSection';
 import { ArchitectureOverviewDiagram } from '@/features/architecture/ArchitectureOverviewDiagram';
+import type { ContentRegistryStats } from '@/content/registry/contentRegistry';
+import type { SourceManifestSummary } from '@/content/models/knowledge';
 
 const QUICK_NAV_IDS = [
   'knowledge-library',
@@ -38,14 +40,40 @@ const QUICK_NAV_IDS = [
 ] as const;
 
 export interface DashboardViewProps {
-  publishedRecordsCount?: number;
+  registryStats?: ContentRegistryStats;
+  manifestSummary?: SourceManifestSummary;
 }
 
+const DEFAULT_REGISTRY_STATS: ContentRegistryStats = {
+  totalPublished: 0,
+  uniqueConceptualTopics: 0,
+  officialImportedCount: 0,
+  activeCollectionsCount: 0,
+  byCollection: {},
+  byCompleteness: {},
+  byClassification: {},
+  byType: {},
+  byLanguage: {},
+};
+
+const DEFAULT_MANIFEST_SUMMARY: SourceManifestSummary = {
+  totalSources: 0,
+  expectedCount: 0,
+  awaitingSourceCount: 0,
+  sourceReceivedCount: 0,
+  validatedCount: 0,
+  importedCount: 0,
+  publishedCount: 0,
+  rejectedCount: 0,
+};
+
 export function DashboardView({
-  publishedRecordsCount = 0,
+  registryStats = DEFAULT_REGISTRY_STATS,
+  manifestSummary = DEFAULT_MANIFEST_SUMMARY,
 }: DashboardViewProps) {
   const t = useTranslations();
   const { locale } = useAppLocale();
+  const publishedRecordsCount = registryStats.totalPublished;
 
   const identity = useMemo(() => getProjectIdentity(), []);
   const metrics = useMemo(() => deriveDashboardMetrics(), []);
@@ -143,8 +171,14 @@ export function DashboardView({
         {t('app.planningProgressNotice')}
       </InformationCallout>
 
-      {/* 2. Key Metrics Strip (Single Structural Container with Equal 1px Hairlines) */}
-      <section aria-label={t('dashboard.title')}>
+      {/* 2A. ERP Project Status Strip (Official Planning Reference Snapshot) */}
+      <section
+        aria-label={t('foundations.dashboardHubMetrics.erpStatusHeading')}
+        className="space-y-2.5"
+      >
+        <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+          {t('foundations.dashboardHubMetrics.erpStatusHeading')}
+        </p>
         <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             label={t('dashboard.metrics.approvedDecisions')}
@@ -175,6 +209,63 @@ export function DashboardView({
               total: metrics.phase5.totalCount,
             })}
             emphasis="accent"
+            className="bg-surface"
+          />
+        </div>
+      </section>
+
+      {/* 2B. Knowledge Hub Content & Ingestion Status Strip (Strictly Derived from Registry & Manifest) */}
+      <section
+        aria-label={t('foundations.dashboardHubMetrics.hubStatusHeading')}
+        className="space-y-2.5"
+      >
+        <div className="space-y-0.5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            {t('foundations.dashboardHubMetrics.hubStatusHeading')}
+          </p>
+          <p className="text-xs text-text-secondary">
+            {t('foundations.dashboardHubMetrics.hubStatusSubtitle')}
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          <MetricCard
+            label={t('foundations.dashboardHubMetrics.publishedVariants')}
+            value={registryStats.totalPublished}
+            note={t('foundations.dashboardHubMetrics.publishedVariantsNote', {
+              ar: registryStats.byLanguage.ar ?? 0,
+              en: registryStats.byLanguage.en ?? 0,
+            })}
+            className="bg-surface"
+          />
+          <MetricCard
+            label={t('foundations.dashboardHubMetrics.conceptualTopics')}
+            value={registryStats.uniqueConceptualTopics}
+            note={t('foundations.dashboardHubMetrics.conceptualTopicsNote', {
+              collections: registryStats.activeCollectionsCount,
+            })}
+            className="bg-surface"
+          />
+          <MetricCard
+            label={t('foundations.dashboardHubMetrics.importedOfficialSources')}
+            value={manifestSummary.publishedCount}
+            suffix={`/ ${manifestSummary.totalSources}`}
+            note={t('foundations.dashboardHubMetrics.importedOfficialSourcesNote', {
+              published: manifestSummary.publishedCount,
+              total: manifestSummary.totalSources,
+              awaiting:
+                manifestSummary.awaitingSourceCount +
+                manifestSummary.expectedCount,
+            })}
+            className="bg-surface"
+          />
+          <MetricCard
+            label={t('foundations.dashboardHubMetrics.ingestionReadiness')}
+            value={
+              manifestSummary.awaitingSourceCount +
+              manifestSummary.expectedCount
+            }
+            suffix={`/ ${manifestSummary.totalSources}`}
+            note={t('foundations.dashboardHubMetrics.ingestionReadinessNote')}
             className="bg-surface"
           />
         </div>

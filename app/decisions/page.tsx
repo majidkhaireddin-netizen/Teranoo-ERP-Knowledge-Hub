@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getSourceManifestEntryByRefId } from '@/content/manifest/sourceManifest';
 import { DecisionRegisterView } from '@/features/decisions/DecisionRegisterView';
 
 export const metadata: Metadata = {
@@ -6,5 +7,13 @@ export const metadata: Metadata = {
 };
 
 export default function DecisionsPage() {
-  return <DecisionRegisterView />;
+  const decisionRegisterSourceEntry = getSourceManifestEntryByRefId(
+    'src-pf-05-decision-register'
+  );
+
+  return (
+    <DecisionRegisterView
+      decisionRegisterSourceEntry={decisionRegisterSourceEntry}
+    />
+  );
 }

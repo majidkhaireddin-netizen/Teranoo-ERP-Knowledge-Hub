@@ -1,0 +1,972 @@
+# TASK-003 — Official Knowledge Ingestion & Project Foundations
+
+**Project:** Teranoo ERP Knowledge Hub
+
+**Previous foundation:** TASK-001 approved. TASK-002 reviewed with targeted corrections required.
+
+**Objective:** Transition the application from a knowledge architecture foundation into the first meaningful, source-backed ERP knowledge collection.
+
+---
+
+## 1. Mission
+
+Implement the first official knowledge ingestion workflow and the Project Foundations knowledge experience.
+
+Teranoo ERP Knowledge Hub must become a comprehensive public reference documenting how an enterprise ERP system is researched, designed, built, tested, deployed, and continuously improved.
+
+The platform must eventually contain sufficient detail for readers to understand and reproduce the engineering journey.
+
+The objective is not to display project statistics or short summaries alone.
+
+Every major section must eventually combine:
+
+- Complete authorized original documentation.
+- Structured and navigable knowledge.
+- Educational explanations.
+- Architectural reasoning.
+- Source-backed decisions.
+- Related research and evidence.
+- Visual explanations.
+- Traceability to future functional and engineering specifications.
+
+Preserve the approved application architecture and visual identity.
+
+Do not redesign the entire application.
+
+Do not start TASK-004.
+
+---
+
+## 2. Corrective Requirements from TASK-002 Review
+
+Complete the following corrections before introducing the official content ingestion workflow.
+
+### A. Official Source Identity
+
+Correct references to the original Product Vision document.
+
+The verified official source path is:
+
+    teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md
+
+Do not reference the incorrect path:
+
+    teranoo-erp-planning/00-project-foundation/PRODUCT_VISION.md
+
+Review all existing references to this document.
+
+Remove `DOC-TERANOO-VISION-REF` from official document identifiers unless an authoritative source explicitly establishes that identifier.
+
+The existing Knowledge Hub internal content identifier may remain.
+
+Do not invent official ERP document identifiers.
+
+### B. Content Integrity Enforcement
+
+Review the current Content Registry and Content Loader behavior.
+
+Invalid content must not silently disappear from the public library.
+
+Requirements:
+
+- Fatal content validation errors must block release verification.
+- Duplicate content IDs and canonical routes must never be silently overwritten.
+- Invalid records must generate clear diagnostics.
+- Production builds must execute content integrity validation.
+- The standalone build command must not bypass mandatory content validation.
+- Explicitly deferred references may remain non-blocking warnings.
+
+Preserve the distinction between an invalid document and a valid document that is intentionally unpublished.
+
+### C. Markdown Heading Integrity
+
+Review the heading anchor generator in `markdownPipeline.ts`.
+
+Ensure globally unique heading IDs within each document.
+
+Test collisions involving headings such as:
+
+    Example
+    Example
+    Example-2
+    Example
+
+Include Arabic heading collision tests.
+
+Ensure all Table of Contents links resolve to the intended heading.
+
+Preserve safe HTML sanitization and prevent DOM clobbering through generated or user-controlled identifiers.
+
+### D. Relative Source Links
+
+Original ERP Markdown documents may include relative references to other source files.
+
+Support safe resolution of relative Markdown links.
+
+Requirements:
+
+- Resolve known references to canonical Knowledge Hub routes when the target content is published.
+- Preserve appropriate source references when the target has not yet been imported.
+- Clearly identify deferred or unavailable targets.
+- Never allow a relative link to expose arbitrary server files.
+- Block unsafe protocols and unauthorized paths.
+- Preserve valid heading fragments.
+- Handle relative local images through an explicitly governed asset strategy.
+- Do not silently remove safe relative references simply because they are not absolute URLs.
+
+Add automated tests for valid, deferred, malformed, and unsafe references.
+
+### E. Standalone Deployment Verification
+
+Review Next.js standalone deployment behavior.
+
+Verify that authorized Markdown collections and required content assets are available in the deployed application.
+
+Use appropriate Next.js output tracing or deterministic build packaging if necessary.
+
+Do not assume that source files will automatically be included in the production artifact.
+
+Execute a production-mode smoke test covering a known published document.
+
+If the Google AI Studio environment prevents this test, report the limitation explicitly.
+
+### F. Documentation Consistency
+
+Review the implemented content schemas and their technical documentation.
+
+Ensure the authoring guide, schema reference, completion reports, and actual Zod schema describe the same field names and allowed values.
+
+Correct stale schema examples.
+
+Do not modify historical completion reports to hide earlier discrepancies.
+
+Record corrections in the new task report.
+
+---
+
+## 3. Establish the Official Content Ingestion Workflow
+
+Create a deterministic, maintainable workflow for ingesting approved source documents into the Knowledge Hub.
+
+The workflow must support future ingestion of:
+
+- Product foundations.
+- Architecture documents.
+- Module models.
+- Platform frameworks.
+- Decision registers.
+- Requirements.
+- Research reports.
+- Future considerations.
+- Independent reviews.
+- Functional specifications.
+- Screen specifications.
+- Business rules.
+- Engineering records.
+- Test documentation.
+
+For TASK-003, focus on the initial Project Foundations collection.
+
+Do not build a general-purpose CMS.
+
+Do not implement live GitHub synchronization.
+
+Do not create a database.
+
+### Required workflow
+
+    Authorized Source Material
+        → Source Inventory
+        → Provenance Capture
+        → Content Classification
+        → Metadata Mapping
+        → Canonical Record Creation
+        → Relationship Resolution
+        → Publication Validation
+        → Knowledge Registry
+        → Document Reader & Search
+
+The workflow must be repeatable for future source batches.
+
+---
+
+## 4. Source Repository and Authority
+
+The official ERP planning repository is:
+
+    https://github.com/Alabasi1980/TeranooErp
+
+The application repository is:
+
+    https://github.com/majidkhaireddin-netizen/Teranoo-ERP-Knowledge-Hub
+
+These repositories have different responsibilities.
+
+The official ERP repository is the source of truth for approved ERP project documentation.
+
+The Knowledge Hub repository contains the public knowledge presentation application and explicitly authorized content.
+
+Do not assume access to the original ERP repository.
+
+Do not request credentials or access tokens.
+
+Do not attempt to bypass repository permissions.
+
+Do not automatically copy the entire source repository.
+
+Never modify the original ERP repository.
+
+---
+
+## 5. Initial Project Foundations Source Inventory
+
+Prepare the ingestion workflow for the following verified source documents.
+
+All paths are relative to the official ERP repository.
+
+### Source 01 — Product Vision
+
+    teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md
+
+Purpose:
+
+- Product vision.
+- Product goals.
+- Target customers.
+- Product positioning.
+- Core ERP modules.
+- Enterprise modules and future extensions.
+- Strategic product boundaries.
+- Success criteria.
+
+### Source 02 — Project Work Plan
+
+    teranoo-erp-planning/00-project-foundation/PROJECT_WORK_PLAN.md
+
+Purpose:
+
+- Complete official planning roadmap.
+- Planning phases and gates.
+- Current project status.
+- Phase deliverables.
+- Approved phase outcomes.
+- Deferred activities.
+- Future planning work.
+
+### Source 03 — Working Rules
+
+    teranoo-erp-planning/00-project-foundation/WORKING_RULES.md
+
+Purpose:
+
+- ERP project planning rules.
+- Decision discipline.
+- Research boundaries.
+- Phase progression.
+- Deferral governance.
+- Prevention of premature implementation.
+- Prevention of planning inflation.
+
+### Source 04 — Cross-Phase Product Guardrails
+
+    teranoo-erp-planning/00-project-foundation/CROSS_PHASE_PRODUCT_GUARDRAILS.md
+
+Purpose:
+
+- Cross-phase architectural principles.
+- Single product core.
+- Upgrade-safe customization.
+- Configuration governance.
+- Integration contract compatibility.
+- Migration and data exit.
+- Background processing and supportability.
+- AI safety boundaries.
+- Online-only transaction processing.
+- Product feature governance.
+
+### Source 05 — Decision Register
+
+    teranoo-erp-planning/00-project-foundation/DECISION_REGISTER.md
+
+Purpose:
+
+- Official decision index.
+- Decision identifiers.
+- Decision titles.
+- Source documents.
+- Owning phases.
+- Decision impact.
+
+The Decision Register is an index of official decisions.
+
+It must not be represented as the full authoritative text of every decision.
+
+Each decision's authoritative source remains its owning document.
+
+### Source 06 — Future Architecture Considerations
+
+    teranoo-erp-planning/00-project-foundation/FUTURE_ARCHITECTURE_CONSIDERATIONS.md
+
+Purpose:
+
+- Official inventory of future architecture considerations.
+- Research-required topics.
+- Deferred design questions.
+- Future capabilities.
+- Potential architectural risks.
+
+Future considerations are not automatically approved ERP decisions.
+
+---
+
+## 6. Source Availability Boundary — Critical
+
+The source inventory above identifies real documents and their verified paths.
+
+However, the full document bodies have not been provided within this task prompt.
+
+Do not fabricate their contents.
+
+Do not reconstruct them from filenames, general ERP knowledge, existing reference summaries, or previous task instructions.
+
+If the actual source files have not been supplied to the application:
+
+1. Implement the ingestion workflow.
+2. Register the expected source inventory separately from published content.
+3. Mark each unavailable source honestly.
+4. Preserve existing authorized reference content.
+5. Generate a source import readiness report.
+6. Prepare exact instructions for adding the real source files in a later authorized batch.
+
+Do not create empty published documents pretending to contain the official source material.
+
+Do not claim that the six official documents have been imported unless their actual bodies were supplied and processed.
+
+Do not automatically authorize publication of documents merely because their paths are listed.
+
+---
+
+## 7. Source Inventory and Import Manifest
+
+Introduce a lightweight source manifest.
+
+The manifest should support:
+
+- Stable source reference ID.
+- Original repository.
+- Exact source path.
+- Source title.
+- Source commit or tree revision, when verified.
+- Source file hash, when available.
+- Document classification.
+- Expected content type.
+- Associated project phase.
+- Import status.
+- Publication authorization status.
+- Published Knowledge Hub content ID.
+- Completeness classification.
+- Available languages.
+- Source verification status.
+
+Suggested import statuses:
+
+- Expected.
+- Awaiting Source.
+- Source Received.
+- Validated.
+- Imported.
+- Published.
+- Rejected.
+
+Keep source import status separate from official ERP approval status.
+
+Do not create a complex workflow engine for the import manifest.
+
+A validated JSON or TypeScript-based manifest is sufficient.
+
+The manifest must make it possible to distinguish:
+
+- How many source documents exist.
+- How many have been received.
+- How many have been imported.
+- How many are publicly available.
+
+Only actual imported and authorized content may contribute to published document counts.
+
+---
+
+## 8. Source Preservation
+
+When actual source documents are supplied, the ingestion workflow must preserve their substantive contents.
+
+Do not replace the original document with an AI-generated summary.
+
+Preserve:
+
+- Original sections.
+- Heading hierarchy.
+- Tables.
+- Lists.
+- Decision identifiers.
+- Requirement identifiers.
+- Original terminology.
+- Architectural constraints.
+- Source links.
+- Explicit uncertainties.
+- Deferred decisions.
+- Approval statements.
+- Historical notes.
+- Applicable copyright notices.
+
+It is acceptable to add presentation metadata and a YAML frontmatter envelope.
+
+Any substantive editorial correction must be separately identified.
+
+Do not silently rewrite an original source.
+
+Source documents may contain stale or conflicting information.
+
+Preserve the original material and identify verified discrepancies separately rather than altering historical evidence.
+
+---
+
+## 9. Project Foundations Knowledge Experience
+
+Create an integrated Project Foundations experience using the existing application routes and design system.
+
+The experience should help readers understand:
+
+1. What we are building.
+2. Why we are building it.
+3. Who the intended customers are.
+4. How the project is organized.
+5. How architectural decisions are made.
+6. Which principles govern the product.
+7. Where the project currently stands.
+8. What remains to be researched or implemented.
+
+Reuse the existing routes:
+
+- `/product-vision`
+- `/roadmap`
+- `/architecture`
+- `/decisions`
+- `/knowledge`
+
+Add a dedicated route such as `/project-foundations` only if it improves navigation and does not duplicate existing content.
+
+The same underlying content record must remain canonical.
+
+Do not maintain separate inconsistent copies of the same document.
+
+### Page behavior
+
+When full original source material is available and authorized:
+
+- Present the complete document.
+- Link to its canonical reader.
+- Provide relevant metadata and related content.
+- Distinguish original source from educational interpretation.
+
+When full source material is unavailable:
+
+- Present only existing verified reference content.
+- Clearly identify the source document as awaiting ingestion.
+- Do not display fabricated content.
+
+---
+
+## 10. Product Vision Experience
+
+Improve the existing Product Vision page so it becomes the entry point to understanding the ERP product.
+
+Prepare the page to accommodate:
+
+- Product identity.
+- Problem statement.
+- Target audience.
+- Target industries.
+- Product objectives.
+- Core ERP modules.
+- Shared platform capabilities.
+- Future enterprise modules.
+- Industry extensions.
+- Product positioning.
+- Product boundaries.
+- Success criteria.
+- Source references.
+- Related decisions and research.
+
+Do not populate sections using assumptions.
+
+Use the existing verified reference snapshot until the complete Product Vision source file is supplied.
+
+The existing abbreviated reference document must remain clearly labeled as a reference summary.
+
+Once the complete source is imported, the full source document and the educational overview must remain distinguishable.
+
+---
+
+## 11. Complete Project Roadmap Foundation
+
+Prepare the roadmap to support the entire official project plan, not merely the first five phases.
+
+The roadmap must support:
+
+- Completed phases.
+- Current phase.
+- Future phases.
+- Intermediate phases such as Phase 6.5.
+- Decision gates.
+- Phase items.
+- Dependencies.
+- Deliverables.
+- Approval outcomes.
+- Related source documents.
+- Research prerequisites.
+- Deferred work.
+
+Distinguish between:
+
+1. ERP product planning.
+2. ERP engineering implementation.
+3. Knowledge Hub development.
+4. Actual ERP operational readiness.
+
+Never combine these into a misleading single completion percentage.
+
+Do not invent phase titles, dates, completion statuses, or deliverables.
+
+The existing snapshot contains verified status information for Phases 1–5.
+
+The remaining official roadmap details must be populated from the actual `PROJECT_WORK_PLAN.md` document when supplied.
+
+Do not infer the complete roadmap from generic ERP development methodology.
+
+---
+
+## 12. Project Journey Navigation
+
+Introduce the foundation for exploring knowledge by its position within the full ERP development journey.
+
+Suggested journey dimensions:
+
+- Product discovery.
+- Research and evidence.
+- Architecture.
+- Functional design.
+- Detailed system design.
+- Engineering and implementation.
+- Testing and validation.
+- Deployment.
+- Operations.
+- Continuous improvement.
+
+These are Knowledge Hub educational navigation dimensions.
+
+They are not substitutes for the official ERP project phases.
+
+Allow published records to appear under relevant journey dimensions using their existing metadata.
+
+An unavailable stage must display an honest future-content or empty state.
+
+Do not fabricate activities for future stages.
+
+---
+
+## 13. Official Decisions — Initial Foundation
+
+Improve the existing Decision Register experience to support future full decision ingestion.
+
+The future register must provide:
+
+- Search by decision ID.
+- Decision title.
+- Owning phase.
+- Classification.
+- Status.
+- Source document.
+- Primary impact.
+- Related decisions.
+- Relevant requirements.
+- Source-backed rationale where available.
+
+For this task:
+
+- Preserve the seven existing verified Phase 5 decision references.
+- Implement the required reusable data structures and source integration boundary.
+- Clearly indicate that the current locally available decisions are only a subset of the source-declared decision inventory.
+
+Do not generate 120 artificial decision records.
+
+Do not infer decision details from decision identifiers.
+
+If the complete original Decision Register is not supplied, do not claim its ingestion is complete.
+
+The source-declared aggregate count and locally registered decision count must remain distinct.
+
+---
+
+## 14. Educational Presentation Principles
+
+The Knowledge Hub is intended to help people learn how ERP systems are built.
+
+Future educational explanations should answer:
+
+- What is the concept?
+- Why does it matter?
+- What business problem does it solve?
+- How do enterprise ERP products address it?
+- Which alternatives were considered?
+- What did Teranoo ERP adopt?
+- Why was that option selected?
+- What remains unresolved?
+- How will this influence implementation?
+- What lessons can readers apply to their own projects?
+
+Establish reusable presentation patterns for these questions.
+
+Do not require every document to use the same rigid article structure.
+
+Do not generate unsourced educational explanations about future ERP functionality.
+
+---
+
+## 15. Source Traceability and Related Knowledge
+
+Ensure each imported document can be associated with:
+
+- Original source path.
+- Source revision.
+- Content completeness.
+- Official decision identifiers.
+- Requirement identifiers.
+- Future considerations.
+- Relevant research.
+- Related independent analysis.
+- Related journey stages.
+- Related project phases.
+
+Preserve the typed relationship system implemented in TASK-002.
+
+Use explicitly deferred relationships where related source documents have not yet been imported.
+
+Do not link to nonexistent local routes.
+
+Do not replace exact source references with generic navigation links.
+
+---
+
+## 16. Dashboard Improvements — Limited Scope
+
+Improve the existing Dashboard only where needed to reflect the actual knowledge ingestion foundation.
+
+Add meaningful distinctions between:
+
+### ERP Project Status
+
+- Official planning status.
+- Source-declared decision count.
+- Current planning phase progress.
+
+### Knowledge Hub Content Status
+
+- Available published documents.
+- Imported source documents.
+- Available language variants.
+- Knowledge collections.
+- Source ingestion readiness.
+
+All new content metrics must be derived from the registry and import manifest.
+
+Do not invent metrics.
+
+Do not count untranslated language variants as separate conceptual topics without explaining the distinction.
+
+Maintain the existing visual identity.
+
+A complete dashboard redesign is outside this task.
+
+---
+
+## 17. Public Publishing and Source Integrity
+
+Maintain the approved public knowledge-sharing direction.
+
+Do not publish:
+
+- Credentials.
+- Secrets.
+- Customer data.
+- Sensitive operational information.
+- Unauthorized source material.
+- Unpublished internal documents.
+- Test fixtures presented as real documentation.
+
+Remember that a public GitHub repository exposes committed files even if the application excludes those files from its public registry.
+
+Do not store confidential documents inside the public Knowledge Hub repository.
+
+Application-level publication filters do not protect files committed to a public repository.
+
+Maintain source attribution and applicable intellectual property notices.
+
+Do not introduce a software license without explicit owner authorization.
+
+---
+
+## 18. Technical Implementation Constraints
+
+Preserve the existing stack:
+
+- Next.js App Router.
+- React.
+- TypeScript Strict Mode.
+- Tailwind CSS.
+- next-intl.
+- next-themes.
+- Existing Markdown rendering pipeline.
+- Existing Zod validation.
+- Existing content registry.
+- Existing design tokens and UI components.
+
+Do not replace the established architecture.
+
+Prefer extending existing services and types.
+
+Avoid:
+
+- Duplicate loaders.
+- Parallel content registries.
+- Duplicate search indexes.
+- Unnecessary state management libraries.
+- Premature graph infrastructure.
+- External content services.
+- Excessive abstractions.
+
+Any new dependency must have a documented justification.
+
+---
+
+## 19. Source Batch Authoring Guide
+
+Create a clear guide describing how the project supervisor can provide the next batch of real source documents.
+
+The guide must specify:
+
+- Where source files should be placed.
+- How to preserve original source paths.
+- How to supply provenance metadata.
+- How to assign stable Knowledge Hub IDs.
+- How to record source revisions.
+- How to configure publication authorization.
+- How to validate imported documents.
+- How to detect duplicate documents.
+- How to update an existing document.
+- How to preserve history.
+- How to resolve references to other imported documents.
+- How to handle unavailable related sources.
+
+Provide examples using existing verified reference documents or explicitly illustrative fixtures.
+
+Do not create fictitious official ERP documents to demonstrate the process.
+
+The ingestion process must be practical for repeated source batches throughout the project lifecycle.
+
+---
+
+## 20. Automated Tests
+
+Add or extend tests covering:
+
+### Content Integrity
+
+- Fatal validation failures.
+- Duplicate IDs.
+- Duplicate slugs.
+- Invalid metadata.
+- Build-time content validation.
+- Clear diagnostic output.
+
+### Heading Anchors
+
+- Duplicate headings.
+- Existing numeric suffixes.
+- Arabic headings.
+- Mixed-language headings.
+- Correct TOC targets.
+
+### Relative References
+
+- Valid relative Markdown links.
+- Resolved published targets.
+- Deferred targets.
+- Fragment links.
+- Unsafe protocols.
+- Path traversal.
+- Malformed links.
+
+### Source Manifest
+
+- Expected source without body.
+- Source received but not authorized.
+- Authorized and validated source.
+- Duplicate source mapping.
+- Published source count.
+- Missing provenance.
+
+### Content Presentation
+
+- Source summary versus full source.
+- Official approval versus public authorization.
+- Source aggregate count versus imported count.
+- Unavailable source states.
+- Language variant counting.
+- Existing Product Vision and Roadmap compatibility.
+
+### Deployment
+
+- Production content availability.
+- Published document route rendering.
+- Search availability.
+- Unpublished content exclusion.
+
+Execute the existing test suites and all new tests.
+
+Do not report unexecuted tests as passed.
+
+---
+
+## 21. Acceptance Criteria
+
+TASK-003 is complete when:
+
+1. All targeted TASK-002 corrections are addressed.
+2. The exact official Product Vision source path is corrected.
+3. Invented official identifiers are removed.
+4. Mandatory content integrity validation is enforced.
+5. Duplicate content records cannot silently overwrite one another.
+6. Heading anchors remain unique.
+7. Safe source-relative links are supported.
+8. The source ingestion workflow is implemented.
+9. The six verified Project Foundations source paths exist in a source inventory.
+10. Unavailable source bodies are clearly identified.
+11. No official source body has been fabricated.
+12. Product Vision supports full-source ingestion.
+13. Roadmap supports the complete future official planning structure.
+14. Phase 6.5 and decision gates are structurally supported.
+15. ERP progress and Knowledge Hub progress remain distinct.
+16. The Decision Register distinguishes source counts from available records.
+17. Journey-based knowledge discovery is established.
+18. Source attribution and publication governance remain intact.
+19. Existing routes and functionality are preserved.
+20. Arabic and English interface behavior remains correct.
+21. Light and dark themes remain consistent.
+22. Content validation succeeds.
+23. Type checking succeeds.
+24. ESLint succeeds.
+25. Automated tests pass.
+26. Production build succeeds.
+27. Production content availability is verified or explicitly reported as unverified.
+28. The source batch authoring guide is complete.
+29. The application is ready to receive the first actual authorized official source batch.
+
+---
+
+## 22. Technical Documentation
+
+Create or update:
+
+    docs/
+      OFFICIAL_SOURCE_INGESTION.md
+      SOURCE_MANIFEST.md
+      SOURCE_BATCH_AUTHORING_GUIDE.md
+      PROJECT_FOUNDATIONS_STRUCTURE.md
+      TASK-003-COMPLETION_REPORT.md
+
+Update the existing content schema, validation, architecture, and authoring documentation where necessary.
+
+Avoid duplicated and conflicting documentation.
+
+Preserve previous task reports.
+
+---
+
+## 23. Completion Report
+
+Create:
+
+    docs/TASK-003-COMPLETION_REPORT.md
+
+Include:
+
+A. Executive summary.
+
+B. TASK-002 corrections completed.
+
+C. Official source inventory.
+
+D. Source ingestion architecture.
+
+E. Source availability and authorization status.
+
+F. Project Foundations experience.
+
+G. Product Vision improvements.
+
+H. Roadmap foundation.
+
+I. Decision Register improvements.
+
+J. Journey navigation.
+
+K. Dashboard content metrics.
+
+L. Markdown link and heading improvements.
+
+M. Content integrity enforcement.
+
+N. Deployment verification.
+
+O. Dependencies and technical decisions.
+
+P. Actual test and build results.
+
+Q. Files created or modified.
+
+R. Known limitations.
+
+S. Requirements not implemented.
+
+T. Required source files for the next ingestion batch.
+
+U. Readiness for independent review.
+
+Explicitly distinguish between:
+
+- Features actually implemented.
+- Actual source documents received.
+- Actual source documents imported.
+- Source documents still awaiting delivery.
+- Tests executed.
+- Tests not executed.
+
+---
+
+## Final Instructions
+
+The purpose of TASK-003 is to establish the first production-minded, repeatable ingestion workflow for real ERP project knowledge.
+
+The application must evolve into a complete reference for researching, designing, implementing, testing, and operating an enterprise ERP system.
+
+Do not confuse presentation readiness with the existence of actual source content.
+
+Do not generate official ERP documentation from assumptions.
+
+Do not invent decisions, requirements, research findings, or implementation details.
+
+Preserve the established application foundation.
+
+Implement TASK-003, execute the required checks, document the results, and stop for independent review.
+
+Do not start TASK-004.

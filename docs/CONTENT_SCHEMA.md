@@ -53,3 +53,9 @@ All variants include: `attribution`, `sourceLanguage?`, `sourceDocumentDate?` (`
 - `publicationAuthorization`: `{ authorized: boolean; authorizedBy?: string; scopeNote?: LocalizedText; completeness: 'complete' | 'excerpt' | 'reference-summary' }`
 - `versioning`: `{ revision: number; sourceVersion?: string; previousRevisionId?: string; supersedesId?: string; lastVerifiedDate?: string | null; correctionNote?: LocalizedText }`
 - `collectionSequence?`: `{ collectionId: string; order: number }` — explicit sequential navigation scoped per language track.
+
+## 6. Official Source Manifest & Runtime Reference Models (`TASK-003`)
+
+- **Source Manifest (`content/manifest/sourceManifest.ts`, `sourceManifestEntrySchema`):** Validates `sourceRefId`, `repository`, normalized POSIX `sourcePath`, localized `title` and `purpose`, `sourceRevision`, `sourceFileHash` (SHA-256), `classification`, `expectedContentType`, `phaseRef`, `importStatus`, `publicationAuthorizationStatus`, `publishedContentId`, `referenceSummaryContentId?`, `completeness`, `availableLanguages`, `sourceVerificationStatus`, and `authorityNote?`.
+- **Runtime Document Extensions (`content/models/knowledge.ts`):** `KnowledgeDocument` includes `deferredReferences: readonly DeferredMarkdownReference[]` tracking unimported relative Markdown links and assets safely neutralized during rendering.
+

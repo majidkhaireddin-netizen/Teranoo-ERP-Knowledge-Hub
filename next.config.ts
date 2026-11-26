@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   output: 'standalone',
+  outputFileTracingIncludes: {
+    '/*': ['./content/collections/**/*'],
+  },
+  outputFileTracingExcludes: {
+    '/*': ['./content/fixtures/**/*'],
+  },
   webpack: (config, {dev}) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.
     // Do not modify—file watching is disabled to prevent flickering during agent edits.

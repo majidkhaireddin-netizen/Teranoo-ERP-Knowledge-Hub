@@ -51,7 +51,6 @@ tags:
   - saas-first
   - postgresql
 traceability:
-  officialDocumentId: DOC-TERANOO-VISION-REF
   decisionIds:
     - D-PLAT-01
     - D-PLAT-02
@@ -70,10 +69,10 @@ relationships:
   - type: related-to
     targetId: kh-edu-classification-governance-ar
   - type: derived-from
-    deferredRef: teranoo-erp-planning/00-project-foundation/PRODUCT_VISION.md
+    deferredRef: teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md
     label:
-      ar: "ملف رؤية المنتج الأصلي (مؤجَّل للاستيراد الكامل في مهمة لاحقة)"
-      en: "Original Product Vision source file (deferred for full ingestion in a later task)"
+      ar: "ملف رؤية المنتج الأصلي (00_PROJECT_VISION.md — بانتظار تسليم المصدر للاستيراد الكامل)"
+      en: "Original Product Vision source file (00_PROJECT_VISION.md — awaiting source delivery for full ingestion)"
 source:
   kind: snapshot-derived
   repository: https://github.com/Alabasi1980/TeranooErp

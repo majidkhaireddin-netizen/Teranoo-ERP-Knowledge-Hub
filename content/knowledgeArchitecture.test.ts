@@ -188,7 +188,7 @@ test('content registry resolves outgoing relationships, incoming backlinks, defe
   assert.ok(visionAr);
 
   const rels = registry.getRelationships(visionAr.metadata.id);
-  // Outgoing includes translation-of EN, related-to educational AR, and deferred original PRODUCT_VISION.md
+  // Outgoing includes translation-of EN, related-to educational AR, and deferred original 00_PROJECT_VISION.md
   assert.ok(
     rels.outgoing.some(
       (r) =>
@@ -202,7 +202,7 @@ test('content registry resolves outgoing relationships, incoming backlinks, defe
       (r) =>
         r.type === 'derived-from' &&
         r.status === 'deferred' &&
-        r.deferredRef?.includes('PRODUCT_VISION.md')
+        r.deferredRef?.includes('00_PROJECT_VISION.md')
     )
   );
   // Incoming backlink from educational governance article referencing Product Vision AR
@@ -442,8 +442,8 @@ test('Markdown renderer strips raw script tags, event handlers, javascript: and 
   assert.equal(headingsResult.headings.length, 4);
   const ids = headingsResult.headings.map((h) => h.id);
   assert.equal(new Set(ids).size, 4);
-  assert.equal(ids[0], 'overview');
-  assert.equal(ids[1], 'overview-2');
+  assert.equal(ids[0], 'kh-h-overview');
+  assert.equal(ids[1], 'kh-h-overview-2');
 });
 
 test('path resolution strictly blocks traversal, absolute escape paths, and null bytes', () => {

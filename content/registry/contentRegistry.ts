@@ -1,12 +1,14 @@
 import type { ContentClassificationType } from '@/content/models/types';
 import type {
   CollectionNeighbors,
+  ContentCompleteness,
   DocumentLanguage,
   KnowledgeDocument,
   KnowledgeRecordMetadata,
   ResolvedRelationship,
 } from '@/content/models/knowledge';
 import type {
+  ApprovedCollectionDir,
   ContentTypeId,
   ControlledTopicId,
   EditorialStatus,
@@ -19,7 +21,13 @@ import {
   CONTENT_COLLECTIONS_ROOT,
   loadApprovedCollections,
 } from '@/content/loaders/contentLoader';
-import { isPubliclyPublishableRecord } from '@/content/validators/contentValidator';
+import {
+  ContentIntegrityError,
+  isPubliclyPublishableRecord,
+  validateLoadedEntries,
+  type ValidationDiagnostic,
+} from '@/content/validators/contentValidator';
+import { PROJECT_FOUNDATIONS_SOURCE_MANIFEST } from '@/content/manifest/sourceManifest';
 
 export interface KnowledgeFilterCriteria {
   readonly query?: string;
@@ -37,7 +45,16 @@ export interface KnowledgeFilterCriteria {
 }
 
 export interface ContentRegistryStats {
+  /** Total published language records (e.g. Arabic + English variants). */
   readonly totalPublished: number;
+  /** Unique conceptual topics counting linked translation pairs as one topic. */
+  readonly uniqueConceptualTopics: number;
+  /** Published records with source.kind="official-source" and completeness="complete". */
+  readonly officialImportedCount: number;
+  /** Number of distinct collection directories containing at least one published record. */
+  readonly activeCollectionsCount: number;
+  readonly byCollection: Partial<Record<ApprovedCollectionDir, number>>;
+  readonly byCompleteness: Partial<Record<ContentCompleteness, number>>;
   readonly byClassification: Partial<Record<ContentClassificationType, number>>;
   readonly byType: Partial<Record<ContentTypeId, number>>;
   readonly byLanguage: Partial<Record<DocumentLanguage, number>>;
@@ -61,13 +78,58 @@ export interface ContentRegistry {
 }
 
 /**
- * Pure Content Registry factory. Strictly applies the Publication Boundary:
- * unpublished records, drafts, unauthorized records, and test fixtures are
- * excluded from every lookup, filter, relationship, and metadata index.
+ * Pure Content Registry factory.
+ *
+ * Integrity & Publication Boundary guarantees:
+ * 1. Duplicate content IDs or duplicate canonical slugs throw ContentIntegrityError
+ *    and NEVER silently overwrite one another.
+ * 2. Valid records that are intentionally unpublished (draft, internal/private,
+ *    or publicationAuthorization.authorized=false) and test fixtures are cleanly
+ *    excluded from every public lookup, filter, relationship, and metadata index.
  */
 export function createContentRegistry(
   documents: readonly KnowledgeDocument[]
 ): ContentRegistry {
+  // Enforce global ID and slug uniqueness across all supplied documents
+  const seenIds = new Map<string, string>();
+  const seenSlugs = new Map<string, string>();
+  const integrityErrors: ValidationDiagnostic[] = [];
+
+  for (const doc of documents) {
+    const prevIdFile = seenIds.get(doc.metadata.id);
+    if (prevIdFile) {
+      integrityErrors.push({
+        severity: 'error',
+        code: 'DUPLICATE_ID',
+        file: doc.sourceFileRelativePath,
+        field: 'id',
+        message: `Duplicate content ID "${doc.metadata.id}" (already declared in ${prevIdFile})`,
+      });
+    } else {
+      seenIds.set(doc.metadata.id, doc.sourceFileRelativePath);
+    }
+
+    const prevSlugFile = seenSlugs.get(doc.metadata.slug);
+    if (prevSlugFile) {
+      integrityErrors.push({
+        severity: 'error',
+        code: 'DUPLICATE_SLUG',
+        file: doc.sourceFileRelativePath,
+        field: 'slug',
+        message: `Duplicate canonical slug "${doc.metadata.slug}" (already declared in ${prevSlugFile})`,
+      });
+    } else {
+      seenSlugs.set(doc.metadata.slug, doc.sourceFileRelativePath);
+    }
+  }
+
+  if (integrityErrors.length > 0) {
+    throw new ContentIntegrityError(
+      `Content Registry integrity failure: ${integrityErrors.map((e) => e.message).join('; ')}`,
+      integrityErrors
+    );
+  }
+
   const publicDocs = documents
     .filter(isPubliclyPublishableRecord)
     .sort((a, b) => a.metadata.id.localeCompare(b.metadata.id));
@@ -90,7 +152,9 @@ export function createContentRegistry(
     return bySlug.get(slug) ?? null;
   }
 
-  function getByOfficialId(officialId: string): readonly KnowledgeRecordMetadata[] {
+  function getByOfficialId(
+    officialId: string
+  ): readonly KnowledgeRecordMetadata[] {
     const normalized = officialId.trim().toLowerCase();
     if (!normalized) return [];
 
@@ -370,16 +434,37 @@ export function createContentRegistry(
     const byClassification: Partial<Record<ContentClassificationType, number>> = {};
     const byType: Partial<Record<ContentTypeId, number>> = {};
     const byLanguage: Partial<Record<DocumentLanguage, number>> = {};
+    const byCollection: Partial<Record<ApprovedCollectionDir, number>> = {};
+    const byCompleteness: Partial<Record<ContentCompleteness, number>> = {};
+    const conceptualTopicKeys = new Set<string>();
+    let officialImportedCount = 0;
 
     for (const meta of publicMetadata) {
       byClassification[meta.classification] =
         (byClassification[meta.classification] ?? 0) + 1;
       byType[meta.type] = (byType[meta.type] ?? 0) + 1;
       byLanguage[meta.language] = (byLanguage[meta.language] ?? 0) + 1;
+      if (meta.collection !== 'fixtures') {
+        byCollection[meta.collection] =
+          (byCollection[meta.collection] ?? 0) + 1;
+      }
+      const comp = meta.publicationAuthorization.completeness;
+      byCompleteness[comp] = (byCompleteness[comp] ?? 0) + 1;
+
+      conceptualTopicKeys.add(meta.translationGroupId ?? meta.id);
+
+      if (meta.source.kind === 'official-source' && comp === 'complete') {
+        officialImportedCount += 1;
+      }
     }
 
     return {
       totalPublished: publicMetadata.length,
+      uniqueConceptualTopics: conceptualTopicKeys.size,
+      officialImportedCount,
+      activeCollectionsCount: Object.keys(byCollection).length,
+      byCollection,
+      byCompleteness,
       byClassification,
       byType,
       byLanguage,
@@ -405,7 +490,11 @@ let cachedServerRegistry: ContentRegistry | null = null;
 
 /**
  * Controlled server-side registry accessor.
- * Loads approved local collections once per server lifecycle (never reads fixtures).
+ * Validates all loaded collection entries before building the registry:
+ * - Fatal integrity errors (invalid frontmatter, duplicate IDs/slugs, unsafe URLs,
+ *   broken internal links, unauthorized public records) throw ContentIntegrityError
+ *   and are NEVER silently discarded.
+ * - Valid intentionally-unpublished documents remain excluded from public outputs.
  */
 export function getContentRegistry(
   collectionsRoot: string = CONTENT_COLLECTIONS_ROOT
@@ -418,6 +507,23 @@ export function getContentRegistry(
   }
 
   const entries = loadApprovedCollections(collectionsRoot);
+  const validation = validateLoadedEntries(entries, {
+    manifestEntries:
+      collectionsRoot === CONTENT_COLLECTIONS_ROOT
+        ? PROJECT_FOUNDATIONS_SOURCE_MANIFEST
+        : undefined,
+  });
+
+  if (!validation.ok) {
+    const summary = validation.errors
+      .map((e) => `[${e.code}] ${e.file} (${e.field}): ${e.message}`)
+      .join('\n');
+    throw new ContentIntegrityError(
+      `Content integrity validation failed with ${validation.errors.length} fatal error(s):\n${summary}`,
+      validation.errors
+    );
+  }
+
   const validDocs: KnowledgeDocument[] = [];
   for (const entry of entries) {
     if (entry.ok) {

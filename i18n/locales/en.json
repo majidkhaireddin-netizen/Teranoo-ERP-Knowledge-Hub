@@ -490,7 +490,7 @@
       "r1Hub": "Public read-only documentation & knowledge platform chronicling the ERP journey",
       "r2Dim": "Current State",
       "r2Erp": "Architectural planning & approval stage (Phase 5) — software engineering not started",
-      "r2Hub": "Incremental platform implementation (TASK-001 approved, TASK-002 in progress)",
+      "r2Hub": "Incremental platform implementation (TASK-001 approved, TASK-002 reviewed, TASK-003 in progress)",
       "r3Dim": "Where Work Is Recorded",
       "r3Erp": "In this Engineering Journal (/engineering-journal) once real ERP engineering starts",
       "r3Hub": "In Knowledge Hub task completion reports (docs/TASK-*-COMPLETION_REPORT.md)"
@@ -506,6 +506,129 @@
       "commits": "Verified commit references only.",
       "testing": "Actual test evidence and verification results.",
       "lessons": "Lessons learned and architectural feedback."
+    }
+  },
+  "foundations": {
+    "sourceManifest": {
+      "sectionTitle": "Official Project Foundations Source Inventory",
+      "sectionSubtitle": "Six verified official source paths registered in the ingestion manifest, tracked separately from locally published records.",
+      "boundaryNoticeTitle": "Source Availability Boundary",
+      "boundaryNoticeBody": "These six official file paths are verified in the ERP planning repository, but their full Markdown bodies have not been delivered to this Knowledge Hub yet. No official source content has been fabricated.",
+      "summaryStrip": "{total} expected official sources · {received} received · {imported} imported · {published} publicly available · {awaiting} awaiting delivery",
+      "headers": {
+        "document": "Official Source Document",
+        "sourcePath": "Official Repository Path",
+        "phase": "Phase",
+        "importStatus": "Import Status",
+        "authorization": "Publication Auth",
+        "completeness": "Completeness"
+      },
+      "importStatuses": {
+        "expected": "Expected",
+        "awaiting-source": "Awaiting Source",
+        "source-received": "Source Received",
+        "validated": "Validated",
+        "imported": "Imported",
+        "published": "Published",
+        "rejected": "Rejected"
+      },
+      "authStatuses": {
+        "pending": "Pending",
+        "authorized": "Authorized",
+        "restricted": "Restricted"
+      },
+      "completenessStatuses": {
+        "not-imported": "Not Imported",
+        "reference-summary-only": "Reference Summary Only",
+        "excerpt": "Excerpt",
+        "complete": "Complete Source"
+      }
+    },
+    "journeyNav": {
+      "sectionTitle": "Explore by ERP Engineering Journey Stage",
+      "sectionSubtitle": "Knowledge Hub educational navigation dimensions across the full enterprise ERP lifecycle — distinct from official ERP planning phases.",
+      "allStages": "All Journey Stages",
+      "recordsCount": "{count} records",
+      "emptyStageTitle": "No published documents in this journey stage yet",
+      "emptyStageBody": "No authorized knowledge records are mapped to this stage yet. Content will appear here as official sources and engineering records are ingested in future tasks."
+    },
+    "productVision": {
+      "sourceStatusTitle": "Official Source Availability — 00_PROJECT_VISION.md",
+      "sourceStatusBody": "The full official source file (teranoo-erp-planning/00-project-foundation/00_PROJECT_VISION.md) is registered in the ingestion manifest and currently awaiting delivery. Verified snapshot facts remain displayed below without assumptions.",
+      "readinessTitle": "Full-Source Section Structure (Ingestion Readiness)",
+      "readinessIntro": "This page is structured to host the complete official Product Vision alongside an educational overview once 00_PROJECT_VISION.md is supplied and authorized. Sections without verified source text are explicitly marked as awaiting ingestion.",
+      "statusVerified": "Verified Snapshot",
+      "statusAwaiting": "Awaiting 00_PROJECT_VISION.md",
+      "sections": {
+        "identity": "Product Identity & Core Strategy",
+        "problem": "Problem Statement & Market Need",
+        "audience": "Target Audience & Target Industries",
+        "objectives": "Product Objectives & Success Criteria",
+        "coreModules": "Core Business ERP Modules (4 Verified)",
+        "platform": "Shared Platform Capabilities (Phase 5)",
+        "futureExtensions": "Future Enterprise Modules & Industry Extensions",
+        "boundaries": "Product Positioning & Strategic Boundaries"
+      }
+    },
+    "roadmap": {
+      "title": "Project Roadmap & Complete Planning Foundation",
+      "subtitle": "Structured roadmap supporting Phases 1–5 verified snapshot data, future phases, intermediate phases (such as Phase 6.5), and formal decision gates.",
+      "tracksTitle": "Four Distinct Progress Dimensions (Never Combined)",
+      "tracksSubtitle": "ERP planning, ERP software engineering, Knowledge Hub platform tasks, and operational readiness are tracked independently.",
+      "tracks": {
+        "erpPlanning": "1. ERP Product Planning",
+        "erpPlanningValue": "Phases 1–4 Complete · Phase 5: 7/13 (54%)",
+        "erpPlanningNote": "Official architectural planning progress from reviewed snapshot; later phases await PROJECT_WORK_PLAN.md.",
+        "erpEngineering": "2. ERP Engineering Implementation",
+        "erpEngineeringValue": "Not Started",
+        "erpEngineeringNote": "Active ERP software coding has not begun; tracked separately from architectural planning.",
+        "hubDevelopment": "3. Knowledge Hub Platform Development",
+        "hubDevelopmentValue": "TASK-003 (Ingestion Foundation)",
+        "hubDevelopmentNote": "Documentation platform milestones — never represents ERP product implementation progress.",
+        "operationalReadiness": "4. ERP Operational Readiness",
+        "operationalReadinessValue": "Not Started",
+        "operationalReadinessNote": "Production deployment and enterprise operations readiness begin only after implementation and verification."
+      },
+      "verifiedPhasesTitle": "Verified Planning Phases (Snapshot: Phases 1–5)",
+      "futureSupportTitle": "Future Official Phases, Intermediate Phases (Phase 6.5) & Decision Gates",
+      "futureSupportBody": "The roadmap data model natively supports non-integer intermediate phases (such as Phase 6.5), decision gates (such as Phase 5 Item 13: Platform Foundation Adoption), deliverables, research prerequisites, and deferred items. Detailed titles, deliverables, and dates beyond Phase 5 will be populated strictly from teranoo-erp-planning/00-project-foundation/PROJECT_WORK_PLAN.md once delivered — no future phase titles or timelines have been invented."
+    },
+    "decisions": {
+      "title": "Architectural Decision Register",
+      "subtitle": "Source-backed foundation for searching and inspecting official Teranoo ERP architectural and functional decisions.",
+      "indexNoticeTitle": "Official Index vs. Owning Authoritative Document",
+      "indexNoticeBody": "DECISION_REGISTER.md (currently awaiting source delivery) serves as the official decision index. Each decision’s complete authoritative text remains in its owning planning document. Currently 7 verified Phase 5 references are registered locally out of 120 source-declared decisions; zero missing decisions have been fabricated.",
+      "sourceDeclaredLabel": "Source-Declared Decisions (DECISION_REGISTER.md)",
+      "locallyAvailableLabel": "Locally Registered Decision References",
+      "locallyAvailableNote": "Verified Phase 5 platform capability decisions (D-PLAT-01 through D-PLAT-07) from the reviewed reference snapshot.",
+      "searchPlaceholder": "Search by decision ID (e.g. D-PLAT-03), title, or owning phase...",
+      "phaseFilterAll": "All Phases",
+      "resultsCount": "Showing {shown} of {total} locally verified decision references",
+      "emptyTitle": "No matching locally verified decisions",
+      "emptyDescription": "Only D-PLAT-01 through D-PLAT-07 are currently verified locally. Remaining decisions await official DECISION_REGISTER.md delivery.",
+      "headers": {
+        "decisionId": "Decision ID",
+        "title": "Decision Title",
+        "phase": "Owning Phase",
+        "status": "Status",
+        "source": "Source Reference",
+        "impact": "Scope / Impact"
+      },
+      "defaultImpact": "Approved Phase 5 Shared Platform Capability"
+    },
+    "dashboardHubMetrics": {
+      "erpStatusHeading": "ERP Project Status (Official Planning Reference Snapshot)",
+      "hubStatusHeading": "Knowledge Hub Content & Ingestion Status (Derived from Registry & Manifest)",
+      "hubStatusSubtitle": "Strictly separated from ERP product planning counts; distinguishes language variants from unique conceptual topics.",
+      "publishedVariants": "Published Language Records",
+      "publishedVariantsNote": "{ar} Arabic · {en} English (includes linked bilingual variants)",
+      "conceptualTopics": "Unique Conceptual Topics",
+      "conceptualTopicsNote": "Linked Arabic/English translations counted once as a single topic across {collections} active collections",
+      "importedOfficialSources": "Imported Official Full Sources",
+      "importedOfficialSourcesNote": "{published} published / {total} expected Project Foundations sources ({awaiting} awaiting delivery)",
+      "ingestionReadiness": "Official Sources Awaiting Delivery",
+      "ingestionReadinessValue": "Manifest & Validator Active",
+      "ingestionReadinessNote": "Deterministic ingestion & validation pipeline active and ready for the first authorized batch"
     }
   },
   "states": {

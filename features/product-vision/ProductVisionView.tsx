@@ -33,7 +33,15 @@ import { RelatedContent } from '@/components/documentation/RelatedContent';
 import { StatusIndicator } from '@/components/ui/StatusIndicator';
 import { Timeline } from '@/components/visualization/Timeline';
 
-export function ProductVisionView() {
+import type { SourceManifestEntry } from '@/content/models/knowledge';
+
+export interface ProductVisionViewProps {
+  visionSourceEntry?: SourceManifestEntry;
+}
+
+export function ProductVisionView({
+  visionSourceEntry,
+}: ProductVisionViewProps) {
   const t = useTranslations();
   const { locale } = useAppLocale();
 
@@ -165,12 +173,68 @@ export function ProductVisionView() {
             ]}
           />
 
-          <InformationCallout title={t('documentation.scopeLabel')}>
-            {resolveLocalizedText(
-              PRODUCT_VISION_DOC.metadata.scopeNote,
-              locale
-            )}
+          <InformationCallout title={t('foundations.productVision.sourceStatusTitle')}>
+            <p>{t('foundations.productVision.sourceStatusBody')}</p>
+            {visionSourceEntry ? (
+              <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-text-muted">
+                <code className="font-mono bidi-ltr break-all">
+                  {visionSourceEntry.sourcePath}
+                </code>
+                <span aria-hidden="true">·</span>
+                <span>
+                  {t(
+                    `foundations.sourceManifest.importStatuses.${visionSourceEntry.importStatus}`
+                  )}
+                </span>
+              </p>
+            ) : null}
           </InformationCallout>
+
+          {/* Full-Source Ingestion Readiness Section Map (Zero Fabricated Prose) */}
+          <section className="rounded-lg border border-border bg-surface p-4 space-y-3">
+            <div className="space-y-1">
+              <h2 className="text-sm font-semibold text-text-primary">
+                {t('foundations.productVision.readinessTitle')}
+              </h2>
+              <p className="text-xs leading-relaxed text-text-secondary">
+                {t('foundations.productVision.readinessIntro')}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
+              {(
+                [
+                  ['identity', true],
+                  ['coreModules', true],
+                  ['platform', true],
+                  ['problem', false],
+                  ['audience', false],
+                  ['objectives', false],
+                  ['futureExtensions', false],
+                  ['boundaries', false],
+                ] as const
+              ).map(([key, isVerified]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-surface-subtle/40 px-3 py-2"
+                >
+                  <span className="font-medium text-text-primary">
+                    {t(`foundations.productVision.sections.${key}`)}
+                  </span>
+                  <span
+                    className={`shrink-0 rounded-sm border px-1.5 py-0.5 text-[10px] font-medium ${
+                      isVerified
+                        ? 'border-success-border bg-success-bg text-success'
+                        : 'border-border bg-surface text-text-muted'
+                    }`}
+                  >
+                    {isVerified
+                      ? t('foundations.productVision.statusVerified')
+                      : t('foundations.productVision.statusAwaiting')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-0.5 text-xs">

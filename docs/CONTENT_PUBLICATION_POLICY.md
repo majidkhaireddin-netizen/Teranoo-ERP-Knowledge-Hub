@@ -26,4 +26,7 @@ A record is exposed publicly **if and only if ALL four conditions hold**:
 - **No Secrets or Sensitive Data:** API keys, tokens, credentials, customer data, and sensitive operational details are strictly prohibited in Markdown files, frontmatter, or public assets.
 - **Source Attribution & Completeness:** Every record declares its `source.kind`, `source.attribution`, and `publicationAuthorization.completeness` (`complete`, `excerpt`, or `reference-summary`).
 - **No Fabricated Dates:** Unknown original source document dates must be recorded as `null` or omitted and rendered honestly as `"Not recorded in source"` / `"غير مسجّل في المصدر"`.
-- **Safe Failure on Unauthorized Routes:** Direct requests to `/knowledge/<unpublished-slug>` or `/knowledge/<nonexistent-slug>` return a clean HTTP 404 via `notFound()` without leaking filesystem paths, draft existence, or private metadata.
+- **Safe Failure on Unauthorized Routes:** Direct requests to `/knowledge/<unpublished-slug>` or `/knowledge/<nonexistent-slug>` invoke Next.js `notFound()` in both `generateMetadata()` and the page component without leaking filesystem paths, draft existence, or private metadata.
+- **Standalone Deployment Packaging Isolation:** `next.config.ts` traces `./content/collections/**/*` into standalone builds while explicitly excluding `./content/fixtures/**/*`.
+- **Source Manifest Authorization Gating:** Official sources registered in `content/manifest/sourceManifest.ts` must keep `publishedContentId: null` until explicitly authorized (`publicationAuthorizationStatus: "authorized"`) and linked to a publicly published registry record.
+

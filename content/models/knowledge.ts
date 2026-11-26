@@ -150,11 +150,19 @@ export interface RenderedHeading {
   readonly level: 2 | 3;
 }
 
+export interface DeferredMarkdownReference {
+  readonly kind: 'link' | 'asset';
+  readonly rawRef: string;
+  readonly normalizedSourcePath: string;
+  readonly fragment?: string;
+}
+
 export interface KnowledgeDocument {
   readonly metadata: KnowledgeRecordMetadata;
   readonly bodyMarkdown: string;
   readonly renderedHtml: string;
   readonly headings: readonly RenderedHeading[];
+  readonly deferredReferences: readonly DeferredMarkdownReference[];
   readonly readingTimeMinutes: number;
   readonly sourceFileRelativePath: string;
 }
@@ -178,9 +186,103 @@ export interface CollectionNeighbors {
 }
 
 /**
+ * Source Inventory & Import Manifest contracts (TASK-003 Sections 5–7).
+ * Strictly separates source import status from official ERP approval status.
+ */
+export type SourceImportStatus =
+  | 'expected'
+  | 'awaiting-source'
+  | 'source-received'
+  | 'validated'
+  | 'imported'
+  | 'published'
+  | 'rejected';
+
+export type SourceAuthorizationStatus =
+  | 'pending'
+  | 'authorized'
+  | 'restricted';
+
+export type SourceVerificationStatus =
+  | 'path-verified-awaiting-body'
+  | 'hash-verified'
+  | 'verified'
+  | 'unverified';
+
+export type SourceCompletenessStatus =
+  | 'not-imported'
+  | 'reference-summary-only'
+  | 'excerpt'
+  | 'complete';
+
+export interface SourceManifestEntry {
+  readonly sourceRefId: string;
+  readonly repository: string;
+  readonly sourcePath: string;
+  readonly title: LocalizedText;
+  readonly purpose: LocalizedText;
+  readonly sourceRevision?: string | null;
+  readonly sourceFileHash?: string | null;
+  readonly classification: ContentClassificationType;
+  readonly expectedContentType: ContentTypeId;
+  readonly phaseRef: string;
+  readonly importStatus: SourceImportStatus;
+  readonly publicationAuthorizationStatus: SourceAuthorizationStatus;
+  readonly publishedContentId: string | null;
+  readonly referenceSummaryContentId?: string | null;
+  readonly completeness: SourceCompletenessStatus;
+  readonly availableLanguages: readonly DocumentLanguage[];
+  readonly sourceVerificationStatus: SourceVerificationStatus;
+  readonly authorityNote?: LocalizedText;
+}
+
+export interface SourceManifestSummary {
+  readonly totalSources: number;
+  readonly expectedCount: number;
+  readonly awaitingSourceCount: number;
+  readonly sourceReceivedCount: number;
+  readonly validatedCount: number;
+  readonly importedCount: number;
+  readonly publishedCount: number;
+  readonly rejectedCount: number;
+}
+
+export interface SourceReadinessReport {
+  readonly generatedFromManifest: string;
+  readonly officialRepository: string;
+  readonly summary: SourceManifestSummary;
+  readonly awaitingDelivery: readonly {
+    readonly sourceRefId: string;
+    readonly sourcePath: string;
+    readonly expectedContentType: ContentTypeId;
+    readonly phaseRef: string;
+    readonly importStatus: SourceImportStatus;
+  }[];
+  readonly readyForPublicDisplay: readonly string[];
+}
+
+/**
+ * Reusable foundation structures for future full Roadmap and Decision Register
+ * ingestion (TASK-003 Sections 11 & 13).
+ */
+export interface DecisionRegisterEntryModel {
+  readonly decisionId: string;
+  readonly title: LocalizedText;
+  readonly owningPhase: string;
+  readonly classification: ContentClassificationType;
+  readonly status: OfficialApprovalStatus;
+  readonly sourceDocumentPath: string;
+  readonly primaryImpact?: LocalizedText;
+  readonly relatedDecisions: readonly string[];
+  readonly relatedRequirements: readonly string[];
+  readonly rationale?: LocalizedText;
+  readonly canonicalHref?: string;
+}
+
+/**
  * Lightweight future specialized extension contracts (Section 18).
- * Not populated with fabricated records in TASK-002; allows typed viewer
- * extensions without redesigning KnowledgeRecordMetadata.
+ * Not populated with fabricated records; allows typed viewer extensions
+ * without redesigning KnowledgeRecordMetadata.
  */
 export interface ScreenSpecificationExtension {
   readonly kind: 'screen-specification';
