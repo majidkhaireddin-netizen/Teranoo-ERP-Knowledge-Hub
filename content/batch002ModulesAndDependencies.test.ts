@@ -36,8 +36,11 @@ import {
   resetExtractedDependencyArchitectureCache,
 } from '@/content/extractors/dependencyArchitectureExtractor';
 import {
+  DEFAULT_EDUCATIONAL_CONTROLS,
   DEFAULT_PLATFORM_PREREQUISITES,
   simulateModuleActivation,
+  validateSimulatorCatalogConsistency,
+  type DependencySimulationCatalog,
 } from '@/content/simulators/moduleActivationSimulator';
 import {
   buildUnifiedSearchIndex,
@@ -335,10 +338,12 @@ test('dependencyArchitectureExtractor extracts exact Phase 2 dependency model, 0
 });
 
 // ============================================================================
-// 5. Module Activation Simulator — Exhaustive Verification of All 16 Combinations
+// 5. Module Activation Simulator — Semantic Integrity (TASK-005-FIX-01 / FIX-01-R06)
 // ============================================================================
 
-test('simulateModuleActivation exhaustively verifies all 16 module combinations (2^4) with 0 HBMD, standalone support, exact CIC/FLD readiness, and PCD gating', () => {
+test('FIX-01-R06 (1, 2, 9): all 16 (2^4) Core Module combinations preserve 0 HBMD, standalone base activation, Required PCD gating, and explicit scope boundaries', () => {
+  resetExtractedDependencyArchitectureCache();
+  const catalog = getExtractedDependencyArchitecture().matrix;
   const modules: readonly CoreModuleId[] = [
     'finance',
     'inventory-warehouse',
@@ -346,7 +351,7 @@ test('simulateModuleActivation exhaustively verifies all 16 module combinations 
     'sales-order-management',
   ];
 
-  // Iterate all 2^4 = 16 combinations
+  // 1. Exhaustively test all 2^4 = 16 combinations against authoritative catalog
   for (let mask = 0; mask < 16; mask++) {
     const selectedModules: Record<CoreModuleId, boolean> = {
       finance: Boolean(mask & 1),
@@ -356,6 +361,7 @@ test('simulateModuleActivation exhaustively verifies all 16 module combinations 
     };
 
     const res = simulateModuleActivation({
+      catalog,
       selectedModules,
       platform: DEFAULT_PLATFORM_PREREQUISITES,
     });
@@ -364,44 +370,58 @@ test('simulateModuleActivation exhaustively verifies all 16 module combinations 
       (id) => selectedModules[id]
     ).length;
 
-    // Zero HBMD across every single combination
+    // 9. Zero HBMD invariant across all 16 combinations
     assert.equal(res.hbmdEdgeCount, 0);
     assert.equal(res.selectedCount, expectedSelectedCount);
     assert.equal(res.activatableModulesCount, expectedSelectedCount);
-    assert.equal(res.readyCics.length + res.inactiveCics.length, 6);
-    assert.equal(res.availableFlds.length + res.unavailableFlds.length, 5);
+    assert.equal(res.cicOutcomes.length, 6);
+    assert.equal(res.fldOutcomes.length, 5);
     assert.ok(res.disclaimer.ar.length > 0 && res.disclaimer.en.length > 0);
+    assert.ok(res.activationScopeBoundary.evaluatedConditions.length >= 3);
+    assert.ok(res.activationScopeBoundary.outOfScopeConditions.length >= 4);
 
-    // Every standalone single-module activation must succeed with 0 ready CICs and 0 FLDs
-    if (expectedSelectedCount === 1) {
-      assert.equal(res.activatableModulesCount, 1);
-      assert.equal(res.readyCics.length, 0);
-      assert.equal(res.availableFlds.length, 0);
+    for (const outcome of res.moduleOutcomes) {
+      assert.deepEqual(outcome.hbmdBlockers, []);
+      if (outcome.selected) {
+        assert.equal(outcome.canActivateBaseWithinEvaluatedScope, true);
+        assert.equal(outcome.status, 'base-activatable-within-evaluated-scope');
+      }
     }
 
-    // All 4 active => 6 ready CICs and 5 available FLDs
+    // Active modules alone with default conservative controls NEVER produce
+    // evaluated-conceptual-prerequisites-satisfied or claim full runtime readiness
+    assert.equal(res.cicSummary.evaluatedConceptualPrereqsSatisfied, 0);
+    assert.equal(
+      res.fldSummary.evaluatedPrereqsSatisfiedFunctionalUnspecified,
+      0
+    );
+
+    if (expectedSelectedCount === 1) {
+      assert.equal(res.activatableModulesCount, 1);
+      assert.equal(res.cicSummary.architecturalModulePrereqsSatisfied, 0);
+      assert.equal(
+        res.fldOutcomes.filter((f) => f.requiredModulesAvailable).length,
+        0
+      );
+    }
+
     if (expectedSelectedCount === 4) {
-      assert.equal(res.readyCics.length, 6);
-      assert.equal(res.availableFlds.length, 5);
+      // All 4 active => all 6 CICs satisfy participating-module prerequisites,
+      // but remain readiness-not-established under conservative defaults (never bare "Ready")
+      assert.equal(res.cicSummary.architecturalModulePrereqsSatisfied, 6);
+      assert.equal(res.cicSummary.readinessNotEstablished, 6);
+      assert.equal(res.cicSummary.evaluatedConceptualPrereqsSatisfied, 0);
+      assert.equal(
+        res.fldOutcomes.filter((f) => f.requiredModulesAvailable).length,
+        5
+      );
+      assert.equal(res.fldSummary.readinessNotEstablished, 5);
     }
   }
 
-  // Specific combo: Sales + Inventory only => 1 CIC (SALES-INV-001) & 1 FLD (Stock Sale)
-  const salesInv = simulateModuleActivation({
-    selectedModules: {
-      finance: false,
-      'inventory-warehouse': true,
-      procurement: false,
-      'sales-order-management': true,
-    },
-    platform: DEFAULT_PLATFORM_PREREQUISITES,
-  });
-  assert.equal(salesInv.readyCics.length, 1);
-  assert.equal(salesInv.readyCics[0]?.contractId, 'CIC-CORE-SALES-INV-001');
-  assert.equal(salesInv.availableFlds.length, 1);
-
-  // PCD Gating: disabling mandatoryPlatformCore blocks all selected modules & CICs while HBMD stays 0
+  // 2. Missing Required PCDs: mandatoryPlatformCore blocks all 4 while HBMD stays 0
   const noPlatformCore = simulateModuleActivation({
+    catalog,
     selectedModules: {
       finance: true,
       'inventory-warehouse': true,
@@ -415,11 +435,12 @@ test('simulateModuleActivation exhaustively verifies all 16 module combinations 
   });
   assert.equal(noPlatformCore.hbmdEdgeCount, 0);
   assert.equal(noPlatformCore.activatableModulesCount, 0);
-  assert.equal(noPlatformCore.readyCics.length, 0);
-  assert.equal(noPlatformCore.availableFlds.length, 0);
+  assert.equal(noPlatformCore.cicSummary.participatingModulesUnavailable, 6);
+  assert.equal(noPlatformCore.fldSummary.sourceInactive, 5);
 
-  // PCD Gating: disabling fiscalCalendar blocks Finance only
+  // Missing fiscalCalendar blocks Finance only; other 3 remain base-activatable
   const noFiscal = simulateModuleActivation({
+    catalog,
     selectedModules: {
       finance: true,
       'inventory-warehouse': true,
@@ -431,15 +452,359 @@ test('simulateModuleActivation exhaustively verifies all 16 module combinations 
       fiscalCalendar: false,
     },
   });
+  assert.equal(noFiscal.hbmdEdgeCount, 0);
   assert.equal(noFiscal.activatableModulesCount, 3);
-  assert.equal(
-    noFiscal.moduleOutcomes.find((o) => o.moduleId === 'finance')?.status,
-    'blocked-by-pcd'
+  const finOutcome = noFiscal.moduleOutcomes.find(
+    (o) => o.moduleId === 'finance'
+  );
+  assert.equal(finOutcome?.status, 'blocked-by-required-pcd');
+  assert.ok(
+    finOutcome?.missingRequiredPcds.includes(
+      'Fiscal Calendar / Accounting Period'
+    )
   );
   assert.equal(
     noFiscal.moduleOutcomes.find((o) => o.moduleId === 'inventory-warehouse')
       ?.status,
-    'activatable'
+    'base-activatable-within-evaluated-scope'
+  );
+});
+
+test('FIX-01-R06 (3, 4, 5, 6, 9): CIC readiness distinguishes contract disabled, scenario disabled, contract-specific preconditions unmet, unknown/deferred, and conceptual scope without introducing implicit HBMDs', () => {
+  resetExtractedDependencyArchitectureCache();
+  const catalog = getExtractedDependencyArchitecture().matrix;
+  const allFour: Record<CoreModuleId, boolean> = {
+    finance: true,
+    'inventory-warehouse': true,
+    procurement: true,
+    'sales-order-management': true,
+  };
+
+  // 3. Both CIC modules active, contract disabled
+  const contractDisabled = simulateModuleActivation({
+    catalog,
+    selectedModules: allFour,
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: {
+      defaultCicContractEnabled: 'unsatisfied',
+      defaultCicScenarioEnabled: 'satisfied',
+      defaultCicSpecificPreconditions: 'satisfied',
+      defaultFldConfigured: 'satisfied',
+      treatDeferredBoundariesAsUnresolved: false,
+    },
+  });
+  assert.equal(contractDisabled.activatableModulesCount, 4);
+  assert.equal(contractDisabled.hbmdEdgeCount, 0);
+  assert.equal(contractDisabled.cicSummary.architecturalModulePrereqsSatisfied, 6);
+  assert.equal(contractDisabled.cicSummary.contractOrScenarioNotEnabled, 6);
+  assert.equal(contractDisabled.cicSummary.evaluatedConceptualPrereqsSatisfied, 0);
+  for (const cic of contractDisabled.cicOutcomes) {
+    assert.equal(
+      cic.modulePrerequisiteStatus,
+      'architectural-module-prerequisites-satisfied'
+    );
+    assert.equal(cic.readinessStatus, 'contract-or-scenario-not-enabled');
+    assert.equal(cic.contractEnabledState, 'unsatisfied');
+    assert.equal(cic.fullRuntimeReadinessEstablished, false);
+  }
+  // FLDs linked to blocked CICs report dependency-prerequisites-not-satisfied (never blocking base modules!)
+  assert.equal(contractDisabled.fldSummary.dependencyPrereqsNotSatisfied, 5);
+
+  // 4. Both modules active, contract enabled, required scenario disabled
+  const scenarioDisabled = simulateModuleActivation({
+    catalog,
+    selectedModules: allFour,
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: {
+      defaultCicContractEnabled: 'satisfied',
+      defaultCicScenarioEnabled: 'unsatisfied',
+      defaultCicSpecificPreconditions: 'satisfied',
+      defaultFldConfigured: 'satisfied',
+      treatDeferredBoundariesAsUnresolved: false,
+    },
+  });
+  assert.equal(scenarioDisabled.activatableModulesCount, 4);
+  assert.equal(scenarioDisabled.cicSummary.contractOrScenarioNotEnabled, 6);
+  for (const cic of scenarioDisabled.cicOutcomes) {
+    assert.equal(cic.readinessStatus, 'contract-or-scenario-not-enabled');
+    assert.equal(cic.contractEnabledState, 'satisfied');
+    assert.equal(cic.scenarioEnabledState, 'unsatisfied');
+    assert.ok(
+      cic.reason.en.includes(cic.sourceRef.activationConditionVerbatim),
+      `${cic.contractId} scenario-disabled explanation must cite official activationCondition`
+    );
+  }
+
+  // 5. Contract-specific prerequisites not satisfied
+  const prereqUnmet = simulateModuleActivation({
+    catalog,
+    selectedModules: allFour,
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: {
+      defaultCicContractEnabled: 'satisfied',
+      defaultCicScenarioEnabled: 'satisfied',
+      defaultCicSpecificPreconditions: 'unsatisfied',
+      defaultFldConfigured: 'satisfied',
+      treatDeferredBoundariesAsUnresolved: false,
+    },
+  });
+  assert.equal(prereqUnmet.activatableModulesCount, 4);
+  assert.equal(prereqUnmet.hbmdEdgeCount, 0);
+  assert.equal(prereqUnmet.cicSummary.contractPrereqsNotSatisfied, 6);
+  for (const cic of prereqUnmet.cicOutcomes) {
+    assert.equal(cic.readinessStatus, 'contract-prerequisites-not-satisfied');
+    assert.equal(cic.specificPreconditionsState, 'unsatisfied');
+  }
+
+  // 6a. Unknown inputs keep readiness in readiness-not-established-insufficient-info
+  const unknownControls = simulateModuleActivation({
+    catalog,
+    selectedModules: allFour,
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: DEFAULT_EDUCATIONAL_CONTROLS,
+  });
+  assert.equal(unknownControls.cicSummary.readinessNotEstablished, 6);
+  assert.equal(unknownControls.cicSummary.evaluatedConceptualPrereqsSatisfied, 0);
+
+  // 6b. Satisfied inputs with treatDeferredBoundariesAsUnresolved=true STILL report
+  // readiness-not-established-insufficient-info because all 6 CICs have TBD Contract Owner (Phase 5)
+  const deferredUnresolved = simulateModuleActivation({
+    catalog,
+    selectedModules: allFour,
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: {
+      defaultCicContractEnabled: 'satisfied',
+      defaultCicScenarioEnabled: 'satisfied',
+      defaultCicSpecificPreconditions: 'satisfied',
+      defaultFldConfigured: 'satisfied',
+      treatDeferredBoundariesAsUnresolved: true,
+    },
+  });
+  assert.equal(deferredUnresolved.cicSummary.readinessNotEstablished, 6);
+  assert.equal(
+    deferredUnresolved.cicSummary.evaluatedConceptualPrereqsSatisfied,
+    0
+  );
+  for (const cic of deferredUnresolved.cicOutcomes) {
+    assert.equal(cic.hasUnresolvedOrDeferredConditions, true);
+    assert.ok(cic.unresolvedDeferredReasons.length >= 1);
+  }
+
+  // 6c. Per-CIC override tests mixed states in a single run (e.g. Sales+Inventory+Procurement+Finance)
+  const mixedOverrides = simulateModuleActivation({
+    catalog,
+    selectedModules: allFour,
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: {
+      defaultCicContractEnabled: 'satisfied',
+      defaultCicScenarioEnabled: 'satisfied',
+      defaultCicSpecificPreconditions: 'satisfied',
+      defaultFldConfigured: 'satisfied',
+      treatDeferredBoundariesAsUnresolved: false,
+      cicOverrides: {
+        'CIC-CORE-PROC-INV-001': { specificPreconditions: 'unsatisfied' },
+        'CIC-CORE-SALES-FIN-001': { scenarioEnabled: 'unsatisfied' },
+        'CIC-CORE-INV-FIN-001': { contractEnabled: 'unknown' },
+      },
+    },
+  });
+  assert.equal(
+    mixedOverrides.cicOutcomes.find(
+      (c) => c.contractId === 'CIC-CORE-PROC-INV-001'
+    )?.readinessStatus,
+    'contract-prerequisites-not-satisfied'
+  );
+  assert.equal(
+    mixedOverrides.cicOutcomes.find(
+      (c) => c.contractId === 'CIC-CORE-SALES-FIN-001'
+    )?.readinessStatus,
+    'contract-or-scenario-not-enabled'
+  );
+  assert.equal(
+    mixedOverrides.cicOutcomes.find(
+      (c) => c.contractId === 'CIC-CORE-INV-FIN-001'
+    )?.readinessStatus,
+    'readiness-not-established-insufficient-info'
+  );
+  assert.equal(
+    mixedOverrides.cicOutcomes.find(
+      (c) => c.contractId === 'CIC-CORE-SALES-INV-001'
+    )?.readinessStatus,
+    'evaluated-conceptual-prerequisites-satisfied'
+  );
+});
+
+test('FIX-01-R06 (7, 10): FLD evaluation separates all 4 dimensions, never claims full functional implementation, preserves deferred ownership, and emits non-misleading labels & source refs', () => {
+  resetExtractedDependencyArchitectureCache();
+  const catalog = getExtractedDependencyArchitecture().matrix;
+
+  // Scenario A: All modules active, conceptual scope satisfied (deferred acknowledged)
+  const conceptualSatisfied = simulateModuleActivation({
+    catalog,
+    selectedModules: {
+      finance: true,
+      'inventory-warehouse': true,
+      procurement: true,
+      'sales-order-management': true,
+    },
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: {
+      defaultCicContractEnabled: 'satisfied',
+      defaultCicScenarioEnabled: 'satisfied',
+      defaultCicSpecificPreconditions: 'satisfied',
+      defaultFldConfigured: 'satisfied',
+      treatDeferredBoundariesAsUnresolved: false,
+    },
+  });
+
+  assert.equal(
+    conceptualSatisfied.fldSummary.evaluatedPrereqsSatisfiedFunctionalUnspecified,
+    5
+  );
+  for (const fld of conceptualSatisfied.fldOutcomes) {
+    assert.equal(fld.requiredModulesAvailable, true);
+    assert.equal(fld.featureDependencyPrerequisitesSatisfied, true);
+    assert.equal(fld.featureConfiguredState, 'satisfied');
+    // Crucial: full functional behavior is ALWAYS false in Phase 2
+    assert.equal(fld.fullFunctionalBehaviorSpecified, false);
+    assert.equal(
+      fld.status,
+      'evaluated-prerequisites-satisfied-functional-unspecified'
+    );
+    // 10. Labels must NEVER be unqualified "Available" / "متاحة"
+    assert.notEqual(fld.statusLabel.en.trim().toLowerCase(), 'available');
+    assert.notEqual(fld.statusLabel.ar.trim(), 'متاحة');
+    assert.ok(fld.sourceRef.evidence.length > 0);
+    assert.equal(fld.sourceRef.documentSlug, 'module-dependency-matrix');
+    assert.equal(fld.sourceRef.lifecycleRuleRef, 'MODULE_LIFECYCLE_RULES.md §5');
+  }
+
+  // Three-Way Match must preserve Feature Owner: Deferred
+  const threeWay = conceptualSatisfied.fldOutcomes.find(
+    (f) => f.id === 'FLD-CORE-05'
+  );
+  assert.ok(threeWay);
+  assert.equal(threeWay.isOwnerDeferred, true);
+  assert.match(threeWay.sourceRef.featureOwner, /Deferred/i);
+
+  // Customer Billing must preserve deferred invoice generation boundary
+  const customerBilling = conceptualSatisfied.fldOutcomes.find(
+    (f) => f.id === 'FLD-CORE-02'
+  );
+  assert.ok(customerBilling);
+  assert.equal(customerBilling.hasDeferredBoundary, true);
+  assert.ok(customerBilling.deferredNote);
+
+  // Scenario B: Sales active + Inventory active, but FLD feature explicitly disabled
+  const fldDisabled = simulateModuleActivation({
+    catalog,
+    selectedModules: {
+      finance: false,
+      'inventory-warehouse': true,
+      procurement: false,
+      'sales-order-management': true,
+    },
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+    controls: {
+      defaultCicContractEnabled: 'satisfied',
+      defaultCicScenarioEnabled: 'satisfied',
+      defaultCicSpecificPreconditions: 'satisfied',
+      defaultFldConfigured: 'unsatisfied',
+      treatDeferredBoundariesAsUnresolved: false,
+    },
+  });
+  const stockSale = fldDisabled.fldOutcomes.find((f) => f.id === 'FLD-CORE-01');
+  assert.ok(stockSale);
+  assert.equal(stockSale.requiredModulesAvailable, true);
+  assert.equal(stockSale.featureDependencyPrerequisitesSatisfied, true);
+  assert.equal(stockSale.featureConfiguredState, 'unsatisfied');
+  assert.equal(stockSale.status, 'feature-not-configured-or-disabled');
+  assert.equal(stockSale.fullFunctionalBehaviorSpecified, false);
+
+  // 10. CIC labels & source traceability checks
+  for (const cic of conceptualSatisfied.cicOutcomes) {
+    assert.notEqual(cic.statusLabel.en.trim().toLowerCase(), 'ready');
+    assert.notEqual(
+      cic.statusLabel.en.trim().toLowerCase(),
+      'conceptually ready'
+    );
+    assert.notEqual(cic.statusLabel.ar.trim(), 'جاهز');
+    assert.notEqual(cic.statusLabel.ar.trim(), 'جاهز مفاهيميًا');
+    assert.equal(cic.fullRuntimeReadinessEstablished, false);
+    assert.ok(cic.sourceRef.sectionAnchor.startsWith('kh-h-'));
+    assert.ok(cic.sourceRef.evidence.length > 0);
+    assert.ok(cic.sourceRef.requiredPreconditionsVerbatim.length > 0);
+    assert.ok(cic.sourceRef.activationConditionVerbatim.length > 0);
+    assert.equal(cic.sourceRef.lifecycleRuleRef, 'MODULE_LIFECYCLE_RULES.md §6');
+  }
+});
+
+test('FIX-01-R06 (8): validateSimulatorCatalogConsistency aligns 1:1 with authoritative extracted CIC, FLD, and PCD catalogs and fails loud on catalog drift', () => {
+  resetExtractedDependencyArchitectureCache();
+  const catalog = getExtractedDependencyArchitecture().matrix;
+
+  // Authoritative catalog validates cleanly
+  const summary = validateSimulatorCatalogConsistency(catalog);
+  assert.equal(summary.valid, true);
+  assert.equal(summary.cicCount, 6);
+  assert.equal(summary.fldCount, 5);
+  assert.equal(summary.pcdRowCount, 21);
+  assert.equal(summary.hbmdEdgeCount, 0);
+
+  // Drift 1: Missing CIC contract must throw
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
+        coreCics: catalog.coreCics.slice(0, 5),
+      }),
+    /Simulator CIC catalog drift/
+  );
+
+  // Drift 2: Altered CIC endpoint must throw
+  const badCicCatalog: DependencySimulationCatalog = {
+    ...catalog,
+    coreCics: catalog.coreCics.map((c, idx) =>
+      idx === 0 ? { ...c, targetModuleId: 'procurement' } : c
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(badCicCatalog),
+    /Simulator CIC endpoint mismatch/
+  );
+
+  // Drift 3: Missing FLD record must throw
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
+        coreFlds: catalog.coreFlds.slice(0, 4),
+      }),
+    /Simulator FLD catalog drift/
+  );
+
+  // Drift 4: Flipping deferred ownership on Three-Way Match must throw
+  const badFldCatalog: DependencySimulationCatalog = {
+    ...catalog,
+    coreFlds: catalog.coreFlds.map((f) =>
+      f.id === 'FLD-CORE-05' ? { ...f, isOwnerDeferred: false } : f
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(badFldCatalog),
+    /Simulator FLD deferred-owner mismatch/
+  );
+
+  // Drift 5: Missing PCD row referenced by simulator must throw
+  const badPcdCatalog: DependencySimulationCatalog = {
+    ...catalog,
+    pcdMatrix: catalog.pcdMatrix.filter(
+      (r) => r.capability !== 'Fiscal Calendar / Accounting Period'
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(badPcdCatalog),
+    /not found in authoritative PCD Matrix/
   );
 });
 

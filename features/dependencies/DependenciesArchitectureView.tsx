@@ -330,7 +330,9 @@ export function DependenciesArchitectureView({
           />
         ) : null}
 
-        {activeTab === 'simulator' ? <ModuleActivationSimulatorView /> : null}
+        {activeTab === 'simulator' ? (
+          <ModuleActivationSimulatorView matrix={architecture.matrix} />
+        ) : null}
 
         {activeTab === 'ownership' ? (
           <DataOwnershipExplorer matrix={architecture.matrix} />

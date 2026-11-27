@@ -1,7 +1,7 @@
 # Teranoo ERP Knowledge Hub
 
 **Subtitle:** The Complete Journey of Building an Enterprise ERP System (`الرحلة الكاملة لبناء نظام ERP مؤسسي`)  
-**Current Scope:** TASK-005 — Core Module Architecture & Dependencies (`BATCH-002 — Business Core Architecture`, `16/16` verified official files published across BATCH-001 + BATCH-002) building upon approved TASK-001, TASK-001-FIX-01, TASK-002, TASK-003, and TASK-004
+**Current Scope:** `TASK-005-FIX-01` — Module Activation Simulator Semantic Integrity (corrective pass on `TASK-005` addressing independent review findings `KH-026` and `KH-027`; `16/16` verified official files published across BATCH-001 + BATCH-002)
 
 Teranoo ERP Knowledge Hub is a dedicated enterprise documentation, encyclopedia, engineering guide, living architecture, research library, and build-in-public knowledge platform for the **Teranoo ERP** product. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.
 
@@ -122,6 +122,7 @@ docs/                 # Vision, architecture, ingestion, manifest, schema, autho
 - [`docs/CORE_MODULE_KNOWLEDGE_STRUCTURE.md`](docs/CORE_MODULE_KNOWLEDGE_STRUCTURE.md)
 - [`docs/DEPENDENCY_EXPLORER_SPECIFICATION.md`](docs/DEPENDENCY_EXPLORER_SPECIFICATION.md)
 - [`docs/TASK-005-COMPLETION_REPORT.md`](docs/TASK-005-COMPLETION_REPORT.md)
+- [`docs/TASK-005-FIX-01-COMPLETION_REPORT.md`](docs/TASK-005-FIX-01-COMPLETION_REPORT.md)
 
 ---
 

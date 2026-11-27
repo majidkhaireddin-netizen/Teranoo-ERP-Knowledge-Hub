@@ -30,9 +30,9 @@ The Dependencies & Integration Architecture Center (`/dependencies`) transforms 
 
 | Tab ID | Official Backing Document(s) | Extracted Structured Artifacts |
 | --- | --- | --- |
-| `matrix` | `MODULE_DEPENDENCY_MATRIX.md` | 4×4 interactive module matrix (`0 HBMD`, `0 cycles`, `12` verified absence rows), all **6 Core CICs** (`CIC-CORE-*`) with full **16-field contract metadata** (ID + 15 official attributes), **5 Future Link Definitions (`FLD`)**, and **21 Platform Capability Dependencies (`PCD`)**. |
+| `matrix` | `MODULE_DEPENDENCY_MATRIX.md` | 4×4 interactive module matrix (`0 HBMD`, `0 cycles`, `12` verified absence rows), all **6 Core CICs** (`CIC-CORE-*`) with full **16-field contract metadata** (ID + 15 official attributes), **5 Feature-Level Dependencies (`FLD`)**, and **21 Platform Capability Dependencies (`PCD`)**. |
 | `model` | `DEPENDENCY_MODEL.md` | **4 formal dependency classifications** (`HBMD`, `PCD`, `CIC`, `FLD`), **12 architectural governance rules**, and allowed vs prohibited dependency patterns. |
-| `simulator` | `MODULE_DEPENDENCY_MATRIX.md` + `MODULE_LIFECYCLE_RULES.md` | Interactive **Module Activation & Integration Simulator** covering all **16 (`2⁴`)** Core Module combinations plus **6 Platform PCD availability toggles** and preset deployment profiles. |
+| `simulator` | `MODULE_DEPENDENCY_MATRIX.md` + `MODULE_LIFECYCLE_RULES.md` | Source-backed **Module Activation & Dependency Simulator** (`TASK-005-FIX-01`) covering all **16 (`2⁴`)** Core Module combinations, **21-row PCD Matrix** gating, tri-state CIC readiness controls (§6), and 4-dimensional FLD checks (§5). |
 | `ownership` | `MODULE_DEPENDENCY_MATRIX.md` | **15 authoritative Data Ownership rows** mapping owning module, read consumers, write exclusivity, and **4 explicitly deferred ownership boundaries**. |
 | `scenarios` | `MODULE_DEPENDENCY_MATRIX.md` | **10 end-to-end architectural consistency & cross-module scenario checks** verifying standalone and integrated behavior. |
 | `lifecycle` | `MODULE_LIFECYCLE_RULES.md` | **3 formal module lifecycle states** (`Inactive`, `Active`, `Frozen`), **`Freeze, not Delete`** historical integrity principle, activation/freeze/reactivation rules, and **8 compatibility review checks**. |
@@ -41,13 +41,14 @@ The Dependencies & Integration Architecture Center (`/dependencies`) transforms 
 
 ---
 
-## 3. Interactive Module Activation Simulator Specification
+## 3. Interactive Module Activation Simulator Specification (`TASK-005-FIX-01`)
 
-### Deterministic Rules (`content/simulators/moduleActivationSimulator.ts`)
-1. **Zero Hard Business Module Dependencies (`0 HBMD`):** Every non-empty subset of `{Finance, Inventory, Procurement, Sales}` is architecturally **activatable** provided required Platform Capability Dependencies (`PCD`) are available. No Core Business Module blocks another Core Business Module from activating.
-2. **Exact Combinatorial Coverage (`16` States):** Evaluates all `2⁴ = 16` combinations (`0` to `4` active modules), returning per-module status (`activatable`, `blocked-by-pcd`, `inactive`), active vs inactive CIC list (among the `6` Core CICs), operating mode (standalone vs integrated), and disabled cross-module flows.
-3. **Platform Capability Dependency (`PCD`) Simulation:** Allows toggling 6 shared platform foundations (e.g., Identity/Tenant, Master Data, Document Numbering, Audit/Events, Currency/Tax, Workflow/Approvals) to demonstrate why **PCD** is a true structural dependency while business modules remain mutually independent.
-4. **Mandatory Educational Disclaimer:** Every simulator view renders an explicit, non-dismissible badge and notice stating that this is an **Illustrative Architectural Simulation** derived from Phase 2 rules — **not** an operational ERP tenant configuration tool or live runtime deployment engine.
+### Authoritative Input & Semantic Rules (`content/simulators/moduleActivationSimulator.ts`)
+1. **Zero Duplicated Dependency Catalogs (`FIX-01-R01`):** The simulator is pure and client-safe (no `fs` imports). It consumes `DependencySimulationCatalog` directly from the validated `ExtractedDependencyArchitecture['matrix']` passed by the `/dependencies` Server Component and executes `validateSimulatorCatalogConsistency()` on every run to fail loud on any CIC, FLD, PCD, or HBMD drift.
+2. **Base Activation & Explicit Scope Boundary (`FIX-01-R02`):** Preserves `0 Core HBMD` standalone module activation while gating base activation directly from `R` (Required) rows in the official 21-row PCD Matrix (`MODULE_DEPENDENCY_MATRIX.md §7.2`). Explicitly separates evaluated conditions (`PCD: Required`, `0 HBMD`, `CIC/FLD` non-blocking) from out-of-scope activation conditions (`MODULE_LIFECYCLE_RULES.md §4`: Entitlement, Phase 3 org/context references, runtime Security/Roles/Audit provisioning, and minimum module configuration baseline).
+3. **Multi-State CIC Readiness (`FIX-01-R03`):** Never marks a CIC "Ready" merely because both participating modules are active. Explicitly distinguishes `modulePrerequisiteStatus` (`participating-modules-unavailable` vs `architectural-module-prerequisites-satisfied`) from `readinessStatus` (`participating-modules-unavailable`, `contract-or-scenario-not-enabled`, `contract-prerequisites-not-satisfied`, `readiness-not-established-insufficient-info`, `evaluated-conceptual-prerequisites-satisfied`) using verbatim official `Required Preconditions`, `Activation Condition`, `Contract Owner` (`TBD — Phase 5`), and deferred functional boundaries.
+4. **4-Dimensional FLD Evaluation (`FIX-01-R04`):** Evaluates each of the 5 Core FLDs across four separate dimensions (`requiredModulesAvailable`, `featureDependencyPrerequisitesSatisfied` including conditional PCDs and linked CICs per `§5`, `featureConfiguredState`, and constant `fullFunctionalBehaviorSpecified: false` for Phase 2), preserving `Feature Owner: Deferred` on `Three-Way Match` (`FLD-CORE-05`) and the deferred invoice generation boundary on `Customer Billing` (`FLD-CORE-02`).
+5. **UI Accuracy & Traceability (`FIX-01-R05`):** Renders conservative defaults (`Unknown` + deferred boundaries treated as unresolved), zero unqualified `Ready` / `Available` / `جاهز` / `متاحة` badges, clickable links to `MODULE_DEPENDENCY_MATRIX.md` and `MODULE_LIFECYCLE_RULES.md`, verbatim official excerpts, official Decision IDs (`Evidence`), and a non-dismissible educational simulation disclaimer.
 
 ---
 
