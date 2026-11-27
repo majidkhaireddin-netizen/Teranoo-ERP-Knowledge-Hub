@@ -1,4 +1,4 @@
-import type { LocalizedText } from '@/content/models/types';
+import type { IdentifierScope, LocalizedText } from '@/content/models/types';
 import type { CoreModuleId } from '@/content/extractors/moduleModelsExtractor';
 import type {
   CoreCicContract,
@@ -16,12 +16,28 @@ export type DependencySimulationCatalog = Pick<
   ExtractedDependencyArchitecture['matrix'],
   | 'documentSlug'
   | 'officialSourcePath'
+  | 'sourceRevision'
+  | 'sourceBodySha256'
   | 'hbmdEdgeCount'
   | 'hbmdCycleCount'
   | 'coreCics'
   | 'coreFlds'
   | 'pcdMatrix'
 >;
+
+/**
+ * Authoritative source pin for the simulator's executable CIC, FLD, and PCD mappings
+ * (KH-034 / FIX-02-R06). Any revision or canonical body SHA-256 change to
+ * MODULE_DEPENDENCY_MATRIX.md invalidates the executable mappings until reviewed.
+ */
+export const SIMULATOR_PINNED_SOURCE = {
+  officialSourcePath:
+    'teranoo-erp-planning/03-modules/MODULE_DEPENDENCY_MATRIX.md',
+  mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+  mappedSourceBodySha256:
+    '34700c3027731399dd8a3276cf41f1fa3f5bc9234453502901589f8a46c55c43',
+  lastReviewedDate: '2026-11-26',
+} as const;
 
 export type ConditionEvalState = 'satisfied' | 'unsatisfied' | 'unknown';
 
@@ -106,6 +122,8 @@ export interface CicSourceReference {
 
 export interface SimulatedCicOutcome {
   readonly contractId: string;
+  /** Official Phase 2 ERP contract identifier (KH-032). */
+  readonly identifierScope: Extract<IdentifierScope, 'official-erp'>;
   readonly sourceModuleId: CoreModuleId;
   readonly targetModuleId: CoreModuleId;
   readonly scenario: LocalizedText;
@@ -146,7 +164,9 @@ export interface FldSourceReference {
 }
 
 export interface SimulatedFldOutcome {
+  /** Knowledge Hub internal row reference ID (e.g. FLD-CORE-01); NOT an official ERP ID (KH-032). */
   readonly id: string;
+  readonly identifierScope: Extract<IdentifierScope, 'knowledge-hub-internal'>;
   readonly sourceModuleId: CoreModuleId;
   readonly featureLabel: LocalizedText;
   readonly sourceModuleFeatureVerbatim: string;
@@ -172,6 +192,9 @@ export interface SimulatedFldOutcome {
 
 export interface CatalogConsistencySummary {
   readonly valid: true;
+  readonly sourceRevision: string;
+  readonly sourceBodySha256: string;
+  readonly mappingFreshnessStatus: 'verified-current';
   readonly cicCount: number;
   readonly fldCount: number;
   readonly pcdRowCount: number;
@@ -304,10 +327,55 @@ export const PCD_TOGGLE_CAPABILITY_BINDINGS: Readonly<
   currencyFoundation: ['Currency Foundation'],
 };
 
+/**
+ * Pinned PCD Matrix classifications from MODULE_DEPENDENCY_MATRIX.md §7.2 (21 rows).
+ * Detects classification drift (e.g., C -> R, — -> R, R -> C, C* modifications) so
+ * stale executable simulator assumptions are rejected until reviewed (KH-034).
+ */
+export const PINNED_PCD_MATRIX_CLASSIFICATIONS: Readonly<
+  Record<
+    string,
+    {
+      readonly finance: string;
+      readonly inventory: string;
+      readonly procurement: string;
+      readonly sales: string;
+    }
+  >
+> = {
+  'Tenant Context': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Company / Legal Entity Context': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Users / Roles / Permissions': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Audit Trail': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Reporting Infrastructure': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Configuration / Feature Management': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Integration / API Framework Availability': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Localization Framework Availability': { finance: 'R', inventory: 'R', procurement: 'R', sales: 'R' },
+  'Branch / Operating / Business Unit Context': { finance: 'C', inventory: 'C', procurement: 'C', sales: 'C' },
+  'Workflow / Approvals': { finance: 'C', inventory: 'C', procurement: 'C', sales: 'C' },
+  'Documents & Attachments': { finance: 'C', inventory: 'C', procurement: 'C', sales: 'C' },
+  'Shared Party Identity': { finance: 'C', inventory: 'C', procurement: 'R — Supplier', sales: 'R — Customer' },
+  'Shared Product / Item / Service Identity': { finance: '—', inventory: 'R', procurement: 'C', sales: 'R' },
+  'UOM Foundation': { finance: '—', inventory: 'R', procurement: 'C', sales: 'R' },
+  'Inventory Storage / Fulfillment Context': { finance: '—', inventory: 'R', procurement: 'C', sales: 'C' },
+  'Fiscal Calendar / Accounting Period': { finance: 'R', inventory: '—', procurement: '—', sales: '—' },
+  'Currency Foundation': { finance: 'R', inventory: 'C', procurement: 'R', sales: 'R' },
+  'Exchange Rates': { finance: 'C', inventory: 'C', procurement: 'C', sales: 'C' },
+  'Tax Foundation': { finance: 'C', inventory: 'C', procurement: 'C', sales: 'C' },
+  'Pricing Capability': { finance: '—', inventory: '—', procurement: '—', sales: 'C*' },
+  'Credit Capability': { finance: '—', inventory: '—', procurement: '—', sales: 'C*' },
+};
+
 interface CicExecutableSpec {
   readonly contractId: string;
   readonly expectedSourceModuleId: CoreModuleId;
   readonly expectedTargetModuleId: CoreModuleId;
+  /** Reviewed verbatim semantic pins from MODULE_DEPENDENCY_MATRIX.md §5.1–§5.6 (KH-034). */
+  readonly pinnedRequiredPreconditions: string;
+  readonly pinnedActivationCondition: string;
+  readonly pinnedContractOwner: string;
+  readonly pinnedStatus: string;
+  readonly pinnedHasDeferredBoundary: boolean;
   readonly scenarioLabel: LocalizedText;
   readonly specificPreconditionLabel: LocalizedText;
   readonly requiredPlatformKeys: readonly (keyof PlatformPrerequisiteState)[];
@@ -325,6 +393,14 @@ const CIC_EXECUTABLE_SPECS: Readonly<Record<string, CicExecutableSpec>> = {
     contractId: 'CIC-CORE-INV-FIN-001',
     expectedSourceModuleId: 'inventory-warehouse',
     expectedTargetModuleId: 'finance',
+    pinnedRequiredPreconditions:
+      'الوحدتان Active؛ CIC مفعّل؛ Integration Framework متاح؛ الحركة داخلة في سيناريو مالي معتمد',
+    pinnedActivationCondition:
+      'Inventory + Finance + السيناريو المالي المشترك + العقد مفعّلة',
+    pinnedContractOwner: 'TBD — Integration Governance / Phase 5',
+    pinnedStatus:
+      '✅ Approved Conceptual CIC; Costing/Valuation mechanics deferred',
+    pinnedHasDeferredBoundary: true,
     scenarioLabel: {
       ar: 'الأثر المالي لحركات المخزون (Inventory → Finance)',
       en: 'Financial effect of inventory movement (Inventory → Finance)',
@@ -343,6 +419,13 @@ const CIC_EXECUTABLE_SPECS: Readonly<Record<string, CicExecutableSpec>> = {
     contractId: 'CIC-CORE-PROC-INV-001',
     expectedSourceModuleId: 'procurement',
     expectedTargetModuleId: 'inventory-warehouse',
+    pinnedRequiredPreconditions:
+      'Procurement + Inventory Active؛ PO صالح كسياق للاستلام؛ Storage Context متاح؛ CIC مفعّل',
+    pinnedActivationCondition: 'Stock Purchase / Receipt scenario مفعّل',
+    pinnedContractOwner: 'TBD — Integration Governance / Phase 5',
+    pinnedStatus:
+      '✅ Approved Conceptual CIC; Receiving orchestration details deferred',
+    pinnedHasDeferredBoundary: true,
     scenarioLabel: {
       ar: 'الاستلام المخزني مقابل أمر الشراء (Procurement → Inventory)',
       en: 'Receipt against PO / Stock Purchase receipt (Procurement → Inventory)',
@@ -361,6 +444,13 @@ const CIC_EXECUTABLE_SPECS: Readonly<Record<string, CicExecutableSpec>> = {
     contractId: 'CIC-CORE-PROC-FIN-001',
     expectedSourceModuleId: 'procurement',
     expectedTargetModuleId: 'finance',
+    pinnedRequiredPreconditions:
+      'Procurement + Finance Active؛ Shared Party context متاح؛ CIC مفعّل؛ السيناريو يحتاج Finance',
+    pinnedActivationCondition: 'Financial Procurement scenario مفعّل',
+    pinnedContractOwner: 'TBD — Integration Governance / Phase 5',
+    pinnedStatus:
+      '✅ Approved Conceptual CIC; Invoice Matching ownership/orchestration deferred',
+    pinnedHasDeferredBoundary: true,
     scenarioLabel: {
       ar: 'فاتورة المورد والذمم الدائنة والأثر المالي (Procurement → Finance)',
       en: 'Supplier Invoice / AP / financial effect (Procurement → Finance)',
@@ -379,6 +469,13 @@ const CIC_EXECUTABLE_SPECS: Readonly<Record<string, CicExecutableSpec>> = {
     contractId: 'CIC-CORE-SALES-INV-001',
     expectedSourceModuleId: 'sales-order-management',
     expectedTargetModuleId: 'inventory-warehouse',
+    pinnedRequiredPreconditions:
+      'Sales + Inventory Active؛ Product له Inventory Context مناسب؛ CIC مفعّل',
+    pinnedActivationCondition: 'Stock Sale / Stock Fulfillment feature مفعّلة',
+    pinnedContractOwner: 'TBD — Integration Governance / Phase 5',
+    pinnedStatus:
+      '✅ Approved Conceptual CIC; reservation algorithms/shipment orchestration deferred',
+    pinnedHasDeferredBoundary: true,
     scenarioLabel: {
       ar: 'تنفيذ المخزون والتوفر والحجز والصرف (Sales → Inventory)',
       en: 'Stock Fulfillment: availability, reservation, and goods issue (Sales → Inventory)',
@@ -401,6 +498,13 @@ const CIC_EXECUTABLE_SPECS: Readonly<Record<string, CicExecutableSpec>> = {
     contractId: 'CIC-CORE-SALES-FIN-001',
     expectedSourceModuleId: 'sales-order-management',
     expectedTargetModuleId: 'finance',
+    pinnedRequiredPreconditions:
+      'Sales + Finance Active؛ financial/billing feature/scenario active؛ CIC مفعّل',
+    pinnedActivationCondition: 'Customer Billing/Financial Sales scenario مفعّل',
+    pinnedContractOwner: 'TBD — Integration Governance / Phase 5',
+    pinnedStatus:
+      '✅ Approved Conceptual CIC; Customer Invoice Generation Boundary deferred',
+    pinnedHasDeferredBoundary: true,
     scenarioLabel: {
       ar: 'فوترة العميل والذمم المدينة والإيراد والتحصيل (Sales → Finance)',
       en: 'Customer Billing / AR / Revenue / Payment flow (Sales → Finance)',
@@ -423,6 +527,13 @@ const CIC_EXECUTABLE_SPECS: Readonly<Record<string, CicExecutableSpec>> = {
     contractId: 'CIC-CORE-SALES-PROC-001',
     expectedSourceModuleId: 'sales-order-management',
     expectedTargetModuleId: 'procurement',
+    pinnedRequiredPreconditions:
+      'Sales + Procurement Active؛ feature/scenario configured؛ CIC مفعّل',
+    pinnedActivationCondition:
+      'Drop Ship / Direct Delivery / Back-to-Back feature مفعّلة',
+    pinnedContractOwner: 'TBD — Integration Governance / Phase 5',
+    pinnedStatus: '✅ Approved Conceptual CIC',
+    pinnedHasDeferredBoundary: false,
     scenarioLabel: {
       ar: 'الشحن المباشر / التوريد الخلفي (Drop Ship / Direct Delivery / Back-to-Back)',
       en: 'Drop Ship / Direct Delivery / Back-to-Back (Sales → Procurement)',
@@ -440,10 +551,17 @@ const CIC_EXECUTABLE_SPECS: Readonly<Record<string, CicExecutableSpec>> = {
 };
 
 interface FldExecutableSpec {
+  /** Knowledge Hub internal row reference ID (KH-032). */
   readonly id: string;
   readonly expectedSourceModuleId: CoreModuleId;
   readonly expectedTargetModules: readonly CoreModuleId[];
   readonly expectedOwnerDeferred: boolean;
+  /** Reviewed verbatim semantic pins from MODULE_DEPENDENCY_MATRIX.md §6 (KH-034). */
+  readonly pinnedSourceModuleFeature: string;
+  readonly pinnedTargetModuleCapability: string;
+  readonly pinnedFeatureScenario: string;
+  readonly pinnedFeatureOwner: string;
+  readonly pinnedStatus: string;
   readonly featureLabel: LocalizedText;
   readonly conditionalPlatformKeys: readonly (keyof PlatformPrerequisiteState)[];
   readonly linkedCicIds: readonly string[];
@@ -460,6 +578,11 @@ const FLD_EXECUTABLE_SPECS: Readonly<Record<string, FldExecutableSpec>> = {
     expectedSourceModuleId: 'sales-order-management',
     expectedTargetModules: ['inventory-warehouse'],
     expectedOwnerDeferred: false,
+    pinnedSourceModuleFeature: 'Sales / Stock Sale / Stock Fulfillment',
+    pinnedTargetModuleCapability: 'Inventory',
+    pinnedFeatureScenario: 'بيع صنف مخزني مع fulfillment',
+    pinnedFeatureOwner: 'Sales',
+    pinnedStatus: '✅ Approved',
     featureLabel: {
       ar: 'Sales · بيع المخزون وتنفيذه (Stock Sale / Stock Fulfillment)',
       en: 'Sales · Stock Sale / Stock Fulfillment',
@@ -472,6 +595,11 @@ const FLD_EXECUTABLE_SPECS: Readonly<Record<string, FldExecutableSpec>> = {
     expectedSourceModuleId: 'sales-order-management',
     expectedTargetModules: ['finance'],
     expectedOwnerDeferred: false,
+    pinnedSourceModuleFeature: 'Sales / Customer Billing',
+    pinnedTargetModuleCapability: 'Finance',
+    pinnedFeatureScenario: 'Billing/AR/financial sales flow',
+    pinnedFeatureOwner: 'Sales',
+    pinnedStatus: '✅ Approved; invoice generation boundary deferred',
     featureLabel: {
       ar: 'Sales · فوترة العميل (Customer Billing)',
       en: 'Sales · Customer Billing',
@@ -488,6 +616,12 @@ const FLD_EXECUTABLE_SPECS: Readonly<Record<string, FldExecutableSpec>> = {
     expectedSourceModuleId: 'sales-order-management',
     expectedTargetModules: ['procurement'],
     expectedOwnerDeferred: false,
+    pinnedSourceModuleFeature:
+      'Sales / Drop Ship / Direct Delivery / Back-to-Back',
+    pinnedTargetModuleCapability: 'Procurement',
+    pinnedFeatureScenario: 'Supplier fulfillment initiated from Sales',
+    pinnedFeatureOwner: 'Sales',
+    pinnedStatus: '✅ Approved',
     featureLabel: {
       ar: 'Sales · الشحن المباشر / التوريد الخلفي (Drop Ship / Back-to-Back)',
       en: 'Sales · Drop Ship / Direct Delivery / Back-to-Back',
@@ -500,6 +634,11 @@ const FLD_EXECUTABLE_SPECS: Readonly<Record<string, FldExecutableSpec>> = {
     expectedSourceModuleId: 'procurement',
     expectedTargetModules: ['inventory-warehouse'],
     expectedOwnerDeferred: false,
+    pinnedSourceModuleFeature: 'Procurement / Stock Purchase',
+    pinnedTargetModuleCapability: 'Inventory',
+    pinnedFeatureScenario: 'Procurement line/scenario requires stock receipt',
+    pinnedFeatureOwner: 'Procurement',
+    pinnedStatus: '✅ Approved',
     featureLabel: {
       ar: 'Procurement · شراء الأصناف المخزنية (Stock Purchase)',
       en: 'Procurement · Stock Purchase',
@@ -512,6 +651,12 @@ const FLD_EXECUTABLE_SPECS: Readonly<Record<string, FldExecutableSpec>> = {
     expectedSourceModuleId: 'procurement',
     expectedTargetModules: ['inventory-warehouse', 'finance'],
     expectedOwnerDeferred: true,
+    pinnedSourceModuleFeature: 'Procurement / Three-Way Match',
+    pinnedTargetModuleCapability: 'Inventory Receipt capability + Finance',
+    pinnedFeatureScenario: 'PO + Receipt + Financial Invoice matching',
+    pinnedFeatureOwner: 'Deferred',
+    pinnedStatus:
+      '✅ Approved as Feature-Level Dependency class; Invoice Matching ownership deferred',
     featureLabel: {
       ar: 'Procurement · المطابقة الثلاثية (Three-Way Match · المالك مؤجل)',
       en: 'Procurement · Three-Way Match (Feature Owner: Deferred)',
@@ -574,11 +719,24 @@ function getPlatformKeyLabel(key: keyof PlatformPrerequisiteState): string {
   }
 }
 
+function normalizeSemanticField(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
 /**
- * Explicitly validates 1:1 consistency between the authoritative extracted
- * DependencySimulationCatalog and the simulator's executable bindings.
- * Throws loudly on any catalog drift, missing contract/FLD, endpoint mismatch,
- * or HBMD invariant violation.
+ * Explicitly validates 1:1 structural AND semantic consistency between the
+ * authoritative extracted DependencySimulationCatalog and the simulator's
+ * pinned executable bindings (FIX-01-R01 + KH-034 / FIX-02-R06).
+ *
+ * Throws loudly (fail-closed) on:
+ * - HBMD invariant violation
+ * - Duplicate CIC, FLD, or PCD identifiers
+ * - Source revision or canonical body SHA-256 drift vs SIMULATOR_PINNED_SOURCE
+ * - Missing/extra CIC or FLD catalog records or endpoint mismatch
+ * - Semantic drift in CIC preconditions, activation condition, owner, status, or deferred boundary
+ * - Semantic drift in FLD feature, target capability, scenario, owner, deferred status, or status
+ * - Any Required ('R') PCD row lacking an executable toggle binding (never silently ignored)
+ * - PCD classification drift (R / C / C* / —) across any module column
  */
 export function validateSimulatorCatalogConsistency(
   catalog: DependencySimulationCatalog
@@ -589,6 +747,52 @@ export function validateSimulatorCatalogConsistency(
     );
   }
 
+  // 1. Source revision & canonical stored-body SHA-256 pin check (KH-034)
+  if (catalog.sourceRevision !== SIMULATOR_PINNED_SOURCE.mappedSourceRevision) {
+    throw new Error(
+      `Simulator source revision drift (KH-034): executable mappings are pinned to "${SIMULATOR_PINNED_SOURCE.mappedSourceRevision}", received "${catalog.sourceRevision ?? 'null'}". Review and re-pin simulator mappings before enabling.`
+    );
+  }
+  if (
+    catalog.sourceBodySha256 !== SIMULATOR_PINNED_SOURCE.mappedSourceBodySha256
+  ) {
+    throw new Error(
+      `Simulator source body digest drift (KH-034): executable mappings are pinned to SHA-256 "${SIMULATOR_PINNED_SOURCE.mappedSourceBodySha256}", received "${catalog.sourceBodySha256}". Review MODULE_DEPENDENCY_MATRIX.md changes before re-pinning.`
+    );
+  }
+
+  // 2. Identifier uniqueness validation across CICs, FLDs, and PCD rows (KH-034)
+  const seenCicIds = new Set<string>();
+  for (const cic of catalog.coreCics) {
+    if (seenCicIds.has(cic.contractId)) {
+      throw new Error(
+        `Simulator duplicate CIC identifier detected: "${cic.contractId}".`
+      );
+    }
+    seenCicIds.add(cic.contractId);
+  }
+
+  const seenFldIds = new Set<string>();
+  for (const fld of catalog.coreFlds) {
+    if (seenFldIds.has(fld.id)) {
+      throw new Error(
+        `Simulator duplicate FLD identifier detected: "${fld.id}".`
+      );
+    }
+    seenFldIds.add(fld.id);
+  }
+
+  const seenPcdCapabilities = new Set<string>();
+  for (const row of catalog.pcdMatrix) {
+    if (seenPcdCapabilities.has(row.capability)) {
+      throw new Error(
+        `Simulator duplicate PCD capability identifier detected: "${row.capability}".`
+      );
+    }
+    seenPcdCapabilities.add(row.capability);
+  }
+
+  // 3. Exact CIC catalog membership, endpoints, and semantic pinning
   const expectedCicIds = Object.keys(CIC_EXECUTABLE_SPECS);
   if (catalog.coreCics.length !== expectedCicIds.length) {
     throw new Error(
@@ -611,8 +815,46 @@ export function validateSimulatorCatalogConsistency(
         `Simulator CIC endpoint mismatch for "${cic.contractId}": authoritative=(${cic.sourceModuleId}->${cic.targetModuleId}), mapping=(${spec.expectedSourceModuleId}->${spec.expectedTargetModuleId}).`
       );
     }
+    if (
+      normalizeSemanticField(cic.metadata.requiredPreconditions) !==
+      normalizeSemanticField(spec.pinnedRequiredPreconditions)
+    ) {
+      throw new Error(
+        `Simulator CIC semantic drift (Required Preconditions) for "${cic.contractId}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (
+      normalizeSemanticField(cic.metadata.activationCondition) !==
+      normalizeSemanticField(spec.pinnedActivationCondition)
+    ) {
+      throw new Error(
+        `Simulator CIC semantic drift (Activation Condition) for "${cic.contractId}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (
+      normalizeSemanticField(cic.metadata.contractOwner) !==
+      normalizeSemanticField(spec.pinnedContractOwner)
+    ) {
+      throw new Error(
+        `Simulator CIC semantic drift (Contract Owner) for "${cic.contractId}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (
+      normalizeSemanticField(cic.metadata.status) !==
+      normalizeSemanticField(spec.pinnedStatus)
+    ) {
+      throw new Error(
+        `Simulator CIC semantic drift (Status) for "${cic.contractId}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (cic.hasDeferredBoundary !== spec.pinnedHasDeferredBoundary) {
+      throw new Error(
+        `Simulator CIC semantic drift (Deferred Boundary) for "${cic.contractId}": authoritative=${cic.hasDeferredBoundary}, pinned=${spec.pinnedHasDeferredBoundary}.`
+      );
+    }
   }
 
+  // 4. Exact FLD catalog membership, targets, deferred ownership, and semantic pinning
   const expectedFldIds = Object.keys(FLD_EXECUTABLE_SPECS);
   if (catalog.coreFlds.length !== expectedFldIds.length) {
     throw new Error(
@@ -644,8 +886,48 @@ export function validateSimulatorCatalogConsistency(
         `Simulator FLD deferred-owner mismatch for "${fld.id}": authoritative=${fld.isOwnerDeferred}, mapping=${spec.expectedOwnerDeferred}.`
       );
     }
+    if (
+      normalizeSemanticField(fld.sourceModuleFeature) !==
+      normalizeSemanticField(spec.pinnedSourceModuleFeature)
+    ) {
+      throw new Error(
+        `Simulator FLD semantic drift (Source Module / Feature) for "${fld.id}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (
+      normalizeSemanticField(fld.targetModuleCapability) !==
+      normalizeSemanticField(spec.pinnedTargetModuleCapability)
+    ) {
+      throw new Error(
+        `Simulator FLD semantic drift (Target Capability) for "${fld.id}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (
+      normalizeSemanticField(fld.featureScenario) !==
+      normalizeSemanticField(spec.pinnedFeatureScenario)
+    ) {
+      throw new Error(
+        `Simulator FLD semantic drift (Feature Scenario) for "${fld.id}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (
+      normalizeSemanticField(fld.featureOwner) !==
+      normalizeSemanticField(spec.pinnedFeatureOwner)
+    ) {
+      throw new Error(
+        `Simulator FLD semantic drift (Feature Owner) for "${fld.id}": source changed relative to reviewed mapping.`
+      );
+    }
+    if (
+      normalizeSemanticField(fld.status) !==
+      normalizeSemanticField(spec.pinnedStatus)
+    ) {
+      throw new Error(
+        `Simulator FLD semantic drift (Status) for "${fld.id}": source changed relative to reviewed mapping.`
+      );
+    }
     for (const linkedCicId of spec.linkedCicIds) {
-      if (!catalog.coreCics.some((c) => c.contractId === linkedCicId)) {
+      if (!seenCicIds.has(linkedCicId)) {
         throw new Error(
           `Simulator FLD "${fld.id}" references unknown linked CIC "${linkedCicId}".`
         );
@@ -653,12 +935,12 @@ export function validateSimulatorCatalogConsistency(
     }
   }
 
-  const matrixCapabilities = new Set(catalog.pcdMatrix.map((row) => row.capability));
+  // 5. PCD bindings exist in authoritative matrix
   for (const [toggleKey, capabilities] of Object.entries(
     PCD_TOGGLE_CAPABILITY_BINDINGS
   )) {
     for (const cap of capabilities) {
-      if (!matrixCapabilities.has(cap)) {
+      if (!seenPcdCapabilities.has(cap)) {
         throw new Error(
           `Simulator PCD mapping "${toggleKey}" references capability "${cap}" not found in authoritative PCD Matrix.`
         );
@@ -666,8 +948,53 @@ export function validateSimulatorCatalogConsistency(
     }
   }
 
+  // 6. Never silently ignore any Required ('R') PCD lacking an executable toggle binding (KH-034)
+  for (const row of catalog.pcdMatrix) {
+    const requiredModules = CORE_MODULE_IDS.filter((moduleId) =>
+      isRequiredPcdCell(getPcdCellForModule(row, moduleId))
+    );
+    if (requiredModules.length > 0) {
+      const toggleKey = getPlatformToggleKeyForCapability(row.capability);
+      if (!toggleKey) {
+        throw new Error(
+          `Simulator PCD executable mapping missing for required capability "${row.capability}" (required by: ${requiredModules.join(', ')}). Newly required PCDs must not be silently ignored.`
+        );
+      }
+    }
+  }
+
+  // 7. Exact PCD Matrix classification pinning across all 21 capabilities (R / C / C* / —)
+  const expectedPcdCapabilities = Object.keys(PINNED_PCD_MATRIX_CLASSIFICATIONS);
+  if (catalog.pcdMatrix.length !== expectedPcdCapabilities.length) {
+    throw new Error(
+      `Simulator PCD catalog drift: expected ${expectedPcdCapabilities.length} PCD rows, received ${catalog.pcdMatrix.length}.`
+    );
+  }
+
+  for (const row of catalog.pcdMatrix) {
+    const pinned = PINNED_PCD_MATRIX_CLASSIFICATIONS[row.capability];
+    if (!pinned) {
+      throw new Error(
+        `Simulator PCD classification drift: unexpected capability "${row.capability}" not present in reviewed PCD Matrix baseline.`
+      );
+    }
+    if (
+      normalizeSemanticField(row.finance) !== normalizeSemanticField(pinned.finance) ||
+      normalizeSemanticField(row.inventory) !== normalizeSemanticField(pinned.inventory) ||
+      normalizeSemanticField(row.procurement) !== normalizeSemanticField(pinned.procurement) ||
+      normalizeSemanticField(row.sales) !== normalizeSemanticField(pinned.sales)
+    ) {
+      throw new Error(
+        `Simulator PCD classification drift for "${row.capability}": authoritative=(fin:${row.finance}, inv:${row.inventory}, proc:${row.procurement}, sales:${row.sales}), pinned=(fin:${pinned.finance}, inv:${pinned.inventory}, proc:${pinned.procurement}, sales:${pinned.sales}).`
+      );
+    }
+  }
+
   return {
     valid: true,
+    sourceRevision: catalog.sourceRevision,
+    sourceBodySha256: catalog.sourceBodySha256,
+    mappingFreshnessStatus: 'verified-current',
     cicCount: catalog.coreCics.length,
     fldCount: catalog.coreFlds.length,
     pcdRowCount: catalog.pcdMatrix.length,
@@ -691,7 +1018,12 @@ function getMissingRequiredPcdsFromMatrix(
       continue;
     }
     const toggleKey = getPlatformToggleKeyForCapability(row.capability);
-    if (toggleKey && !platform[toggleKey]) {
+    if (!toggleKey) {
+      throw new Error(
+        `Simulator PCD executable mapping missing for required capability "${row.capability}" on module "${moduleId}".`
+      );
+    }
+    if (!platform[toggleKey]) {
       missing.push(row.capability);
     }
   }
@@ -913,6 +1245,7 @@ function evaluateCicContract(
 
   return {
     contractId: cic.contractId,
+    identifierScope: 'official-erp',
     sourceModuleId: cic.sourceModuleId,
     targetModuleId: cic.targetModuleId,
     scenario: spec.scenarioLabel,
@@ -1055,6 +1388,7 @@ function evaluateFldRecord(
 
   return {
     id: fld.id,
+    identifierScope: 'knowledge-hub-internal',
     sourceModuleId: fld.sourceModuleId,
     featureLabel: spec.featureLabel,
     sourceModuleFeatureVerbatim: fld.sourceModuleFeature,

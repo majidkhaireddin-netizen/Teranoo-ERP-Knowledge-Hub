@@ -4,6 +4,7 @@ import type {
   CollectionSequenceInfo,
   ContentRelationship,
   DocumentLanguage,
+  KnowledgeDocument,
   LineEndingNormalization,
   SourceManifestEntry,
   SourceVerificationStatus,
@@ -403,3 +404,201 @@ ${sequenceBlock}---
     updatedManifestEntry,
   };
 }
+
+// ============================================================================
+// KH-030 (FIX-02-R03) — Mandatory Canonical Stored-Body Integrity Verification
+// ============================================================================
+
+export interface StoredBodyIntegrityIssue {
+  readonly code:
+    | 'MISSING_STORED_BODY_DIGEST'
+    | 'STORED_BODY_DIGEST_MISMATCH'
+    | 'STORED_BODY_GIT_BLOB_MISMATCH'
+    | 'STORED_BODY_REVISION_MISMATCH'
+    | 'STORED_BODY_CRLF_DRIFT';
+  readonly field: string;
+  readonly message: string;
+}
+
+export interface StoredBodyIntegrityVerificationResult {
+  readonly ok: boolean;
+  /** (1) Original received-byte SHA-256 recorded at ingestion time (before CRLF -> LF). */
+  readonly recordedRawSourceSha256: string | null;
+  /** (2) Canonical LF-normalized source SHA-256 recorded in OFFICIAL_SOURCE_MANIFEST. */
+  readonly manifestSourceFileHash: string | null;
+  /** (3) Stored canonical document-body SHA-256 recorded in frontmatter vs recomputed now. */
+  readonly recordedStoredBodySha256: string | null;
+  readonly actualStoredBodySha256: string;
+  /** (4) Reproducible Git blob SHA-1 recorded vs recomputed directly from stored canonical body bytes. */
+  readonly expectedGitBlobSha: string | null;
+  readonly recordedGitBlobSha: string | null;
+  readonly actualStoredGitBlobSha1: string;
+  readonly issues: readonly StoredBodyIntegrityIssue[];
+}
+
+/**
+ * Extracts the exact canonical stored Markdown body from a `gray-matter` parsed body string.
+ *
+ * Documented Permitted Normalization Rules (KH-030):
+ * 1. At ingestion time only: lossless Windows CRLF (`\r\n`) -> LF (`\n`) conversion is recorded
+ *    explicitly (`lineEndingNormalization: 'crlf-to-lf'`, preserving `rawSourceSha256` separately
+ *    from `storedBodySha256` / `sourceFileHash`).
+ * 2. At validation time: `prepareCanonicalIngestionArtifact()` emits `---\n<yaml>\n---\n\n<body>`,
+ *    so `gray-matter` retains the single envelope separator newline (`\n`) immediately following
+ *    the closing `---` delimiter. Only that exact single leading separator `\n` is stripped.
+ * 3. PROHIBITED: `.trim()`, trailing-newline stripping, whitespace collapsing, or silent CRLF
+ *    conversion at validation time — any substantive or whitespace edit to the stored body
+ *    changes the canonical byte sequence and fails SHA-256 and Git blob SHA-1 verification.
+ */
+export function extractCanonicalStoredBody(parsedBodyMarkdown: string): string {
+  return parsedBodyMarkdown.startsWith('\n')
+    ? parsedBodyMarkdown.slice(1)
+    : parsedBodyMarkdown;
+}
+
+/**
+ * Computes the exact SHA-256 digest of a stored canonical document body after stripping
+ * only the single YAML frontmatter envelope separator newline (no `.trim()`).
+ */
+export function computeCanonicalStoredBodySha256(
+  parsedBodyMarkdown: string
+): string {
+  const canonicalBody = extractCanonicalStoredBody(parsedBodyMarkdown);
+  return computeRawBytesSha256(Buffer.from(canonicalBody, 'utf8'));
+}
+
+/**
+ * Verifies a stored official KnowledgeDocument body directly against its recorded
+ * frontmatter digests and (when linked) its OFFICIAL_SOURCE_MANIFEST entry —
+ * completely independent of raw attachment copies under `/files/`.
+ */
+export function verifyStoredOfficialDocumentIntegrity(
+  doc: Pick<KnowledgeDocument, 'metadata' | 'bodyMarkdown'>,
+  manifestEntry?: SourceManifestEntry
+): StoredBodyIntegrityVerificationResult {
+  const issues: StoredBodyIntegrityIssue[] = [];
+  const source = doc.metadata.source;
+
+  const canonicalBody = extractCanonicalStoredBody(doc.bodyMarkdown);
+  const canonicalBytes = Buffer.from(canonicalBody, 'utf8');
+  const actualStoredBodySha256 = computeRawBytesSha256(canonicalBytes);
+  const actualStoredGitBlobSha1 = computeGitBlobSha1(canonicalBytes);
+
+  const recordedRawSourceSha256 =
+    source.kind === 'official-source' ? (source.rawSourceSha256 ?? null) : null;
+  const recordedStoredBodySha256 =
+    source.kind === 'official-source' ? (source.storedBodySha256 ?? null) : null;
+  const recordedGitBlobSha =
+    source.kind === 'official-source' ? (source.gitBlobSha ?? null) : null;
+  const recordedCommitSha =
+    source.kind === 'official-source' ? (source.commitSha ?? null) : null;
+
+  const manifestSourceFileHash = manifestEntry?.sourceFileHash ?? null;
+  const expectedGitBlobSha =
+    manifestEntry?.expectedGitBlobSha ?? recordedGitBlobSha;
+
+  // Reject unexpected CRLF line endings inside canonical LF-stored official files
+  if (canonicalBody.includes('\r\n')) {
+    issues.push({
+      code: 'STORED_BODY_CRLF_DRIFT',
+      field: 'body',
+      message:
+        'Canonical stored official document body contains CRLF (\\r\\n) line endings; canonical published files must remain LF-only.',
+    });
+  }
+
+  // Require storedBodySha256 on manifest-backed official documents
+  if (manifestEntry) {
+    if (!recordedStoredBodySha256) {
+      issues.push({
+        code: 'MISSING_STORED_BODY_DIGEST',
+        field: 'source.storedBodySha256',
+        message: `Published official document "${doc.metadata.id}" linked to manifest entry "${manifestEntry.sourceRefId}" is missing frontmatter source.storedBodySha256.`,
+      });
+    }
+    if (!manifestSourceFileHash) {
+      issues.push({
+        code: 'MISSING_STORED_BODY_DIGEST',
+        field: 'manifest.sourceFileHash',
+        message: `Manifest entry "${manifestEntry.sourceRefId}" is missing canonical sourceFileHash.`,
+      });
+    }
+    if (
+      recordedStoredBodySha256 &&
+      manifestSourceFileHash &&
+      recordedStoredBodySha256 !== manifestSourceFileHash
+    ) {
+      issues.push({
+        code: 'STORED_BODY_DIGEST_MISMATCH',
+        field: 'source.storedBodySha256',
+        message: `Frontmatter source.storedBodySha256 (${recordedStoredBodySha256}) does not match OFFICIAL_SOURCE_MANIFEST sourceFileHash (${manifestSourceFileHash}).`,
+      });
+    }
+    if (
+      manifestEntry.sourceRevision &&
+      recordedCommitSha &&
+      recordedCommitSha !== manifestEntry.sourceRevision
+    ) {
+      issues.push({
+        code: 'STORED_BODY_REVISION_MISMATCH',
+        field: 'source.commitSha',
+        message: `Frontmatter source.commitSha (${recordedCommitSha}) does not match manifest sourceRevision (${manifestEntry.sourceRevision}).`,
+      });
+    }
+  }
+
+  // Verify recomputed stored body SHA-256 against frontmatter recorded digest
+  if (
+    recordedStoredBodySha256 &&
+    actualStoredBodySha256 !== recordedStoredBodySha256
+  ) {
+    issues.push({
+      code: 'STORED_BODY_DIGEST_MISMATCH',
+      field: 'body',
+      message: `Stored canonical document body SHA-256 (${actualStoredBodySha256}) does not match recorded source.storedBodySha256 (${recordedStoredBodySha256}). Official source bodies must not be modified in place.`,
+    });
+  }
+
+  // Verify recomputed stored body SHA-256 against manifest canonical sourceFileHash
+  if (
+    manifestSourceFileHash &&
+    actualStoredBodySha256 !== manifestSourceFileHash
+  ) {
+    issues.push({
+      code: 'STORED_BODY_DIGEST_MISMATCH',
+      field: 'body',
+      message: `Stored canonical document body SHA-256 (${actualStoredBodySha256}) does not match OFFICIAL_SOURCE_MANIFEST sourceFileHash (${manifestSourceFileHash}).`,
+    });
+  }
+
+  // Verify reproducible Git blob SHA-1 against expectedGitBlobSha & recorded frontmatter gitBlobSha
+  if (expectedGitBlobSha && actualStoredGitBlobSha1 !== expectedGitBlobSha) {
+    issues.push({
+      code: 'STORED_BODY_GIT_BLOB_MISMATCH',
+      field: 'body',
+      message: `Recomputed Git blob SHA-1 (${actualStoredGitBlobSha1}) from stored canonical body does not match expected Git blob SHA (${expectedGitBlobSha}).`,
+    });
+  } else if (
+    recordedGitBlobSha &&
+    actualStoredGitBlobSha1 !== recordedGitBlobSha
+  ) {
+    issues.push({
+      code: 'STORED_BODY_GIT_BLOB_MISMATCH',
+      field: 'source.gitBlobSha',
+      message: `Recomputed Git blob SHA-1 (${actualStoredGitBlobSha1}) from stored canonical body does not match frontmatter source.gitBlobSha (${recordedGitBlobSha}).`,
+    });
+  }
+
+  return {
+    ok: issues.length === 0,
+    recordedRawSourceSha256,
+    manifestSourceFileHash,
+    recordedStoredBodySha256,
+    actualStoredBodySha256,
+    expectedGitBlobSha,
+    recordedGitBlobSha,
+    actualStoredGitBlobSha1,
+    issues,
+  };
+}
+

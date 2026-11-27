@@ -1,7 +1,7 @@
 # Teranoo ERP Knowledge Hub
 
 **Subtitle:** The Complete Journey of Building an Enterprise ERP System (`الرحلة الكاملة لبناء نظام ERP مؤسسي`)  
-**Current Scope:** `TASK-005-FIX-01` — Module Activation Simulator Semantic Integrity (corrective pass on `TASK-005` addressing independent review findings `KH-026` and `KH-027`; `16/16` verified official files published across BATCH-001 + BATCH-002)
+**Current Scope:** `TASK-005-FIX-02` — Source Integrity & Structured Knowledge Governance (corrective pass addressing independent review findings `KH-028` through `KH-034`; `16/16` canonical official files verified unconditionally by stored-body SHA-256 & Git blob SHA-1)
 
 Teranoo ERP Knowledge Hub is a dedicated enterprise documentation, encyclopedia, engineering guide, living architecture, research library, and build-in-public knowledge platform for the **Teranoo ERP** product. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.
 
@@ -84,7 +84,7 @@ content/
   renderers/          # Extensible specialized viewer descriptor registry
   seed/               # Authorized BATCH-001/002 reference snapshot & preserved historical 2026-11-25 snapshot
   repositories/       # Derived-metrics queries, runtime-capability selectors, and unit tests
-scripts/              # Repeatable official source ingestion generators (`ingest-batch-001.ts`, `ingest-batch-002.ts`)
+scripts/              # Repeatable official source ingestion CLI (`ingest-batch-001.ts --source-dir <staging-dir>`)
 features/             # Feature-oriented views (dashboard, knowledge, product-vision, roadmap, modules, dependencies, decisions, ...)
 i18n/                 # Locale configuration & ar/en translation dictionaries (100% key parity tested)
 lib/                  # Shared utilities (cn helper, pure modal focusTrap helper + unit tests)
@@ -123,6 +123,7 @@ docs/                 # Vision, architecture, ingestion, manifest, schema, autho
 - [`docs/DEPENDENCY_EXPLORER_SPECIFICATION.md`](docs/DEPENDENCY_EXPLORER_SPECIFICATION.md)
 - [`docs/TASK-005-COMPLETION_REPORT.md`](docs/TASK-005-COMPLETION_REPORT.md)
 - [`docs/TASK-005-FIX-01-COMPLETION_REPORT.md`](docs/TASK-005-FIX-01-COMPLETION_REPORT.md)
+- [`docs/TASK-005-FIX-02-COMPLETION_REPORT.md`](docs/TASK-005-FIX-02-COMPLETION_REPORT.md)
 
 ---
 

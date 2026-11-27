@@ -9,12 +9,19 @@ import {
   deriveSourceManifestSummary,
   validateSourceManifest,
 } from '@/content/manifest/sourceManifest';
-import { verifySourceIntegrity } from '@/content/ingestion/ingestionPipeline';
+import {
+  extractCanonicalStoredBody,
+  verifyStoredOfficialDocumentIntegrity,
+} from '@/content/ingestion/ingestionPipeline';
 import {
   getContentRegistry,
   resetContentRegistryCache,
 } from '@/content/registry/contentRegistry';
-import { validateApprovedCollections } from '@/content/validators/contentValidator';
+import {
+  validateApprovedCollections,
+  validateLoadedEntries,
+} from '@/content/validators/contentValidator';
+import { parseMarkdownDocument } from '@/content/loaders/contentLoader';
 import {
   getExtractedDecisionRegister,
   resetExtractedDecisionRegisterCache,
@@ -26,6 +33,8 @@ import {
   resetExtractedRoadmapCache,
 } from '@/content/extractors/roadmapExtractor';
 import {
+  CURATED_MODULE_PROJECTION_PINS,
+  buildCoreModuleProfileFromSource,
   getCoreModuleProfileById,
   getExtractedCoreModulesCatalog,
   resetExtractedCoreModulesCache,
@@ -38,6 +47,7 @@ import {
 import {
   DEFAULT_EDUCATIONAL_CONTROLS,
   DEFAULT_PLATFORM_PREREQUISITES,
+  SIMULATOR_PINNED_SOURCE,
   simulateModuleActivation,
   validateSimulatorCatalogConsistency,
   type DependencySimulationCatalog,
@@ -54,11 +64,18 @@ import { PROJECT_REFERENCE_SNAPSHOT } from '@/content/seed/projectSnapshot';
 // 1. BATCH-002 Manifest, Verbatim Ingestion & Git Blob SHA Verification (16/16)
 // ============================================================================
 
-test('all 10 BATCH-002 official files and combined 16/16 OFFICIAL_SOURCE_MANIFEST verify cleanly against exact Git blob SHA-1 and verbatim /files bodies', () => {
+test('all 10 BATCH-002 official files and combined 16/16 OFFICIAL_SOURCE_MANIFEST verify unconditionally via stored canonical bodies without /files/', () => {
   resetContentRegistryCache();
   const registry = getContentRegistry();
   const publishedIds = new Set(
     registry.getAllPublicMetadata().map((m) => m.id)
+  );
+
+  // KH-029: Redundant tracked /files/ raw source directory must not exist
+  assert.equal(
+    fs.existsSync(path.join(process.cwd(), 'files')),
+    false,
+    'Redundant raw source attachment directory /files/ must be removed (KH-029)'
   );
 
   assert.equal(CORE_MODULE_ARCHITECTURE_SOURCE_MANIFEST.length, 10);
@@ -81,10 +98,7 @@ test('all 10 BATCH-002 official files and combined 16/16 OFFICIAL_SOURCE_MANIFES
   assert.equal(validationReport.errors.length, 0);
   assert.equal(validationReport.publishedRecordsCount, 20);
 
-  const filesDir = path.join(process.cwd(), 'files');
-
-  for (const entry of CORE_MODULE_ARCHITECTURE_SOURCE_MANIFEST) {
-    assert.equal(entry.batchId, 'BATCH-002');
+  for (const entry of OFFICIAL_SOURCE_MANIFEST) {
     assert.equal(entry.importStatus, 'published');
     assert.equal(entry.publicationAuthorizationStatus, 'authorized');
     assert.equal(entry.completeness, 'complete');
@@ -105,24 +119,18 @@ test('all 10 BATCH-002 official files and combined 16/16 OFFICIAL_SOURCE_MANIFES
         doc.metadata.source.treeSha,
         BATCH_002_SOURCE_REVISION.treeSha
       );
+      assert.equal(doc.metadata.source.storedBodySha256, entry.sourceFileHash);
     }
 
-    const basename = path.basename(entry.sourcePath);
-    const rawFilePath = path.join(filesDir, basename);
-    if (fs.existsSync(rawFilePath)) {
-      const rawBytes = fs.readFileSync(rawFilePath);
-      const verification = verifySourceIntegrity(
-        rawBytes,
-        entry.expectedGitBlobSha
-      );
-      assert.equal(verification.matchedGitBlobSha, entry.expectedGitBlobSha);
-      const rawNormalized = rawBytes
-        .toString('utf8')
-        .replace(/^\uFEFF/, '')
-        .replace(/\r\n/g, '\n')
-        .trim();
-      assert.equal(doc.bodyMarkdown.trim(), rawNormalized);
-    }
+    // KH-030: Unconditional stored canonical body SHA-256 & reproducible Git blob SHA-1 check
+    const integrity = verifyStoredOfficialDocumentIntegrity(doc, entry);
+    assert.equal(
+      integrity.ok,
+      true,
+      `Stored-body integrity failed for ${entry.sourcePath}: ${integrity.issues.map((i) => i.message).join('; ')}`
+    );
+    assert.equal(integrity.actualStoredBodySha256, entry.sourceFileHash);
+    assert.equal(integrity.actualStoredGitBlobSha1, entry.expectedGitBlobSha);
   }
 });
 
@@ -867,4 +875,446 @@ test('unified global search resolves D-FIN-01, CIC-CORE-INV-FIN-001, HBMD, Freez
   const modProc = searchUnifiedKnowledge('MOD-PROC', index);
   assert.ok(modProc.length >= 1);
   assert.equal(modProc[0]?.href, '/modules/procurement');
+});
+
+// ============================================================================
+// 7. TASK-005-FIX-02 — Source Integrity & Structured Knowledge Governance
+//    (KH-028, KH-029, KH-030, KH-031, KH-032, KH-034)
+// ============================================================================
+
+test('FIX-02-R01 (KH-028): curated module projections pin source revision & canonical body SHA-256 and flag drift on body or revision mutation', () => {
+  resetExtractedCoreModulesCache();
+  const catalog = getExtractedCoreModulesCatalog();
+  const registry = getContentRegistry();
+
+  assert.equal(catalog.anyProjectionRequiresReview, false);
+
+  for (const mod of catalog.modules) {
+    const pin = CURATED_MODULE_PROJECTION_PINS[mod.id];
+    assert.equal(mod.projectionMetadata.kind, 'curated-projection');
+    assert.equal(
+      mod.projectionMetadata.mappingFreshnessStatus,
+      'verified-current'
+    );
+    assert.equal(
+      mod.projectionMetadata.mappedSourceRevision,
+      pin.mappedSourceRevision
+    );
+    assert.equal(
+      mod.projectionMetadata.actualSourceBodySha256,
+      pin.mappedSourceBodySha256
+    );
+    assert.equal(mod.projectionMetadata.reviewWarning, null);
+    assert.ok(mod.projectionMetadata.curatedFields.length > 0);
+    assert.ok(mod.projectionMetadata.deterministicFields.length > 0);
+  }
+
+  // Body drift detection on Procurement module model
+  const procDoc = registry.getBySlug('procurement-module-model');
+  assert.ok(procDoc);
+  const mutatedBodyProfile = buildCoreModuleProfileFromSource(
+    'procurement',
+    procDoc.bodyMarkdown + '\n<!-- simulated source body change -->\n',
+    {
+      documentId: procDoc.metadata.id,
+      sourceRevision:
+        procDoc.metadata.source.kind === 'official-source'
+          ? procDoc.metadata.source.commitSha ?? null
+          : null,
+    }
+  );
+  assert.equal(
+    mutatedBodyProfile.projectionMetadata.mappingFreshnessStatus,
+    'review-required-source-changed'
+  );
+  assert.ok(mutatedBodyProfile.projectionMetadata.reviewWarning !== null);
+
+  // Revision drift detection on Finance module model (body unchanged, commitSha changed)
+  const finDoc = registry.getBySlug('finance-module-model');
+  assert.ok(finDoc);
+  const mutatedRevProfile = buildCoreModuleProfileFromSource(
+    'finance',
+    finDoc.bodyMarkdown,
+    {
+      documentId: finDoc.metadata.id,
+      sourceRevision: '1111111111111111111111111111111111111111',
+    }
+  );
+  assert.equal(
+    mutatedRevProfile.projectionMetadata.mappingFreshnessStatus,
+    'review-required-source-changed'
+  );
+  assert.ok(mutatedRevProfile.projectionMetadata.reviewWarning !== null);
+});
+
+test('FIX-02-R03 (KH-030): mandatory stored-body integrity catches single-char tampering, trailing whitespace edits, and CRLF drift without relying on /files/', () => {
+  const visionRelativePath = 'content/collections/official/project-vision.ar.md';
+  const rawFile = fs.readFileSync(
+    path.join(process.cwd(), visionRelativePath),
+    'utf8'
+  );
+  const manifestEntry = OFFICIAL_SOURCE_MANIFEST.find(
+    (e) => e.publishedContentId === 'kh-doc-project-vision-ar'
+  );
+  assert.ok(manifestEntry);
+
+  // Clean stored file passes mandatory validation
+  const cleanParsed = parseMarkdownDocument(rawFile, {
+    sourceFileRelativePath: visionRelativePath,
+    collection: 'official',
+    isFixture: false,
+  });
+  if (!cleanParsed.ok) {
+    assert.fail('Expected cleanParsed.ok to be true');
+  }
+  assert.equal(
+    verifyStoredOfficialDocumentIntegrity(cleanParsed.document, manifestEntry)
+      .ok,
+    true
+  );
+
+  // Single-character tampering inside body (leaving frontmatter intact) must fail validateLoadedEntries
+  const envelopeSplit = rawFile.indexOf('\n---\n\n');
+  assert.ok(envelopeSplit > 0);
+  const head = rawFile.slice(0, envelopeSplit + 6);
+  const body = rawFile.slice(envelopeSplit + 6);
+  const firstLetterIdx = body.search(/[A-Za-z]/);
+  assert.ok(firstLetterIdx >= 0);
+  const originalChar = body[firstLetterIdx]!;
+  const swappedChar = originalChar === 'X' ? 'Y' : 'X';
+  const tamperedSingleChar =
+    head + body.slice(0, firstLetterIdx) + swappedChar + body.slice(firstLetterIdx + 1);
+  assert.notEqual(tamperedSingleChar, rawFile);
+
+  const parsedTampered = parseMarkdownDocument(tamperedSingleChar, {
+    sourceFileRelativePath: visionRelativePath,
+    collection: 'official',
+    isFixture: false,
+  });
+  const tamperedReport = validateLoadedEntries([parsedTampered], {
+    manifestEntries: [manifestEntry],
+  });
+  assert.equal(tamperedReport.ok, false);
+  assert.ok(
+    tamperedReport.errors.some((e) => e.code === 'STORED_BODY_DIGEST_MISMATCH'),
+    'Expected STORED_BODY_DIGEST_MISMATCH on 1-character body edit'
+  );
+  assert.ok(
+    tamperedReport.errors.some(
+      (e) => e.code === 'STORED_BODY_GIT_BLOB_MISMATCH'
+    ),
+    'Expected STORED_BODY_GIT_BLOB_MISMATCH on 1-character body edit'
+  );
+
+  // Trailing whitespace edit must NOT be masked by broad .trim()
+  const trailingSpaceTampered = rawFile + ' ';
+  const parsedTrailingSpace = parseMarkdownDocument(trailingSpaceTampered, {
+    sourceFileRelativePath: visionRelativePath,
+    collection: 'official',
+    isFixture: false,
+  });
+  if (!parsedTrailingSpace.ok) {
+    assert.fail('Expected parsedTrailingSpace.ok to be true');
+  }
+  assert.equal(
+    extractCanonicalStoredBody(parsedTrailingSpace.document.bodyMarkdown).endsWith(
+      ' '
+    ),
+    true,
+    'extractCanonicalStoredBody must not trim trailing whitespace'
+  );
+  const trailingSpaceReport = validateLoadedEntries([parsedTrailingSpace], {
+    manifestEntries: [manifestEntry],
+  });
+  assert.equal(trailingSpaceReport.ok, false);
+  assert.ok(
+    trailingSpaceReport.errors.some(
+      (e) => e.code === 'STORED_BODY_DIGEST_MISMATCH'
+    ),
+    'Trailing whitespace tampering must fail mandatory stored-body integrity check'
+  );
+
+  // CRLF line-ending drift inside stored canonical body must also fail validation
+  const crlfBodyTampered = head + body.replace(/\n/, '\r\n');
+  const parsedCrlf = parseMarkdownDocument(crlfBodyTampered, {
+    sourceFileRelativePath: visionRelativePath,
+    collection: 'official',
+    isFixture: false,
+  });
+  const crlfReport = validateLoadedEntries([parsedCrlf], {
+    manifestEntries: [manifestEntry],
+  });
+  assert.equal(crlfReport.ok, false);
+  assert.ok(
+    crlfReport.errors.some((e) => e.code === 'STORED_BODY_CRLF_DRIFT'),
+    'CRLF drift inside canonical stored body must fail mandatory validation'
+  );
+});
+
+test('FIX-02-R04 (KH-031): Governing Artifacts match the exact 6 authoritative entries in DECISION_REGISTER.md lines 295-307 (never substituting module models)', () => {
+  resetExtractedDecisionRegisterCache();
+  const register = getExtractedDecisionRegister();
+
+  const expectedGoverningSlugs = [
+    'project-vision',
+    'cross-phase-product-guardrails',
+    'dependency-model',
+    'module-dependency-matrix',
+    'module-lifecycle-rules',
+    'future-module-extension-rules',
+  ];
+
+  assert.equal(register.governingArtifacts.length, 6);
+  const actualSlugs = register.governingArtifacts.map((g) => g.importedSlug);
+  assert.deepEqual(actualSlugs, expectedGoverningSlugs);
+
+  // Explicitly ensure none of the 4 Core Module models were mistakenly listed as Governing Artifacts
+  const forbiddenModuleSlugs = new Set([
+    'finance-module-model',
+    'inventory-module-model',
+    'procurement-module-model',
+    'sales-order-management-module-model',
+  ]);
+  for (const artifact of register.governingArtifacts) {
+    assert.equal(
+      forbiddenModuleSlugs.has(artifact.importedSlug ?? ''),
+      false,
+      `${artifact.artifactPath} must not be substituted with a Core Module model`
+    );
+  }
+});
+
+test('FIX-02-R05 (KH-032): official ERP identifiers vs Knowledge Hub internal identifiers are explicitly classified across extractors, simulator, and search', () => {
+  resetContentRegistryCache();
+  resetExtractedCoreModulesCache();
+  resetExtractedDependencyArchitectureCache();
+
+  const registry = getContentRegistry();
+  const coreModulesCatalog = getExtractedCoreModulesCatalog();
+  const dependencyArchitecture = getExtractedDependencyArchitecture();
+
+  // Core Module display codes (MOD-*) are Knowledge Hub internal
+  for (const mod of coreModulesCatalog.modules) {
+    assert.equal(mod.codeIdentifierScope, 'knowledge-hub-internal');
+  }
+
+  // CIC-CORE-* are Official ERP IDs; FLD-CORE-* and OWN-CORE-* are Knowledge Hub internal
+  for (const cic of dependencyArchitecture.matrix.coreCics) {
+    assert.equal(cic.identifierScope, 'official-erp');
+  }
+  for (const fld of dependencyArchitecture.matrix.coreFlds) {
+    assert.equal(fld.identifierScope, 'knowledge-hub-internal');
+  }
+  for (const own of dependencyArchitecture.matrix.dataOwnershipRecords) {
+    assert.equal(own.identifierScope, 'knowledge-hub-internal');
+  }
+
+  // Simulator outcomes propagate identifierScope cleanly
+  const simResult = simulateModuleActivation({
+    catalog: dependencyArchitecture.matrix,
+    selectedModules: {
+      finance: true,
+      'inventory-warehouse': true,
+      procurement: true,
+      'sales-order-management': true,
+    },
+    platform: DEFAULT_PLATFORM_PREREQUISITES,
+  });
+  for (const cicOut of simResult.cicOutcomes) {
+    assert.equal(cicOut.identifierScope, 'official-erp');
+  }
+  for (const fldOut of simResult.fldOutcomes) {
+    assert.equal(fldOut.identifierScope, 'knowledge-hub-internal');
+  }
+
+  // Unified Search distinguishes official vs internal identifierScope
+  const index = buildUnifiedSearchIndex(
+    registry.getAllPublicMetadata(),
+    PROJECT_REFERENCE_SNAPSHOT,
+    {
+      decisionRegister: getExtractedDecisionRegister(),
+      facRegister: getExtractedFacRegister(),
+      guardrails: getExtractedGuardrails(),
+      roadmap: getExtractedRoadmap(),
+      coreModulesCatalog,
+      dependencyArchitecture,
+    }
+  );
+
+  assert.equal(
+    searchUnifiedKnowledge('D-FIN-01', index)[0]?.identifierScope,
+    'official-erp'
+  );
+  assert.equal(
+    searchUnifiedKnowledge('CIC-CORE-INV-FIN-001', index)[0]?.identifierScope,
+    'official-erp'
+  );
+  assert.equal(
+    searchUnifiedKnowledge('FAC-024', index)[0]?.identifierScope,
+    'official-erp'
+  );
+  assert.equal(
+    searchUnifiedKnowledge('G-ASSUMP-01', index)[0]?.identifierScope,
+    'official-erp'
+  );
+  assert.equal(
+    searchUnifiedKnowledge('MOD-PROC', index)[0]?.identifierScope,
+    'knowledge-hub-internal'
+  );
+  assert.equal(
+    searchUnifiedKnowledge('FLD-CORE-05', index)[0]?.identifierScope,
+    'knowledge-hub-internal'
+  );
+  assert.equal(
+    searchUnifiedKnowledge('OWN-CORE-01', index)[0]?.identifierScope,
+    'knowledge-hub-internal'
+  );
+});
+
+test('FIX-02-R06 (KH-034): simulator catches source pin drift, CIC precondition drift, FLD semantic drift, PCD classification drift, unmapped Required PCDs, and duplicate IDs', () => {
+  resetExtractedDependencyArchitectureCache();
+  const catalog = getExtractedDependencyArchitecture().matrix;
+
+  // Baseline passes and exposes pinned source metadata
+  const validSummary = validateSimulatorCatalogConsistency(catalog);
+  assert.equal(validSummary.valid, true);
+  assert.equal(validSummary.mappingFreshnessStatus, 'verified-current');
+  assert.equal(
+    validSummary.sourceRevision,
+    SIMULATOR_PINNED_SOURCE.mappedSourceRevision
+  );
+  assert.equal(
+    validSummary.sourceBodySha256,
+    SIMULATOR_PINNED_SOURCE.mappedSourceBodySha256
+  );
+
+  // 1. Source revision / body SHA-256 drift rejected
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
+        sourceRevision: '0000000000000000000000000000000000000000',
+      }),
+    /Simulator source revision drift/
+  );
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
+        sourceBodySha256: '0'.repeat(64),
+      }),
+    /Simulator source body digest drift/
+  );
+
+  // 2. Changed CIC Required Preconditions (contractId unchanged) rejected
+  const mutatedCicPrecond: DependencySimulationCatalog = {
+    ...catalog,
+    coreCics: catalog.coreCics.map((c) =>
+      c.contractId === 'CIC-CORE-INV-FIN-001'
+        ? {
+            ...c,
+            metadata: {
+              ...c.metadata,
+              requiredPreconditions:
+                'Mutated precondition requiring external warehouse gateway',
+            },
+          }
+        : c
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(mutatedCicPrecond),
+    /Simulator CIC semantic drift \(Required Preconditions\)/
+  );
+
+  // 3. Changed CIC Activation Condition rejected
+  const mutatedCicActivation: DependencySimulationCatalog = {
+    ...catalog,
+    coreCics: catalog.coreCics.map((c) =>
+      c.contractId === 'CIC-CORE-PROC-FIN-001'
+        ? {
+            ...c,
+            metadata: {
+              ...c.metadata,
+              activationCondition: 'Always auto-enabled when both modules active',
+            },
+          }
+        : c
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(mutatedCicActivation),
+    /Simulator CIC semantic drift \(Activation Condition\)/
+  );
+
+  // 4. Changed FLD semantics (target capability & scenario) rejected
+  const mutatedFldSemantics: DependencySimulationCatalog = {
+    ...catalog,
+    coreFlds: catalog.coreFlds.map((f) =>
+      f.id === 'FLD-CORE-05'
+        ? {
+            ...f,
+            featureScenario: 'Mutated 2-way match scenario without Inventory',
+          }
+        : f
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(mutatedFldSemantics),
+    /Simulator FLD semantic drift \(Feature Scenario\)/
+  );
+
+  // 5. Changed PCD classification (C -> R on mapped capability Currency Foundation for Inventory) rejected
+  const mutatedMappedPcdClass: DependencySimulationCatalog = {
+    ...catalog,
+    pcdMatrix: catalog.pcdMatrix.map((row) =>
+      row.capability === 'Currency Foundation'
+        ? { ...row, inventory: 'R' }
+        : row
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(mutatedMappedPcdClass),
+    /Simulator PCD classification drift/
+  );
+
+  // 6. Newly Required ('R') PCD without an executable toggle binding rejected (never silently ignored)
+  const unmappedRequiredPcd: DependencySimulationCatalog = {
+    ...catalog,
+    pcdMatrix: catalog.pcdMatrix.map((row) =>
+      row.capability === 'Workflow / Approvals'
+        ? { ...row, procurement: 'R' }
+        : row
+    ),
+  };
+  assert.throws(
+    () => validateSimulatorCatalogConsistency(unmappedRequiredPcd),
+    /Simulator PCD executable mapping missing for required capability/
+  );
+
+  // 7. Duplicate dependency identifiers (CIC, FLD, PCD) rejected
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
+        coreCics: [...catalog.coreCics, catalog.coreCics[0]!],
+      }),
+    /Simulator duplicate CIC identifier detected/
+  );
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
+        coreFlds: [...catalog.coreFlds, catalog.coreFlds[0]!],
+      }),
+    /Simulator duplicate FLD identifier detected/
+  );
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
+        pcdMatrix: [...catalog.pcdMatrix, catalog.pcdMatrix[0]!],
+      }),
+    /Simulator duplicate PCD capability identifier detected/
+  );
 });

@@ -539,8 +539,37 @@ const BATCH_001_SPECS: readonly BatchFileSpec[] = [
   },
 ];
 
+function resolveExplicitStagingSourceDir(argv: readonly string[]): string {
+  let cliDir: string | null = null;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--source-dir' && argv[i + 1]) {
+      cliDir = argv[i + 1]!;
+      break;
+    }
+    if (arg && arg.startsWith('--source-dir=')) {
+      cliDir = arg.slice('--source-dir='.length);
+      break;
+    }
+  }
+
+  const rawDir = cliDir ?? process.env.TERANOO_INGESTION_SOURCE_DIR ?? '';
+  if (!rawDir.trim()) {
+    throw new Error(
+      'Explicit staging source directory is required (KH-029). Pass --source-dir <path> or set TERANOO_INGESTION_SOURCE_DIR pointing to a temporary local staging directory outside tracked repository files.'
+    );
+  }
+
+  const resolvedDir = path.resolve(rawDir.trim());
+  if (!fs.existsSync(resolvedDir) || !fs.statSync(resolvedDir).isDirectory()) {
+    throw new Error(`Staging source directory does not exist or is not a directory: ${resolvedDir}`);
+  }
+
+  return resolvedDir;
+}
+
 function main() {
-  const filesRoot = path.resolve(process.cwd(), 'files');
+  const filesRoot = resolveExplicitStagingSourceDir(process.argv.slice(2));
   const collectionsRoot = path.resolve(process.cwd(), 'content', 'collections');
 
   const manifestById = new Map(
@@ -555,7 +584,7 @@ function main() {
 
     const rawFilePath = path.join(filesRoot, spec.fileName);
     if (!fs.existsSync(rawFilePath)) {
-      throw new Error(`Missing attached source file: ${rawFilePath}`);
+      throw new Error(`Missing staged source file: ${rawFilePath}`);
     }
 
     const rawBytes = fs.readFileSync(rawFilePath);

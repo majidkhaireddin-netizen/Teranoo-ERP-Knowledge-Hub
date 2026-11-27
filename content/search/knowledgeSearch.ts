@@ -1,5 +1,6 @@
 import type {
   ContentClassificationType,
+  IdentifierScope,
   LocalizedText,
   ProjectReferenceSnapshot,
   SearchableItem,
@@ -42,6 +43,8 @@ export interface KnowledgeSearchEntry {
   readonly category: KnowledgeSearchCategory;
   readonly classification: ContentClassificationType;
   readonly code?: string;
+  /** Distinguishes official ERP IDs (D-*, CIC-CORE-*, FAC-*, G-ASSUMP-*) from Knowledge Hub internal IDs (MOD-*, FLD-CORE-*, OWN-CORE-*, kh-*). */
+  readonly identifierScope?: IdentifierScope;
   readonly isSuperseded?: boolean;
   readonly searchTokens: readonly string[];
 }
@@ -84,6 +87,7 @@ export function knowledgeRecordToSearchEntry(
     category: 'document',
     classification: record.classification,
     code: primaryOfficialCode,
+    identifierScope: primaryOfficialCode ? 'official-erp' : undefined,
     isSuperseded,
     searchTokens: [
       record.id,
@@ -135,6 +139,7 @@ function buildDecisionEntries(
       category: 'decision',
       classification: 'approved-decision',
       code: decision.decisionId,
+      identifierScope: 'official-erp',
       searchTokens: [
         decision.decisionId,
         decision.family,
@@ -161,6 +166,7 @@ function buildDecisionEntries(
     category: 'decision',
     classification: 'approved-decision',
     code: mkt.decisionId,
+    identifierScope: 'official-erp',
     searchTokens: [
       mkt.decisionId,
       'Decision Gate A',
@@ -191,6 +197,7 @@ function buildPhase2ModuleEntries(
     category: 'module',
     classification: 'official',
     code: mod.code,
+    identifierScope: mod.codeIdentifierScope,
     searchTokens: [
       mod.id,
       mod.code,
@@ -220,6 +227,7 @@ function buildPhase2ModuleEntries(
       category: 'decision',
       classification: 'approved-decision',
       code: dec.decisionId,
+      identifierScope: 'official-erp',
       searchTokens: [
         dec.decisionId,
         dec.family,
@@ -254,6 +262,7 @@ function buildDependencyArchitectureEntries(
       category: 'dependency',
       classification: 'official',
       code: dt.code,
+      identifierScope: 'official-erp',
       searchTokens: [
         dt.code,
         dt.name,
@@ -278,6 +287,7 @@ function buildDependencyArchitectureEntries(
     category: 'contract',
     classification: 'official',
     code: cic.contractId,
+    identifierScope: cic.identifierScope,
     searchTokens: [
       cic.contractId,
       'CIC',
@@ -299,14 +309,16 @@ function buildDependencyArchitectureEntries(
       en: `${fld.sourceModuleFeature} → ${fld.targetModuleCapability}`,
     },
     subtitle: {
-      ar: `اعتمادية مستوى الميزة (FLD) · ${fld.featureScenario}`,
-      en: `Feature-Level Dependency (FLD) · ${fld.featureScenario}`,
+      ar: `اعتمادية مستوى الميزة (FLD · مرجع داخلي ${fld.id}) · ${fld.featureScenario}`,
+      en: `Feature-Level Dependency (FLD · KH internal ref ${fld.id}) · ${fld.featureScenario}`,
     },
     category: 'dependency',
     classification: 'official',
-    code: 'FLD',
+    code: fld.id,
+    identifierScope: fld.identifierScope,
     searchTokens: [
       'FLD',
+      fld.id,
       fld.sourceModuleFeature,
       fld.targetModuleCapability,
       fld.featureScenario,
@@ -330,6 +342,7 @@ function buildDependencyArchitectureEntries(
       category: 'lifecycle',
       classification: 'official',
       code: 'LIFECYCLE',
+      identifierScope: 'knowledge-hub-internal',
       searchTokens: [
         'Freeze, not Delete',
         'Freeze not Delete',
@@ -353,13 +366,15 @@ function buildDependencyArchitectureEntries(
         en: `${rec.businessObject} — Owner: ${rec.ownerAtPhase2}`,
       },
       subtitle: {
-        ar: `المستهلكون: ${rec.consumers}`,
-        en: `Consumers: ${rec.consumers}`,
+        ar: `مرجع داخلي ${rec.id} · المستهلكون: ${rec.consumers}`,
+        en: `KH internal ref ${rec.id} · Consumers: ${rec.consumers}`,
       },
       category: 'ownership',
       classification: 'official',
-      code: rec.isDeferredBoundary ? 'DEFERRED-OWNER' : 'DATA-OWNER',
+      code: rec.id,
+      identifierScope: rec.identifierScope,
       searchTokens: [
+        rec.id,
         rec.businessObject,
         rec.ownerAtPhase2,
         rec.consumers,
@@ -384,6 +399,7 @@ function buildDependencyArchitectureEntries(
       category: 'guardrail',
       classification: 'official',
       code: gr.code,
+      identifierScope: 'official-erp',
       searchTokens: [
         gr.code,
         gr.title,
@@ -420,6 +436,7 @@ function buildFacEntries(
     category: 'fac',
     classification: 'future',
     code: rec.facId,
+    identifierScope: 'official-erp',
     searchTokens: [
       rec.facId,
       rec.status,
@@ -442,6 +459,7 @@ function buildRoadmapEntries(
     category: 'phase',
     classification: 'official',
     code: phase.code,
+    identifierScope: 'official-erp',
     searchTokens: [
       phase.id,
       phase.code,
@@ -470,6 +488,7 @@ function buildGuardrailEntries(
     category: 'guardrail',
     classification: 'official',
     code: `Guardrail #${gr.sequenceNumber}`,
+    identifierScope: 'knowledge-hub-internal',
     searchTokens: [
       `guardrail ${gr.sequenceNumber}`,
       gr.originalTitle,

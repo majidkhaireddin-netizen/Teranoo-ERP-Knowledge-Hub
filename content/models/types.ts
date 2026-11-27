@@ -21,6 +21,15 @@ export type DocumentApprovalStatus =
   | 'reference_snapshot'
   | 'planned';
 
+/**
+ * Explicit identifier provenance boundary (KH-032):
+ * - 'official-erp': Verbatim official identifier authored in Teranoo ERP planning sources
+ *   (e.g. D-*, CIC-CORE-*, FAC-*, G-ASSUMP-*).
+ * - 'knowledge-hub-internal': Local Knowledge Hub display/row/record identifier
+ *   (e.g. FLD-CORE-01..05, OWN-CORE-01..15, MOD-FIN/INV/PROC/SALES, kh-*).
+ */
+export type IdentifierScope = 'official-erp' | 'knowledge-hub-internal';
+
 export interface LocalizedText {
   ar: string;
   en: string;

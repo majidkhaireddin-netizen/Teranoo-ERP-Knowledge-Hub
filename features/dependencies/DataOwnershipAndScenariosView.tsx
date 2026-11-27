@@ -51,8 +51,8 @@ export function DataOwnershipExplorer({ matrix }: DataOwnershipExplorerProps) {
         }
         subtitle={
           isAr
-            ? 'مستخلص مباشرةً من القسم 8 في MODULE_DEPENDENCY_MATRIX.md — ملكية البيانات مستقلة تمامًا عن أنواع الاعتماديات (Data Ownership ≠ Dependency Type).'
-            : 'Extracted from MODULE_DEPENDENCY_MATRIX.md Section 8 — strictly independent of Dependency Types (Data Ownership ≠ Dependency Type).'
+            ? 'مستخلص مباشرةً من القسم 8 في MODULE_DEPENDENCY_MATRIX.md — ملكية البيانات مستقلة تمامًا عن أنواع الاعتماديات (Data Ownership ≠ Dependency Type). رموز OWN-CORE-* مراجع صفوف داخلية لمركز المعرفة وليست معرّفات ERP رسمية.'
+            : 'Extracted from MODULE_DEPENDENCY_MATRIX.md Section 8 — strictly independent of Dependency Types (Data Ownership ≠ Dependency Type). OWN-CORE-* tags are Knowledge Hub internal row references, not official ERP IDs.'
         }
         actions={
           <Link
@@ -133,8 +133,20 @@ export function DataOwnershipExplorer({ matrix }: DataOwnershipExplorerProps) {
           <tbody className="divide-y divide-border">
             {filteredRecords.map((rec) => (
               <tr key={rec.id} className="bg-surface hover:bg-surface-hover/40">
-                <td className="px-3 py-2.5 font-semibold text-text-primary bidi-ltr text-start">
-                  {rec.businessObject}
+                <td className="px-3 py-2.5 font-semibold text-text-primary bidi-ltr text-start space-y-1">
+                  <div>{rec.businessObject}</div>
+                  <span
+                    title={
+                      isAr
+                        ? 'مرجع صف داخلي لمركز المعرفة (ليس معرّف ERP رسميًا)'
+                        : 'Knowledge Hub internal row reference (not an official ERP identifier)'
+                    }
+                    className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-secondary px-1.5 py-0.5 font-mono text-[9px] font-medium text-text-muted bidi-ltr"
+                  >
+                    <span>{rec.id}</span>
+                    <span>·</span>
+                    <span>{isAr ? 'مرجع داخلي' : 'KH Ref'}</span>
+                  </span>
                 </td>
                 <td className="px-3 py-2.5">
                   <span

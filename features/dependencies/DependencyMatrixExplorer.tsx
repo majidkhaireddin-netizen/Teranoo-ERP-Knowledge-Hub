@@ -551,6 +551,9 @@ export function DependencyMatrixExplorer({
                   <span className="rounded-sm border border-primary/30 bg-primary-subtle px-2 py-0.5 font-mono text-xs font-bold text-primary bidi-ltr">
                     {activeCic.contractId}
                   </span>
+                  <span className="rounded-sm border border-success-border bg-success-bg px-1.5 py-0.5 text-[10px] font-medium text-success">
+                    {isAr ? 'معرّف ERP رسمي' : 'Official ERP ID'}
+                  </span>
                   <span className="rounded-sm border border-border bg-surface-secondary px-2 py-0.5 font-mono text-[11px] text-text-secondary bidi-ltr">
                     {activeCic.metadata.version}
                   </span>
@@ -597,14 +600,17 @@ export function DependencyMatrixExplorer({
           }
           subtitle={
             isAr
-              ? 'ضابط FLD الحاكم: أهمية الميزة تجاريًا لا تبرر أبدًا ترقيتها إلى HBMD على مستوى الـ Module.'
-              : 'FLD Guardrail: Commercial importance of a feature never justifies promoting an FLD to an HBMD.'
+              ? 'ضابط FLD الحاكم: أهمية الميزة تجاريًا لا تبرر أبدًا ترقيتها إلى HBMD على مستوى الـ Module. ملاحظة: رموز FLD-CORE-* هي مراجع داخلية لمركز المعرفة (KH Internal Ref) لأن القسم 6 من MODULE_DEPENDENCY_MATRIX.md لا يعرّف رموز FLD رسمية.'
+              : 'FLD Guardrail: Commercial importance of a feature never justifies promoting an FLD to an HBMD. Note: FLD-CORE-* codes are Knowledge Hub internal row references (not official ERP identifiers), as MODULE_DEPENDENCY_MATRIX.md §6 assigns no formal FLD IDs.'
           }
         />
         <div className="overflow-x-auto rounded-lg border border-border bg-surface">
           <table className="w-full border-collapse text-xs">
             <thead>
               <tr className="border-b border-border bg-surface-secondary text-text-primary">
+                <th className="px-3 py-2.5 text-start font-semibold">
+                  {isAr ? 'مرجع داخلي (KH Ref)' : 'KH Internal Ref'}
+                </th>
                 <th className="px-3 py-2.5 text-start font-semibold">Source Module / Feature</th>
                 <th className="px-3 py-2.5 text-start font-semibold">Target</th>
                 <th className="px-3 py-2.5 text-start font-semibold">Scenario</th>
@@ -616,6 +622,21 @@ export function DependencyMatrixExplorer({
             <tbody className="divide-y divide-border">
               {matrix.coreFlds.map((fld) => (
                 <tr key={fld.id} className="bg-surface">
+                  <td className="px-3 py-2.5 align-top">
+                    <span
+                      title={
+                        isAr
+                          ? 'مرجع صف داخلي لمركز المعرفة (ليس معرّف ERP رسميًا)'
+                          : 'Knowledge Hub internal row reference (not an official ERP identifier)'
+                      }
+                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-secondary px-1.5 py-0.5 font-mono text-[10px] font-medium text-text-secondary bidi-ltr"
+                    >
+                      <span>{fld.id}</span>
+                      <span className="text-[9px] text-text-muted">
+                        {isAr ? 'داخلي' : 'KH'}
+                      </span>
+                    </span>
+                  </td>
                   <td className="px-3 py-2.5 font-semibold text-text-primary bidi-ltr text-start">
                     {fld.sourceModuleFeature}
                   </td>

@@ -1,5 +1,6 @@
-import type { LocalizedText } from '@/content/models/types';
+import type { IdentifierScope, LocalizedText } from '@/content/models/types';
 import { createHeadingSlug, HEADING_ID_PREFIX } from '@/content/loaders/markdownPipeline';
+import { computeCanonicalStoredBodySha256 } from '@/content/ingestion/ingestionPipeline';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
 
 export type CoreModuleId =
@@ -7,6 +8,110 @@ export type CoreModuleId =
   | 'inventory-warehouse'
   | 'procurement'
   | 'sales-order-management';
+
+export type ModuleProjectionFreshnessStatus =
+  | 'verified-current'
+  | 'review-required-source-changed';
+
+export interface CuratedModuleProjectionPin {
+  readonly moduleId: CoreModuleId;
+  readonly authoritativeDocumentSlug: string;
+  readonly authoritativeSourcePath: string;
+  readonly mappedSourceRevision: string;
+  readonly mappedSourceBodySha256: string;
+  readonly lastCuratedReviewDate: string;
+}
+
+export interface ModuleProjectionMetadata {
+  readonly kind: 'curated-projection';
+  readonly authoritativeDocumentId: string;
+  readonly authoritativeDocumentSlug: string;
+  readonly authoritativeSourcePath: string;
+  readonly mappedSourceRevision: string;
+  readonly actualSourceRevision: string | null;
+  readonly mappedSourceBodySha256: string;
+  readonly actualSourceBodySha256: string;
+  readonly lastCuratedReviewDate: string;
+  readonly mappingFreshnessStatus: ModuleProjectionFreshnessStatus;
+  /** Fields authored as manually curated educational projections (must be reviewed when source changes). */
+  readonly curatedFields: readonly string[];
+  /** Fields deterministically extracted directly from the verbatim official Markdown body. */
+  readonly deterministicFields: readonly string[];
+  readonly projectionDisclosure: LocalizedText;
+  readonly reviewWarning: LocalizedText | null;
+}
+
+/**
+ * Authoritative source pins for the manually curated educational projections inside
+ * CORE_MODULE_CONFIGS (KH-028 / FIX-02-R01).
+ * Any revision or canonical stored-body SHA-256 drift in the backing official module
+ * model flips `mappingFreshnessStatus` to `review-required-source-changed`.
+ */
+export const CURATED_MODULE_PROJECTION_PINS: Readonly<
+  Record<CoreModuleId, CuratedModuleProjectionPin>
+> = {
+  finance: {
+    moduleId: 'finance',
+    authoritativeDocumentSlug: 'finance-module-model',
+    authoritativeSourcePath:
+      'teranoo-erp-planning/03-modules/finance/FINANCE_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '4638fa9334a96274a7c5ddf5ebbd2642ac435d84a00b6f1ff71877fa4399ad2b',
+    lastCuratedReviewDate: '2026-11-26',
+  },
+  'inventory-warehouse': {
+    moduleId: 'inventory-warehouse',
+    authoritativeDocumentSlug: 'inventory-module-model',
+    authoritativeSourcePath:
+      'teranoo-erp-planning/03-modules/inventory/INVENTORY_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      'c28df337e23ca9cc1cb086e69b0e1a60de86a25ba55a31818881598630d66729',
+    lastCuratedReviewDate: '2026-11-26',
+  },
+  procurement: {
+    moduleId: 'procurement',
+    authoritativeDocumentSlug: 'procurement-module-model',
+    authoritativeSourcePath:
+      'teranoo-erp-planning/03-modules/procurement/PROCUREMENT_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '89c207dd693b93fae802b1b55e8424e5bcae00c0b1b67a5c28ffe5507a7e46f9',
+    lastCuratedReviewDate: '2026-11-26',
+  },
+  'sales-order-management': {
+    moduleId: 'sales-order-management',
+    authoritativeDocumentSlug: 'sales-order-management-module-model',
+    authoritativeSourcePath:
+      'teranoo-erp-planning/03-modules/sales/SALES_ORDER_MANAGEMENT_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '331bcac1def77d6114e5114d25e6c22b80adabca2246e9c2a2ea21c4544528c1',
+    lastCuratedReviewDate: '2026-11-26',
+  },
+};
+
+export const CURATED_MODULE_PROJECTION_FIELDS: readonly string[] = [
+  'identitySummary',
+  'standaloneSummary',
+  'criticalLimitation',
+  'responsibilities',
+  'standaloneCapabilities',
+  'ownedDataDomains',
+  'sharedReferencesConsumed',
+  'relatedCicIds',
+  'relatedFldLabels',
+  'educationalComparisonRows',
+];
+
+export const DETERMINISTIC_MODULE_EXTRACTION_FIELDS: readonly string[] = [
+  'decisions',
+  'requiredPcds',
+  'conditionalPcds',
+  'explicitExclusions',
+  'deferredDesignItems',
+];
 
 export interface Phase2SourceLocalDecision {
   readonly decisionId: string;
@@ -52,7 +157,9 @@ export interface ModuleEducationalComparisonRow {
 
 export interface CoreModuleArchitecturalProfile {
   readonly id: CoreModuleId;
+  /** Knowledge Hub internal display code (e.g. MOD-FIN); NOT an official ERP identifier (KH-032). */
   readonly code: string;
+  readonly codeIdentifierScope: Extract<IdentifierScope, 'knowledge-hub-internal'>;
   readonly name: LocalizedText;
   readonly shortName: LocalizedText;
   readonly documentId: string;
@@ -61,6 +168,7 @@ export interface CoreModuleArchitecturalProfile {
   readonly researchDeferredPath: string;
   readonly phaseStatus: LocalizedText;
   readonly sourceDocumentDate: string | null;
+  readonly projectionMetadata: ModuleProjectionMetadata;
   readonly identitySummary: LocalizedText;
   readonly standaloneSummary: LocalizedText;
   readonly criticalLimitation: LocalizedText;
@@ -87,6 +195,7 @@ export interface ExtractedCoreModulesCatalog {
   readonly allPhase2Decisions: readonly Phase2SourceLocalDecision[];
   readonly phase2DecisionCountByModule: Readonly<Record<CoreModuleId, number>>;
   readonly totalPhase2DecisionsCount: number;
+  readonly anyProjectionRequiresReview: boolean;
 }
 
 interface CoreModuleStaticConfig {
@@ -1076,6 +1185,143 @@ function buildModuleLifecycleBlueprint(
   });
 }
 
+function buildModuleProjectionMetadata(
+  config: CoreModuleStaticConfig,
+  documentId: string,
+  bodyMarkdown: string,
+  actualSourceRevision: string | null
+): ModuleProjectionMetadata {
+  const pin = CURATED_MODULE_PROJECTION_PINS[config.id];
+  const actualSourceBodySha256 = computeCanonicalStoredBodySha256(bodyMarkdown);
+
+  const bodyChanged = actualSourceBodySha256 !== pin.mappedSourceBodySha256;
+  const revisionChanged =
+    actualSourceRevision !== null &&
+    actualSourceRevision !== pin.mappedSourceRevision;
+
+  const mappingFreshnessStatus: ModuleProjectionFreshnessStatus =
+    bodyChanged || revisionChanged
+      ? 'review-required-source-changed'
+      : 'verified-current';
+
+  return {
+    kind: 'curated-projection',
+    authoritativeDocumentId: documentId,
+    authoritativeDocumentSlug: config.documentSlug,
+    authoritativeSourcePath: config.officialSourcePath,
+    mappedSourceRevision: pin.mappedSourceRevision,
+    actualSourceRevision,
+    mappedSourceBodySha256: pin.mappedSourceBodySha256,
+    actualSourceBodySha256,
+    lastCuratedReviewDate: pin.lastCuratedReviewDate,
+    mappingFreshnessStatus,
+    curatedFields: CURATED_MODULE_PROJECTION_FIELDS,
+    deterministicFields: DETERMINISTIC_MODULE_EXTRACTION_FIELDS,
+    projectionDisclosure: {
+      ar: `تجمع هذه الصفحة بين استخلاص حتمي مباشر من النص الرسمي (${config.officialSourcePath}: القرارات المعتمدة حرفيًا، جداول PCD، الاستبعادات الصريحة، والبنود المؤجلة) وبين إسقاطات تعليمية مُراجعة يدويًا (الملخصات، نقاط المسؤوليات والملكية، وجدول المقارنة التعليمية) مُثبّتة على المراجعة ${pin.mappedSourceRevision.slice(0, 12)} وبصمة النص الرسمي.`,
+      en: `This module view explicitly separates deterministic extraction from the verbatim official source (${config.officialSourcePath}: verbatim decisions, PCD tables, explicit exclusions, and deferred items) from manually curated educational projections (summaries, responsibility/ownership highlights, and educational comparison tables) pinned to revision ${pin.mappedSourceRevision.slice(0, 12)} and canonical body SHA-256.`,
+    },
+    reviewWarning:
+      mappingFreshnessStatus === 'review-required-source-changed'
+        ? {
+            ar: `تنبيه انجراف مصدر (KH-028): تغيّرت بصمة أو مراجعة الوثيقة الرسمية (${config.officialSourcePath}) عن النسخة المُراجعة للإسقاط التعليمي — يُرجى مراجعة الإسقاطات التعليمية قبل اعتبارها مطابقة للنسخة الحالية والرجوع مباشرةً إلى النص الرسمي الكامل.`,
+            en: `Source drift detected (KH-028): the authoritative document (${config.officialSourcePath}) digest or revision changed relative to the pinned curated projection — review curated educational summaries against the verbatim official source before treating them as current.`,
+          }
+        : null,
+  };
+}
+
+/**
+ * Pure, testable builder combining deterministic extraction from official module Markdown
+ * with curated educational projection provenance & freshness verification (KH-028 / FIX-02-R01).
+ */
+export function buildCoreModuleProfileFromSource(
+  moduleId: CoreModuleId,
+  bodyMarkdown: string,
+  options?: {
+    readonly documentId?: string;
+    readonly sourceRevision?: string | null;
+    readonly sourceDocumentDate?: string | null;
+  }
+): CoreModuleArchitecturalProfile {
+  const config = CORE_MODULE_CONFIGS.find((c) => c.id === moduleId);
+  if (!config) {
+    throw new Error(`Unknown CoreModuleId "${moduleId}".`);
+  }
+
+  const documentId =
+    options?.documentId ?? `kh-doc-${config.documentSlug}-ar`;
+  const actualSourceRevision =
+    options?.sourceRevision === undefined
+      ? CURATED_MODULE_PROJECTION_PINS[moduleId].mappedSourceRevision
+      : options.sourceRevision;
+
+  const decisions = extractDecisionsFromModuleMarkdown(
+    bodyMarkdown,
+    config,
+    documentId
+  );
+  const { requiredPcds, conditionalPcds } =
+    extractPcdsFromModuleMarkdown(bodyMarkdown);
+  const explicitExclusions = extractListSection(
+    bodyMarkdown,
+    /^##\s+\d+\..*الاستبعادات الصريحة/
+  );
+  const deferredDesignItems = extractListSection(
+    bodyMarkdown,
+    /^##\s+\d+\..*القرارات المفتوحة والمؤجلة/
+  );
+
+  const lifecycleBlueprint = buildModuleLifecycleBlueprint(
+    config,
+    decisions.length,
+    requiredPcds.length,
+    conditionalPcds.length,
+    deferredDesignItems.length
+  );
+
+  const projectionMetadata = buildModuleProjectionMetadata(
+    config,
+    documentId,
+    bodyMarkdown,
+    actualSourceRevision
+  );
+
+  return {
+    id: config.id,
+    code: config.code,
+    codeIdentifierScope: 'knowledge-hub-internal',
+    name: config.name,
+    shortName: config.shortName,
+    documentId,
+    documentSlug: config.documentSlug,
+    officialSourcePath: config.officialSourcePath,
+    researchDeferredPath: config.researchDeferredPath,
+    phaseStatus: config.phaseStatus,
+    sourceDocumentDate: options?.sourceDocumentDate ?? null,
+    projectionMetadata,
+    identitySummary: config.identitySummary,
+    standaloneSummary: config.standaloneSummary,
+    criticalLimitation: config.criticalLimitation,
+    responsibilities: config.responsibilities,
+    standaloneCapabilities: config.standaloneCapabilities,
+    ownedDataDomains: config.ownedDataDomains,
+    sharedReferencesConsumed: config.sharedReferencesConsumed,
+    requiredPcds,
+    conditionalPcds,
+    hbmdCount: 0,
+    relatedCicIds: config.relatedCicIds,
+    relatedFldLabels: config.relatedFldLabels,
+    explicitExclusions,
+    deferredDesignItems,
+    decisions,
+    educationalComparisonTitle: config.educationalComparisonTitle,
+    educationalComparisonNote: config.educationalComparisonNote,
+    educationalComparisonRows: config.educationalComparisonRows,
+    lifecycleBlueprint,
+  };
+}
+
 let cachedCoreModulesCatalog: ExtractedCoreModulesCatalog | null = null;
 
 export function getExtractedCoreModulesCatalog(): ExtractedCoreModulesCatalog {
@@ -1101,65 +1347,24 @@ export function getExtractedCoreModulesCatalog(): ExtractedCoreModulesCatalog {
       );
     }
 
-    const decisions = extractDecisionsFromModuleMarkdown(
+    const sourceRevision =
+      doc.metadata.source.kind === 'official-source'
+        ? (doc.metadata.source.commitSha ?? null)
+        : null;
+
+    const profile = buildCoreModuleProfileFromSource(
+      config.id,
       doc.bodyMarkdown,
-      config,
-      doc.metadata.id
-    );
-    const { requiredPcds, conditionalPcds } = extractPcdsFromModuleMarkdown(
-      doc.bodyMarkdown
-    );
-    const explicitExclusions = extractListSection(
-      doc.bodyMarkdown,
-      /^##\s+\d+\..*الاستبعادات الصريحة/
-    );
-    const deferredDesignItems = extractListSection(
-      doc.bodyMarkdown,
-      /^##\s+\d+\..*القرارات المفتوحة والمؤجلة/
+      {
+        documentId: doc.metadata.id,
+        sourceRevision,
+        sourceDocumentDate: doc.metadata.source.sourceDocumentDate ?? null,
+      }
     );
 
-    const lifecycleBlueprint = buildModuleLifecycleBlueprint(
-      config,
-      decisions.length,
-      requiredPcds.length,
-      conditionalPcds.length,
-      deferredDesignItems.length
-    );
-
-    phase2DecisionCountByModule[config.id] = decisions.length;
-    allPhase2Decisions.push(...decisions);
-
-    modules.push({
-      id: config.id,
-      code: config.code,
-      name: config.name,
-      shortName: config.shortName,
-      documentId: doc.metadata.id,
-      documentSlug: doc.metadata.slug,
-      officialSourcePath: config.officialSourcePath,
-      researchDeferredPath: config.researchDeferredPath,
-      phaseStatus: config.phaseStatus,
-      sourceDocumentDate: doc.metadata.source.sourceDocumentDate ?? null,
-      identitySummary: config.identitySummary,
-      standaloneSummary: config.standaloneSummary,
-      criticalLimitation: config.criticalLimitation,
-      responsibilities: config.responsibilities,
-      standaloneCapabilities: config.standaloneCapabilities,
-      ownedDataDomains: config.ownedDataDomains,
-      sharedReferencesConsumed: config.sharedReferencesConsumed,
-      requiredPcds,
-      conditionalPcds,
-      hbmdCount: 0,
-      relatedCicIds: config.relatedCicIds,
-      relatedFldLabels: config.relatedFldLabels,
-      explicitExclusions,
-      deferredDesignItems,
-      decisions,
-      educationalComparisonTitle: config.educationalComparisonTitle,
-      educationalComparisonNote: config.educationalComparisonNote,
-      educationalComparisonRows: config.educationalComparisonRows,
-      lifecycleBlueprint,
-    });
+    phase2DecisionCountByModule[config.id] = profile.decisions.length;
+    allPhase2Decisions.push(...profile.decisions);
+    modules.push(profile);
   }
 
   cachedCoreModulesCatalog = {
@@ -1167,6 +1372,11 @@ export function getExtractedCoreModulesCatalog(): ExtractedCoreModulesCatalog {
     allPhase2Decisions,
     phase2DecisionCountByModule,
     totalPhase2DecisionsCount: allPhase2Decisions.length,
+    anyProjectionRequiresReview: modules.some(
+      (m) =>
+        m.projectionMetadata.mappingFreshnessStatus ===
+        'review-required-source-changed'
+    ),
   };
 
   return cachedCoreModulesCatalog;

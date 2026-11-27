@@ -36,6 +36,11 @@ In addition, `createContentRegistry()` and `getContentRegistry()` enforce fatal 
 | `BROKEN_INTERNAL_REFERENCE` | Relationship `targetId` pointing to a nonexistent record. |
 | `PUBLIC_TO_UNPUBLISHED_REFERENCE` | Publicly published record referencing an unpublished/draft/unauthorized internal target. |
 | `INVALID_MANIFEST_ENTRY` / `DUPLICATE_SOURCE_*` / `MISSING_SOURCE_PROVENANCE` / `UNAUTHORIZED_SOURCE_PUBLICATION` / `UNRESOLVED_PUBLISHED_CONTENT_ID` | Source Manifest schema, uniqueness, provenance, Git blob verification, or publication-gating failures validated by `validateSourceManifest()`. |
+| `MISSING_STORED_BODY_DIGEST` | Published official document missing recorded `storedBodySha256` / manifest `sourceFileHash` or `expectedGitBlobSha` / `gitBlobSha` required for mandatory body verification (`KH-030`). |
+| `STORED_BODY_DIGEST_MISMATCH` | Stored canonical Markdown body SHA-256 under `content/collections/` diverges from frontmatter `storedBodySha256` or manifest `sourceFileHash` (even a single-character or trailing-whitespace edit). |
+| `STORED_BODY_GIT_BLOB_MISMATCH` | Reproducible Git blob SHA-1 computed from the stored canonical Markdown body diverges from manifest `expectedGitBlobSha` or frontmatter `gitBlobSha`. |
+| `STORED_BODY_REVISION_MISMATCH` | Frontmatter `source.commitSha` diverges from the authoritative manifest `commitSha`. |
+| `STORED_BODY_CRLF_DRIFT` | Stored canonical official document body contains raw `\r` / `\r\n` carriage returns instead of canonical LF line endings. |
 
 ## 3. Non-Blocking Warnings (Exit Code 0)
 
@@ -47,8 +52,8 @@ In addition, `createContentRegistry()` and `getContentRegistry()` enforce fatal 
 
 ## 4. Runtime & Repository Security Invariants
 
-- **Public Repository Staging Boundary (KH-023):** Never commit unauthorized or confidential official source bodies to this public repository — even with `publicationStatus: "internal"` or `authorized: false`. Non-public staging must live outside this public repository; application-level filtering is defense-in-depth only. Test fixtures in `content/fixtures/` must remain strictly synthetic and non-sensitive.
-- **Git Blob SHA Verification (KH-021):** Official ingested files are verified against their trusted 40-character Git blob SHA-1 digest (`git-blob-verified` or `git-blob-verified-lf-normalized`), failing closed on mismatch.
+- **Public Repository Staging Boundary (KH-023 / KH-029):** Canonical published sources live solely under `content/collections/`; redundant raw attachment copies under `files/` are removed from tracking and excluded via `.gitignore` and `next.config.ts`. Never commit unauthorized or confidential official source bodies to this public repository — even with `publicationStatus: "internal"` or `authorized: false`. Non-public staging must live outside this public repository; application-level filtering is defense-in-depth only. Test fixtures in `content/fixtures/` must remain strictly synthetic and non-sensitive.
+- **Mandatory Stored-Body SHA-256 & Git Blob SHA-1 Verification (KH-021 / KH-030):** Every official document stored in `content/collections/` is verified unconditionally inside `validateLoadedEntries()` (without requiring raw `/files/` copies) against its canonical stored body SHA-256 (`storedBodySha256` / `sourceFileHash`) and reproducible 40-character Git blob SHA-1 (`expectedGitBlobSha` / `gitBlobSha`), preserving `rawSourceSha256` separately for pre-normalization ingestion bytes. Only the exact single leading `\n` envelope separator after YAML frontmatter `---\n` is stripped (`extractCanonicalStoredBody`); broad `.trim()` is strictly prohibited.
 - **Path Confinement:** `resolveSafeContentPath` enforces `path.resolve` + trailing `path.sep` boundary checks and rejects `..`, absolute escapes, and null bytes with `ContentPathSecurityError`.
 - **Safe Markdown Pipeline & DOM-Clobbering Prevention:** `remark-rehype` runs with `allowDangerousHtml: false`, `rehype-sanitize` uses strict allowlisting with `clobberPrefix: 'kh-user-'`, and all heading anchors are allocated globally unique `kh-h-*` IDs (`allocateUniqueHeadingId`).
 - **Safe Relative Links & Governed Assets:** `content/loaders/relativeLinkResolver.ts` maps published sibling `.md` links to `/knowledge/[slug]#kh-h-...`, neutralizes unimported relative references, restricts local raster images strictly to `/assets/knowledge/*`, and blocks traversal or unsafe schemes.

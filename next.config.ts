@@ -10,7 +10,12 @@ const nextConfig: NextConfig = {
     '/*': ['./content/collections/**/*'],
   },
   outputFileTracingExcludes: {
-    '/*': ['./content/fixtures/**/*'],
+    '/*': [
+      './content/fixtures/**/*',
+      './files/**/*',
+      './.ingestion-staging/**/*',
+      './tmp/ingestion/**/*',
+    ],
   },
   webpack: (config, {dev}) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.

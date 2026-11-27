@@ -101,8 +101,18 @@ export function CoreModuleDetailView({
               label={t('classification.official.label')}
             />
             <span aria-hidden="true" className="text-text-muted">·</span>
-            <span className="rounded-sm border border-border bg-surface-secondary px-2 py-0.5 font-mono text-[11px] font-semibold text-primary bidi-ltr">
-              {moduleProfile.code}
+            <span
+              title={
+                isAr
+                  ? 'معرّف عرض داخلي لمركز المعرفة (ليس معرّف ERP رسميًا)'
+                  : 'Knowledge Hub internal display code (not an official ERP identifier)'
+              }
+              className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-secondary px-2 py-0.5 font-mono text-[11px] font-semibold text-primary bidi-ltr"
+            >
+              <span>{moduleProfile.code}</span>
+              <span className="text-[9px] font-normal text-text-muted">
+                {isAr ? 'داخلي' : 'KH ID'}
+              </span>
             </span>
             <span aria-hidden="true" className="text-text-muted">·</span>
             <StatusIndicator
@@ -189,13 +199,74 @@ export function CoreModuleDetailView({
         </div>
       </section>
 
+      {/* KH-028 / FIX-02-R01: Curated Projection Provenance & Source Freshness */}
+      <InformationCallout
+        className={
+          moduleProfile.projectionMetadata.mappingFreshnessStatus ===
+          'review-required-source-changed'
+            ? 'border-danger-border bg-danger-bg'
+            : 'border-info-border bg-info-bg/50'
+        }
+        title={
+          moduleProfile.projectionMetadata.mappingFreshnessStatus ===
+          'review-required-source-changed'
+            ? isAr
+              ? 'تنبيه صلاحية التفسير المنظّم: تغيّر المصدر الرسمي ويتطلب مراجعة (Review Required)'
+              : 'Curated Projection Freshness Alert: Official Source Changed (Review Required)'
+            : isAr
+              ? 'مصدرية العرض والتمييز بين النص الرسمي والتفسير التعليمي (Verified Current)'
+              : 'Content Provenance: Deterministic Official Extraction vs. Curated Educational Projection'
+        }
+      >
+        <div className="space-y-1.5 text-xs">
+          {moduleProfile.projectionMetadata.reviewWarning ? (
+            <p className="font-semibold text-danger">
+              {resolveLocalizedText(
+                moduleProfile.projectionMetadata.reviewWarning,
+                locale
+              )}
+            </p>
+          ) : null}
+          <p className="leading-relaxed text-text-secondary">
+            {resolveLocalizedText(
+              moduleProfile.projectionMetadata.projectionDisclosure,
+              locale
+            )}
+          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5 font-mono text-[11px] text-text-muted bidi-ltr">
+            <span>
+              Status: {moduleProfile.projectionMetadata.mappingFreshnessStatus}
+            </span>
+            <span>·</span>
+            <span>
+              Pinned Rev:{' '}
+              {moduleProfile.projectionMetadata.mappedSourceRevision.slice(0, 12)}
+            </span>
+            <span>·</span>
+            <span>
+              Body SHA-256:{' '}
+              {moduleProfile.projectionMetadata.actualSourceBodySha256.slice(0, 12)}
+            </span>
+            <span>·</span>
+            <span>
+              Reviewed: {moduleProfile.projectionMetadata.lastCuratedReviewDate}
+            </span>
+          </div>
+        </div>
+      </InformationCallout>
+
       {/* Band 2 & 3: Architectural Responsibilities & Standalone Operation */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
-          <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
-            <span>{isAr ? 'المسؤوليات المعمارية المعتمدة' : 'Approved Architectural Responsibilities'}</span>
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+              <span>{isAr ? 'المسؤوليات المعمارية المعتمدة' : 'Approved Architectural Responsibilities'}</span>
+            </h2>
+            <span className="rounded-sm border border-info-border bg-info-bg px-1.5 py-0.5 text-[10px] font-medium text-info">
+              {isAr ? 'ملخص تعليمي منظّم' : 'Curated Educational Projection'}
+            </span>
+          </div>
           <ul className="space-y-2">
             {moduleProfile.responsibilities.map((item) => (
               <li
@@ -210,10 +281,15 @@ export function CoreModuleDetailView({
         </div>
 
         <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
-          <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            <Layers className="h-4 w-4 text-primary" aria-hidden="true" />
-            <span>{isAr ? 'التشغيل المستقل والحدود الحرجة' : 'Standalone Operation & Critical Limitation'}</span>
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <Layers className="h-4 w-4 text-primary" aria-hidden="true" />
+              <span>{isAr ? 'التشغيل المستقل والحدود الحرجة' : 'Standalone Operation & Critical Limitation'}</span>
+            </h2>
+            <span className="rounded-sm border border-info-border bg-info-bg px-1.5 py-0.5 text-[10px] font-medium text-info">
+              {isAr ? 'ملخص تعليمي منظّم' : 'Curated Educational Projection'}
+            </span>
+          </div>
           <p className="text-xs leading-relaxed text-text-secondary">
             {resolveLocalizedText(moduleProfile.standaloneSummary, locale)}
           </p>
@@ -254,6 +330,11 @@ export function CoreModuleDetailView({
               moduleProfile.educationalComparisonNote
                 ? resolveLocalizedText(moduleProfile.educationalComparisonNote, locale)
                 : undefined
+            }
+            actions={
+              <span className="rounded-sm border border-info-border bg-info-bg px-2 py-0.5 text-[10px] font-medium text-info">
+                {isAr ? 'جدول تعليمي منظّم' : 'Curated Educational Table'}
+              </span>
             }
           />
           <div className="overflow-x-auto rounded-lg border border-border bg-surface">
@@ -317,6 +398,11 @@ export function CoreModuleDetailView({
             isAr
               ? 'وفق DEPENDENCY_MODEL.md: ملكية البيانات واستهلاك المراجع المشتركة لا ينشئان HBMD تلقائيًا.'
               : 'Per DEPENDENCY_MODEL.md: Data ownership and shared reference consumption never implicitly create an HBMD.'
+          }
+          actions={
+            <span className="rounded-sm border border-info-border bg-info-bg px-2 py-0.5 text-[10px] font-medium text-info">
+              {isAr ? 'ملخص تعليمي منظّم' : 'Curated Educational Summary'}
+            </span>
           }
         />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -392,7 +478,12 @@ export function CoreModuleDetailView({
                   ? `قدرات المنصة المطلوبة (Required PCD · ${moduleProfile.requiredPcds.length})`
                   : `Required Platform Capabilities (PCD · ${moduleProfile.requiredPcds.length})`}
               </h3>
-              <span className="font-mono text-[10px] text-primary bidi-ltr">Module Activation</span>
+              <div className="flex items-center gap-1.5">
+                <span className="rounded-sm border border-success-border bg-success-bg px-1.5 py-0.5 text-[10px] font-medium text-success">
+                  {isAr ? 'استخلاص رسمي' : 'Official Extraction'}
+                </span>
+                <span className="font-mono text-[10px] text-primary bidi-ltr">Module Activation</span>
+              </div>
             </div>
             <div className="divide-y divide-border">
               {moduleProfile.requiredPcds.map((pcd) => (
@@ -509,12 +600,17 @@ export function CoreModuleDetailView({
               : 'Deterministically extracted verbatim from the owning Phase 2 official document — tracked separately from the centralized 126-decision register (Phases 3–5).'
           }
           actions={
-            <Link
-              href="/decisions"
-              className="text-xs font-medium text-primary hover:underline"
-            >
-              {isAr ? 'فتح سجل القرارات الكامل' : 'Open Full Decision Register'}
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-sm border border-success-border bg-success-bg px-2 py-0.5 text-[10px] font-medium text-success">
+                {isAr ? 'استخلاص حتمي حرفي من المصدر' : 'Deterministic Verbatim Source Extraction'}
+              </span>
+              <Link
+                href="/decisions"
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                {isAr ? 'فتح سجل القرارات الكامل' : 'Open Full Decision Register'}
+              </Link>
+            </div>
           }
         />
 
@@ -574,14 +670,19 @@ export function CoreModuleDetailView({
       {/* Band 7: Explicit Exclusions & Deferred Design */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
-          <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            <XCircle className="h-4 w-4 text-text-muted" aria-hidden="true" />
-            <span>
-              {isAr
-                ? `الاستبعادات الصريحة خارج المرحلة 2 (${moduleProfile.explicitExclusions.length})`
-                : `Explicit Phase 2 Exclusions (${moduleProfile.explicitExclusions.length})`}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <XCircle className="h-4 w-4 text-text-muted" aria-hidden="true" />
+              <span>
+                {isAr
+                  ? `الاستبعادات الصريحة خارج المرحلة 2 (${moduleProfile.explicitExclusions.length})`
+                  : `Explicit Phase 2 Exclusions (${moduleProfile.explicitExclusions.length})`}
+              </span>
+            </h2>
+            <span className="rounded-sm border border-success-border bg-success-bg px-1.5 py-0.5 text-[10px] font-medium text-success">
+              {isAr ? 'استخلاص رسمي' : 'Official Extraction'}
             </span>
-          </h2>
+          </div>
           <ul className="space-y-1.5">
             {moduleProfile.explicitExclusions.map((item) => (
               <li
@@ -596,14 +697,19 @@ export function CoreModuleDetailView({
         </div>
 
         <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
-          <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
-            <Clock className="h-4 w-4 text-warning" aria-hidden="true" />
-            <span>
-              {isAr
-                ? `القرارات والحدود المفتوحة والمؤجلة (${moduleProfile.deferredDesignItems.length})`
-                : `Open & Deferred Design Commitments (${moduleProfile.deferredDesignItems.length})`}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <Clock className="h-4 w-4 text-warning" aria-hidden="true" />
+              <span>
+                {isAr
+                  ? `القرارات والحدود المفتوحة والمؤجلة (${moduleProfile.deferredDesignItems.length})`
+                  : `Open & Deferred Design Commitments (${moduleProfile.deferredDesignItems.length})`}
+              </span>
+            </h2>
+            <span className="rounded-sm border border-success-border bg-success-bg px-1.5 py-0.5 text-[10px] font-medium text-success">
+              {isAr ? 'استخلاص رسمي' : 'Official Extraction'}
             </span>
-          </h2>
+          </div>
           <ol className="space-y-1.5">
             {moduleProfile.deferredDesignItems.map((item, idx) => (
               <li

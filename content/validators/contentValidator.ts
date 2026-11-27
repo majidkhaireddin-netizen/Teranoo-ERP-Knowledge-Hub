@@ -9,6 +9,7 @@ import {
   OFFICIAL_SOURCE_MANIFEST,
   validateSourceManifest,
 } from '@/content/manifest/sourceManifest';
+import { verifyStoredOfficialDocumentIntegrity } from '@/content/ingestion/ingestionPipeline';
 
 export type ValidationSeverity = 'error' | 'warning';
 
@@ -347,7 +348,10 @@ export function validateLoadedEntries(
   const publishedDocs = validDocs.filter(isPubliclyPublishableRecord);
   const publishedIds = new Set(publishedDocs.map((d) => d.metadata.id));
 
-  // 10. Official Source Manifest integrity (when provided)
+  // 10. Official Source Manifest & Mandatory Stored-Body Integrity (KH-030 — independent of raw /files copies)
+  const manifestByPublishedId = new Map<string, SourceManifestEntry>();
+  const manifestBySourcePath = new Map<string, SourceManifestEntry>();
+
   if (options?.manifestEntries) {
     const manifestReport = validateSourceManifest(
       options.manifestEntries,
@@ -369,6 +373,53 @@ export function validateLoadedEntries(
         file: `content/manifest/sourceManifest.ts (${warn.sourceRefId})`,
         field: warn.field,
         message: warn.message,
+      });
+    }
+
+    for (const entry of options.manifestEntries) {
+      if (entry.publishedContentId) {
+        manifestByPublishedId.set(entry.publishedContentId, entry);
+      }
+      manifestBySourcePath.set(entry.sourcePath, entry);
+    }
+  }
+
+  for (const doc of validDocs) {
+    if (doc.metadata.source.kind !== 'official-source') {
+      continue;
+    }
+
+    const matchedManifest =
+      manifestByPublishedId.get(doc.metadata.id) ??
+      manifestBySourcePath.get(doc.metadata.source.sourcePath);
+
+    const hasRecordedIntegrityDigests = Boolean(
+      doc.metadata.source.storedBodySha256 || doc.metadata.source.gitBlobSha
+    );
+
+    if (matchedManifest || hasRecordedIntegrityDigests) {
+      const integrityCheck = verifyStoredOfficialDocumentIntegrity(
+        doc,
+        matchedManifest
+      );
+      if (!integrityCheck.ok) {
+        for (const issue of integrityCheck.issues) {
+          errors.push({
+            severity: 'error',
+            code: issue.code,
+            file: doc.sourceFileRelativePath,
+            field: issue.field,
+            message: issue.message,
+          });
+        }
+      }
+    } else if (options?.manifestEntries && isPubliclyPublishableRecord(doc)) {
+      errors.push({
+        severity: 'error',
+        code: 'MISSING_STORED_BODY_DIGEST',
+        file: doc.sourceFileRelativePath,
+        field: 'source.storedBodySha256',
+        message: `Published official-source document "${doc.metadata.id}" is neither linked to OFFICIAL_SOURCE_MANIFEST nor carrying recorded storedBodySha256/gitBlobSha integrity digests.`,
       });
     }
   }

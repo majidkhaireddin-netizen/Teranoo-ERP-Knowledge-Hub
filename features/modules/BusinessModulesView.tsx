@@ -156,17 +156,35 @@ export function BusinessModulesView({
         </div>
       </section>
 
-      {/* Architectural Scope Boundary Notice */}
+      {/* Architectural Scope Boundary & Curated Projection Provenance Notice */}
       <InformationCallout
+        className={
+          catalog.anyProjectionRequiresReview
+            ? 'border-danger-border bg-danger-bg'
+            : undefined
+        }
         title={
-          isAr
-            ? 'نطاق المرحلة 2 المعتمدة — معمارية وحدود وليست مخططات وظيفية أو تنفيذًا برمجيًا'
-            : 'Phase 2 Scope Boundary — Approved Architecture, Not Functional Blueprints or Code'
+          catalog.anyProjectionRequiresReview
+            ? isAr
+              ? 'تنبيه صلاحية: تغيّر مصدر رسمي واحد على الأقل لملخصات الأنظمة (Review Required)'
+              : 'Projection Freshness Alert: Official Module Source Changed (Review Required)'
+            : isAr
+              ? 'نطاق المرحلة 2 المعتمدة ومصدرية التلخيص التعليمي (Verified Current)'
+              : 'Phase 2 Scope Boundary & Curated Projection Provenance (Verified Current)'
         }
       >
-        {isAr
-          ? 'توثّق هذه الصفحات النماذج المعمارية المعتمدة والمغلقة للمرحلة 2 فقط (الاستقلالية، ملكية البيانات، اعتماديات المنصة، وعقود التكامل المفاهيمية). المخططات الوظيفية التفصيلية، الشاشات، نماذج قواعد البيانات، والتنفيذ البرمجي مؤجلة للمرحلة 6 وما بعدها وتظهر صراحةً كأقسام مستقبلية غير مُعبّأة.'
-          : 'These pages document closed Phase 2 architectural models only (standalone capability, data ownership, platform dependencies, and conceptual CIC boundaries). Detailed Functional Blueprints, screens, database schemas, and ERP software code belong to Phase 6 and later phases and are explicitly marked as future unpopulated sections.'}
+        <div className="space-y-1">
+          <p>
+            {isAr
+              ? 'توثّق هذه الصفحات النماذج المعمارية المعتمدة والمغلقة للمرحلة 2 فقط (الاستقلالية، ملكية البيانات، اعتماديات المنصة، وعقود التكامل المفاهيمية). المخططات الوظيفية التفصيلية، الشاشات، نماذج قواعد البيانات، والتنفيذ البرمجي مؤجلة للمرحلة 6 وما بعدها وتظهر صراحةً كأقسام مستقبلية غير مُعبّأة.'
+              : 'These pages document closed Phase 2 architectural models only (standalone capability, data ownership, platform dependencies, and conceptual CIC boundaries). Detailed Functional Blueprints, screens, database schemas, and ERP software code belong to Phase 6 and later phases and are explicitly marked as future unpopulated sections.'}
+          </p>
+          <p className="text-[11px] text-text-secondary">
+            {isAr
+              ? 'بطاقات التلخيص التعليمية مربوطة ببصمة SHA-256 ومراجعة المصدر الرسمي لكل نظام، بينما تُستخلص القرارات وجداول PCD والاستبعادات والمؤجلات استخلاصًا حتميًا مباشرًا من النص الرسمي.'
+              : 'Educational summary projections are pinned to each official module document revision and canonical body SHA-256 digest, while Phase 2 decisions, PCD tables, exclusions, and deferred items are deterministically extracted verbatim from the official source.'}
+          </p>
+        </div>
       </InformationCallout>
 
       {/* 4 Core Module Cards */}
@@ -189,12 +207,28 @@ export function BusinessModulesView({
               <div className="flex flex-wrap items-start justify-between gap-2 border-b border-border pb-3.5">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-sm border border-border bg-surface-secondary px-2 py-0.5 font-mono text-[11px] font-semibold text-primary bidi-ltr">
-                      {mod.code}
+                    <span
+                      title={
+                        isAr
+                          ? 'معرّف عرض داخلي لمركز المعرفة (ليس معرّف ERP رسميًا)'
+                          : 'Knowledge Hub internal display code (not an official ERP identifier)'
+                      }
+                      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-secondary px-2 py-0.5 font-mono text-[11px] font-semibold text-primary bidi-ltr"
+                    >
+                      <span>{mod.code}</span>
+                      <span className="text-[9px] font-normal text-text-muted">
+                        {isAr ? 'داخلي' : 'KH ID'}
+                      </span>
                     </span>
                     <span className="rounded-sm border border-success-border bg-success-bg px-2 py-0.5 text-[11px] font-medium text-success">
                       {isAr ? 'Standalone · 0 HBMD' : 'Standalone · 0 HBMD'}
                     </span>
+                    {mod.projectionMetadata.mappingFreshnessStatus ===
+                    'review-required-source-changed' ? (
+                      <span className="rounded-sm border border-danger-border bg-danger-bg px-2 py-0.5 text-[10px] font-semibold text-danger">
+                        {isAr ? 'يتطلب مراجعة المصدر' : 'Review Required'}
+                      </span>
+                    ) : null}
                   </div>
                   <h2 className="text-base font-semibold text-text-primary">
                     {resolveLocalizedText(mod.name, locale)}

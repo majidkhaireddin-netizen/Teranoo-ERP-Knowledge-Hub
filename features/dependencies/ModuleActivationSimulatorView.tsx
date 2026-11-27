@@ -496,8 +496,13 @@ export function ModuleActivationSimulatorView({
           </p>
           <p className="text-[11px] text-text-secondary">
             {isAr
-              ? `السجل المصدر المُتحقق منه: ${result.catalogValidation.cicCount} عقود CIC رسمية · ${result.catalogValidation.fldCount} سجلات FLD رسمية · ${result.catalogValidation.pcdRowCount} صفًا في مصفوفة PCD · ${result.catalogValidation.hbmdEdgeCount} حواف HBMD.`
-              : `Validated authoritative catalog: ${result.catalogValidation.cicCount} Core CICs · ${result.catalogValidation.fldCount} Core FLDs · ${result.catalogValidation.pcdRowCount} PCD matrix rows · ${result.catalogValidation.hbmdEdgeCount} Core HBMD edges.`}
+              ? `السجل المصدر المُتحقق منه: ${result.catalogValidation.cicCount} عقود CIC رسمية · ${result.catalogValidation.fldCount} سجلات FLD (بمراجع داخلية) · ${result.catalogValidation.pcdRowCount} صفًا في مصفوفة PCD · ${result.catalogValidation.hbmdEdgeCount} حواف HBMD.`
+              : `Validated authoritative catalog: ${result.catalogValidation.cicCount} Official Core CICs · ${result.catalogValidation.fldCount} Core FLDs (KH internal refs) · ${result.catalogValidation.pcdRowCount} PCD matrix rows · ${result.catalogValidation.hbmdEdgeCount} Core HBMD edges.`}
+          </p>
+          <p className="font-mono text-[10px] text-text-muted bidi-ltr">
+            Pinned Matrix Rev: {result.catalogValidation.sourceRevision.slice(0, 12)} · Body SHA-256:{' '}
+            {result.catalogValidation.sourceBodySha256.slice(0, 12)} · Status:{' '}
+            {result.catalogValidation.mappingFreshnessStatus}
           </p>
         </div>
       </InformationCallout>
@@ -586,8 +591,15 @@ export function ModuleActivationSimulatorView({
                       </span>
                     </div>
                   </div>
-                  <span className="shrink-0 font-mono text-[10px] font-semibold text-text-muted bidi-ltr">
-                    {mod.code}
+                  <span
+                    title={
+                      isAr
+                        ? 'معرّف عرض داخلي لمركز المعرفة (ليس معرّف ERP رسميًا)'
+                        : 'Knowledge Hub internal display code (not an official ERP identifier)'
+                    }
+                    className="shrink-0 rounded-sm border border-border bg-surface-secondary px-1.5 py-0.5 font-mono text-[10px] font-semibold text-text-muted bidi-ltr"
+                  >
+                    {mod.code} · {isAr ? 'داخلي' : 'KH'}
                   </span>
                 </label>
               );
@@ -946,9 +958,14 @@ export function ModuleActivationSimulatorView({
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="space-y-0.5">
-                      <span className="font-mono font-semibold text-text-primary bidi-ltr">
-                        {cic.contractId}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-mono font-semibold text-text-primary bidi-ltr">
+                          {cic.contractId}
+                        </span>
+                        <span className="rounded-sm border border-success-border bg-success-bg px-1.5 py-0.5 text-[9px] font-medium text-success">
+                          {isAr ? 'معرّف ERP رسمي' : 'Official ERP ID'}
+                        </span>
+                      </div>
                       <p className="font-medium text-text-primary">
                         {resolveLocalizedText(cic.scenario, locale)}
                       </p>
@@ -1215,8 +1232,18 @@ export function ModuleActivationSimulatorView({
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="space-y-0.5">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="font-mono text-[10px] font-semibold text-text-muted bidi-ltr">
-                          {fld.id}
+                        <span
+                          title={
+                            isAr
+                              ? 'مرجع صف داخلي لمركز المعرفة (القسم 6 لا يعرّف رموز FLD رسمية)'
+                              : 'Knowledge Hub internal reference ID (Matrix §6 defines no official FLD IDs)'
+                          }
+                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface-secondary px-1.5 py-0.5 font-mono text-[10px] font-semibold text-text-muted bidi-ltr"
+                        >
+                          <span>{fld.id}</span>
+                          <span className="text-[9px] font-normal">
+                            · {isAr ? 'معرّف داخلي' : 'KH Ref'}
+                          </span>
                         </span>
                         {fld.isOwnerDeferred ? (
                           <span className="rounded-sm border border-warning-border bg-warning-bg px-1.5 py-0.5 text-[10px] font-semibold text-warning">

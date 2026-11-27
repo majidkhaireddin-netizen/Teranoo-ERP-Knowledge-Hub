@@ -1,7 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
 import {
   BATCH_001_SOURCE_REVISION,
   PROJECT_FOUNDATIONS_SOURCE_MANIFEST,
@@ -11,6 +9,7 @@ import {
   computeGitBlobSha1,
   prepareCanonicalIngestionArtifact,
   verifySourceIntegrity,
+  verifyStoredOfficialDocumentIntegrity,
 } from '@/content/ingestion/ingestionPipeline';
 import {
   getContentRegistry,
@@ -48,7 +47,7 @@ import { validateLoadedEntries } from '@/content/validators/contentValidator';
 // 1. Git Blob SHA Verification, LF Normalization & KH-022 Approval Semantics
 // ============================================================================
 
-test('all 6 official BATCH-001 files verify against exact Git blob SHA-1, commit SHA, tree SHA, and verbatim /files bodies', () => {
+test('all 6 official BATCH-001 files verify unconditionally via stored canonical body SHA-256 and reproducible Git blob SHA-1 without /files/', () => {
   resetContentRegistryCache();
   const registry = getContentRegistry();
   const publishedIds = new Set(
@@ -61,8 +60,6 @@ test('all 6 official BATCH-001 files verify against exact Git blob SHA-1, commit
   );
   assert.equal(manifestValidation.ok, true);
   assert.equal(manifestValidation.errors.length, 0);
-
-  const filesDir = path.join(process.cwd(), 'files');
 
   for (const entry of PROJECT_FOUNDATIONS_SOURCE_MANIFEST) {
     assert.equal(entry.importStatus, 'published');
@@ -91,23 +88,15 @@ test('all 6 official BATCH-001 files verify against exact Git blob SHA-1, commit
       );
     }
 
-    // Verify original raw file in /files matches stored verbatim body (LF normalized)
-    const basename = path.basename(entry.sourcePath);
-    const rawFilePath = path.join(filesDir, basename);
-    if (fs.existsSync(rawFilePath)) {
-      const rawBytes = fs.readFileSync(rawFilePath);
-      const verification = verifySourceIntegrity(
-        rawBytes,
-        entry.expectedGitBlobSha
-      );
-      assert.equal(verification.matchedGitBlobSha, entry.expectedGitBlobSha);
-      const rawNormalized = rawBytes
-        .toString('utf8')
-        .replace(/^\uFEFF/, '')
-        .replace(/\r\n/g, '\n')
-        .trim();
-      assert.equal(doc.bodyMarkdown.trim(), rawNormalized);
-    }
+    // KH-030: Unconditional stored-body SHA-256 + reproducible Git blob SHA-1 verification (no /files/ dependency)
+    const storedCheck = verifyStoredOfficialDocumentIntegrity(doc, entry);
+    assert.equal(
+      storedCheck.ok,
+      true,
+      `Stored integrity failed for ${entry.sourcePath}: ${storedCheck.issues.map((i) => i.message).join('; ')}`
+    );
+    assert.equal(storedCheck.actualStoredBodySha256, entry.sourceFileHash);
+    assert.equal(storedCheck.actualStoredGitBlobSha1, entry.expectedGitBlobSha);
   }
 });
 

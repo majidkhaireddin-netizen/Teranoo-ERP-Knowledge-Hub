@@ -49,17 +49,25 @@ The Dependencies & Integration Architecture Center (`/dependencies`) transforms 
 3. **Multi-State CIC Readiness (`FIX-01-R03`):** Never marks a CIC "Ready" merely because both participating modules are active. Explicitly distinguishes `modulePrerequisiteStatus` (`participating-modules-unavailable` vs `architectural-module-prerequisites-satisfied`) from `readinessStatus` (`participating-modules-unavailable`, `contract-or-scenario-not-enabled`, `contract-prerequisites-not-satisfied`, `readiness-not-established-insufficient-info`, `evaluated-conceptual-prerequisites-satisfied`) using verbatim official `Required Preconditions`, `Activation Condition`, `Contract Owner` (`TBD — Phase 5`), and deferred functional boundaries.
 4. **4-Dimensional FLD Evaluation (`FIX-01-R04`):** Evaluates each of the 5 Core FLDs across four separate dimensions (`requiredModulesAvailable`, `featureDependencyPrerequisitesSatisfied` including conditional PCDs and linked CICs per `§5`, `featureConfiguredState`, and constant `fullFunctionalBehaviorSpecified: false` for Phase 2), preserving `Feature Owner: Deferred` on `Three-Way Match` (`FLD-CORE-05`) and the deferred invoice generation boundary on `Customer Billing` (`FLD-CORE-02`).
 5. **UI Accuracy & Traceability (`FIX-01-R05`):** Renders conservative defaults (`Unknown` + deferred boundaries treated as unresolved), zero unqualified `Ready` / `Available` / `جاهز` / `متاحة` badges, clickable links to `MODULE_DEPENDENCY_MATRIX.md` and `MODULE_LIFECYCLE_RULES.md`, verbatim official excerpts, official Decision IDs (`Evidence`), and a non-dismissible educational simulation disclaimer.
+6. **Semantic Mapping Drift & Duplicate-ID Protection (`TASK-005-FIX-02` / `FIX-02-R06` / `KH-034`):**
+   - `SIMULATOR_PINNED_SOURCE` pins `moduleActivationSimulator.ts` to the authoritative `MODULE_DEPENDENCY_MATRIX.md` commit (`397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f`) and canonical body SHA-256 (`34700c3027731399dd8a3276cf41f1fa3f5bc9234453502901589f8a46c55c43`).
+   - `validateSimulatorCatalogConsistency()` validates not only ID presence, but also exact semantic alignment of:
+     - Every CIC's `requiredPreconditions`, `activationCondition`, `contractOwner`, `status`, and `hasDeferredBoundary`.
+     - Every FLD's `sourceModuleFeature`, `targetModuleCapability`, `featureScenario`, `featureOwner`, `isOwnerDeferred`, and `status`.
+     - All `21` PCD matrix rows (`PINNED_PCD_MATRIX_CLASSIFICATIONS`) across Finance, Inventory, Procurement, and Sales (`R`, `C`, `C*`, `—`).
+   - Rejects **duplicate dependency identifiers** across CIC (`contractId`), FLD (`id`), and PCD (`capability`) collections.
+   - Rejects **any newly Required (`R`) PCD** that lacks an explicit executable mapping in `PCD_CAPABILITY_TO_PREREQUISITE_KEY` instead of silently ignoring it (`assertRequiredPcdExecutableMapping`).
 
 ---
 
-## 4. Unified Global Search Integration
+## 4. Unified Global Search & Identifier Scope Semantics (`KH-032` / `FIX-02-R05`)
 
-`content/search/knowledgeSearch.ts` indexes all BATCH-002 structured entities alongside BATCH-001 records:
-- All **4** Core Business Modules
-- All **34** Phase 2 Source-Local Decisions (`D-FIN-*`, `D-INV-*`, `D-PRC-*`, `D-SLS-*`)
-- All **6** Core CICs (`CIC-CORE-*`) & **5** FLDs (`FLD-*`)
+`content/search/knowledgeSearch.ts` indexes all BATCH-002 structured entities alongside BATCH-001 records and attaches explicit `identifierScope` (`'official-erp'` vs `'knowledge-hub-internal'`) rendered across Global Search (`Ctrl+K`), Dependency Explorer, Data Ownership Explorer, and the Activation Simulator:
+- All **4** Core Business Modules (`MOD-*` explicitly marked `knowledge-hub-internal`)
+- All **34** Phase 2 Source-Local Decisions (`D-FIN-*`, `D-INV-*`, `D-PROC-*`, `D-SALES-*` — `official-erp`)
+- All **6** Core CICs (`CIC-CORE-*` — `official-erp`) & **5** Core FLDs (`FLD-CORE-01..05` explicitly marked `knowledge-hub-internal`, as `MODULE_DEPENDENCY_MATRIX.md §6` defines no official `FLD-*` codes)
 - All **4** Dependency Types (`HBMD`, `PCD`, `CIC`, `FLD`)
 - Module Lifecycle states & **`Freeze, not Delete`** principle
-- All **15** Data Ownership objects
-- All **7** Phase 2 Assumption Safety Guardrails (`G-ASSUMP-01..07`)
+- All **15** Data Ownership objects (`OWN-CORE-01..15` explicitly marked `knowledge-hub-internal`)
+- All **7** Phase 2 Assumption Safety Guardrails (`G-ASSUMP-01..07` — `official-erp`)
 - Exact-ID structured entity hits score `110` (above multi-entity document hits at `100`) so exact ID queries such as `D-FIN-01` or `CIC-CORE-INV-FIN-001` rank first deterministically.

@@ -137,9 +137,34 @@ export function GlobalSearchModal({
                         </span>
                       ) : null}
                       {item.code ? (
-                        <code className="font-mono text-xs font-semibold text-primary bidi-ltr shrink-0">
-                          {item.code}
-                        </code>
+                        <span className="inline-flex items-center gap-1 shrink-0">
+                          <code className="font-mono text-xs font-semibold text-primary bidi-ltr">
+                            {item.code}
+                          </code>
+                          {item.identifierScope === 'knowledge-hub-internal' ? (
+                            <span
+                              title={
+                                locale === 'ar'
+                                  ? 'معرّف داخلي لمركز المعرفة (ليس معرّف ERP رسميًا)'
+                                  : 'Knowledge Hub internal identifier (not an official ERP ID)'
+                              }
+                              className="rounded-sm border border-border bg-surface-secondary px-1 py-0.5 text-[9px] font-medium text-text-muted"
+                            >
+                              {locale === 'ar' ? 'داخلي' : 'KH ID'}
+                            </span>
+                          ) : item.identifierScope === 'official-erp' ? (
+                            <span
+                              title={
+                                locale === 'ar'
+                                  ? 'معرّف رسمي من وثائق Teranoo ERP'
+                                  : 'Official Teranoo ERP identifier'
+                              }
+                              className="rounded-sm border border-success-border bg-success-bg px-1 py-0.5 text-[9px] font-medium text-success"
+                            >
+                              {locale === 'ar' ? 'رسمي' : 'ERP ID'}
+                            </span>
+                          ) : null}
+                        </span>
                       ) : null}
                       <span className="text-sm font-medium text-text-primary truncate">
                         {resolveLocalizedText(item.title, locale)}

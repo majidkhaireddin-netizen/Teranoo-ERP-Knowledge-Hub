@@ -1,5 +1,6 @@
-import type { LocalizedText } from '@/content/models/types';
+import type { IdentifierScope, LocalizedText } from '@/content/models/types';
 import { createHeadingSlug, HEADING_ID_PREFIX } from '@/content/loaders/markdownPipeline';
+import { computeCanonicalStoredBodySha256 } from '@/content/ingestion/ingestionPipeline';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
 import type { CoreModuleId } from '@/content/extractors/moduleModelsExtractor';
 
@@ -36,6 +37,8 @@ export interface HbmdAbsenceRecord {
 
 export interface CoreCicContract {
   readonly contractId: string;
+  /** Official Phase 2 ERP identifier defined verbatim in MODULE_DEPENDENCY_MATRIX.md (KH-032). */
+  readonly identifierScope: Extract<IdentifierScope, 'official-erp'>;
   readonly sourceInitiator: string;
   readonly target: string;
   readonly sourceModuleId: CoreModuleId;
@@ -69,7 +72,9 @@ export interface CoreCicContract {
 }
 
 export interface CoreFldRecord {
+  /** Knowledge Hub internal row reference ID (e.g. FLD-CORE-01); NOT an official ERP identifier (KH-032). */
   readonly id: string;
+  readonly identifierScope: Extract<IdentifierScope, 'knowledge-hub-internal'>;
   readonly sourceModuleFeature: string;
   readonly sourceModuleId: CoreModuleId;
   readonly targetModuleCapability: string;
@@ -93,7 +98,9 @@ export interface PcdMatrixRow {
 }
 
 export interface DataOwnershipRecord {
+  /** Knowledge Hub internal row reference ID (e.g. OWN-CORE-01); NOT an official ERP identifier (KH-032). */
   readonly id: string;
+  readonly identifierScope: Extract<IdentifierScope, 'knowledge-hub-internal'>;
   readonly businessObject: string;
   readonly ownerAtPhase2: string;
   readonly isDeferredBoundary: boolean;
@@ -160,6 +167,8 @@ export interface ExtractedDependencyArchitecture {
   readonly matrix: {
     readonly documentSlug: string;
     readonly officialSourcePath: string;
+    readonly sourceRevision: string | null;
+    readonly sourceBodySha256: string;
     readonly summaryRows: readonly SummaryMatrixRow[];
     readonly hbmdAbsenceRegister: readonly HbmdAbsenceRecord[];
     readonly hbmdEdgeCount: 0;
@@ -601,6 +610,7 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
 
     return {
       contractId,
+      identifierScope: 'official-erp',
       sourceInitiator,
       target,
       sourceModuleId: moduleNameToId(sourceInitiator),
@@ -656,6 +666,7 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
     const featureOwner = row[5] ?? '';
     return {
       id: `FLD-CORE-0${idx + 1}`,
+      identifierScope: 'knowledge-hub-internal',
       sourceModuleFeature,
       sourceModuleId: moduleNameToId(sourceModuleFeature),
       targetModuleCapability,
@@ -710,6 +721,7 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
       const isDeferredBoundary = /Deferred Boundary/i.test(ownerAtPhase2);
       return {
         id: `OWN-CORE-${String(idx + 1).padStart(2, '0')}`,
+        identifierScope: 'knowledge-hub-internal',
         businessObject: row[0] ?? '',
         ownerAtPhase2,
         isDeferredBoundary,
@@ -841,6 +853,11 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
       documentSlug: matrixDoc.metadata.slug,
       officialSourcePath:
         'teranoo-erp-planning/03-modules/MODULE_DEPENDENCY_MATRIX.md',
+      sourceRevision:
+        matrixDoc.metadata.source.kind === 'official-source'
+          ? (matrixDoc.metadata.source.commitSha ?? null)
+          : null,
+      sourceBodySha256: computeCanonicalStoredBodySha256(matrixDoc.bodyMarkdown),
       summaryRows,
       hbmdAbsenceRegister,
       hbmdEdgeCount: 0,

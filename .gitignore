@@ -7,3 +7,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Temporary raw source ingestion staging workspaces (KH-023 / KH-029)
+# Never commit raw attachments or unauthorized staging files to this public repository.
+files/
+.ingestion-staging/
+tmp/ingestion/
+
