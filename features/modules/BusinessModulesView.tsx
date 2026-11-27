@@ -193,8 +193,8 @@ export function BusinessModulesView({
           title={isAr ? 'استكشاف النماذج المعمارية للأنظمة الأربعة' : 'Explore the Four Core Module Models'}
           subtitle={
             isAr
-              ? 'اختر أي نظام لاستعراض مسؤولياته، تشغيله المستقل، ملكية بياناته، اعتمادياته، قراراته المعتمدة حرفيًا، وبنية دورة حياته القابلة للتوسع.'
-              : 'Open any module to inspect its responsibilities, standalone boundaries, data ownership, dependencies, verbatim Phase 2 decisions, and reusable lifecycle blueprint.'
+              ? 'اختر أي نظام لاستعراض سبب وجوده، والتعليل المعماري لحدوده، ومصفوفة الملكية، وأثر غياب الأنظمة النظيرة، والقرارات الـ 34 المعتمدة حرفيًا مع الشرح التعليمي، وسبب تأجيل البنود المستقبلية.'
+              : 'Open any module to inspect why it exists, architecture boundary reasoning, 4-perspective ownership boundaries, absent-peer impacts, verbatim decisions with educational breakdowns, and deferred design rationales.'
           }
         />
 

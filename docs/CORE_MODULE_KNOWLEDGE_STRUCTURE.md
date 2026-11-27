@@ -71,9 +71,9 @@ To protect the integrity of the centralized Decision Register (`DECISION_REGISTE
 `content/extractors/moduleModelsExtractor.ts` strictly separates **deterministic source extraction** from **manually curated educational projections** inside `CORE_MODULE_CONFIGS`:
 
 - **Deterministic Official Extraction (`DETERMINISTIC_MODULE_EXTRACTION_FIELDS`):** `decisions`, `requiredPcds`, `conditionalPcds`, `explicitExclusions`, and `deferredDesignItems` are parsed verbatim from each official module Markdown body on every load.
-- **Curated Educational Projections (`CURATED_MODULE_PROJECTION_FIELDS`):** Bilingual summaries (`identitySummary`, `standaloneSummary`, `criticalLimitation`, `responsibilities`, `standaloneCapabilities`, `ownedDataDomains`, `sharedReferencesConsumed`, `educationalComparisonRows`) are explicitly pinned in `CURATED_MODULE_PROJECTION_PINS` to commit `397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f` and the exact canonical stored-body SHA-256 of each authoritative module model document.
+- **Curated Educational Projections (`CURATED_MODULE_PROJECTION_FIELDS`):** Bilingual summaries (`identitySummary`, `standaloneSummary`, `criticalLimitation`, `responsibilities`, `standaloneCapabilities`, `ownedDataDomains`, `sharedReferencesConsumed`, `educationalComparisonRows`) and `TASK-005-FIX-03A` educational depth structures (`purposeAndImpact`, `designReasoning`, `absentPeerScenarios`, `ownershipBoundaryMatrix`, `deferredBoundaryRationales`, `decisions.educationalDetail`) are explicitly pinned in `CURATED_MODULE_PROJECTION_PINS` to commit `397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f` and the exact canonical stored-body SHA-256 of each authoritative module model document.
 - **Automatic Drift Detection:** If an authoritative module document's revision or canonical body SHA-256 changes, `projectionMetadata.mappingFreshnessStatus` deterministically flips from `verified-current` to `review-required-source-changed`, populates `reviewWarning`, and surfaces a prominent danger-styled freshness alert on `/modules` and `/modules/[moduleId]` so stale curated projections never silently present themselves as verified current knowledge.
-- **UI Provenance Separation:** `/modules/[moduleId]` explicitly badges deterministic verbatim sections (`Official Extraction` / `Deterministic Verbatim Source Extraction`) separately from curated educational summaries (`Curated Educational Projection` / `Curated Educational Table`).
+- **UI Provenance Separation:** `/modules/[moduleId]` explicitly badges deterministic verbatim sections (`Official Extraction` / `Deterministic Verbatim Source Extraction`) separately from curated educational summaries (`Curated Educational Projection` / `Curated Educational Table` / `Educational Interpretation`).
 
 ---
 
@@ -88,3 +88,18 @@ To protect the integrity of the centralized Decision Register (`DECISION_REGISTE
 | `FLD-CORE-01..05` | `knowledge-hub-internal` | Knowledge Hub internal row reference identifiers for `MODULE_DEPENDENCY_MATRIX.md §6` (the official table defines no `FLD-*` IDs). |
 | `OWN-CORE-01..15` | `knowledge-hub-internal` | Knowledge Hub internal row reference identifiers for `MODULE_DEPENDENCY_MATRIX.md §8` Data Ownership rows. |
 | `kh-*` (`kh-doc-*`, `kh-src-*`, `kh-h-*`) | `knowledge-hub-internal` | Knowledge Hub internal document, manifest, and heading-anchor identifiers. |
+
+---
+
+## 7. Core Module Educational Depth & Traceability (`TASK-005-FIX-03A` / `REV-03`)
+
+Implemented in `content/extractors/moduleEducationalContent.ts`, `features/modules/ModuleEducationalSections.tsx`, `features/modules/ModuleDecisionEducationList.tsx`, and `features/modules/CoreModuleDetailView.tsx`:
+
+1. **Purpose, Problems & Future Impact (`#module-purpose`):** Explains why each module exists, core enterprise coupling problems solved, and how approved Phase 2 architecture constrains Phases 3, 5, and 6 functional design.
+2. **Architecture Design Reasoning (`#architecture-reasoning`):** Collapsible architectural design trade-offs explicitly separating `Official Reasoning in Authoritative Source` from clearly labeled `Educational Interpretation` and direct `Architectural Implication`.
+3. **Standalone vs. Absent-Peer Impact (`#absent-peer-impacts`):** Comparison table showing what operates standalone (`0 HBMD`) versus what becomes unavailable when each peer module is absent, mapped to the governing `CIC` / `FLD` bridge.
+4. **4-Perspective Ownership Matrix (`#ownership-matrix`):** Distinguishes `Owned by This Module` | `Consumes / References` | `Owned by Peers / Platform` | `Unresolved / Deferred`, accompanied by an explicit `R03` non-inference disclaimer (conceptual ownership never implies DB schemas, columns, APIs, or final runtime behavior).
+5. **Approved Decisions Educational Breakdown (`#approved-decisions`):** Preserves all `34` Phase 2 decisions (`6` Finance, `8` Inventory, `9` Procurement, `11` Sales) with verbatim official body always visible plus progressive disclosure for Educational Explanation, Architectural Implication, Relevant Limitations, and Authoritative Source Sections.
+6. **Deferred Design Rationales (`#deferred-rationale`):** Explains why unresolved topics (`Costing/Valuation`, `Pricing Engine`, `Customer Invoice`, `3-Way Match`, `Soft/Hard Reservation`, `Tax/Currency`, `Orchestration`, `Multi-Branch`) remain intentionally deferred while keeping the 8 future lifecycle slots (`10–17`) unpopulated.
+7. **Deterministic Anchor Verification:** Every `sectionAnchor` on decisions, educational sections, and supporting source references is automatically verified against `renderSafeMarkdown(doc.bodyMarkdown).headings` in `content/batch002ModulesAndDependencies.test.ts`.
+

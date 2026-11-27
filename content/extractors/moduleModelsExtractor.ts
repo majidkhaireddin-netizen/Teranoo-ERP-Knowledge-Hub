@@ -2,6 +2,32 @@ import type { IdentifierScope, LocalizedText } from '@/content/models/types';
 import { createHeadingSlug, HEADING_ID_PREFIX } from '@/content/loaders/markdownPipeline';
 import { computeCanonicalStoredBodySha256 } from '@/content/ingestion/ingestionPipeline';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
+import {
+  MODULE_EDUCATIONAL_DEPTH_BUNDLES,
+  type DecisionEducationalDetail,
+  type ModuleAbsentPeerScenario,
+  type ModuleBusinessProblemItem,
+  type ModuleDeferredBoundaryRationale,
+  type ModuleDesignReasoningEntry,
+  type ModuleEducationalDepthBundle,
+  type ModuleFutureDesignImpactItem,
+  type ModuleOwnershipBoundaryRow,
+  type ModulePurposeAndImpactProfile,
+  type ModuleSourceAnchorRef,
+} from '@/content/extractors/moduleEducationalContent';
+
+export type {
+  DecisionEducationalDetail,
+  ModuleAbsentPeerScenario,
+  ModuleBusinessProblemItem,
+  ModuleDeferredBoundaryRationale,
+  ModuleDesignReasoningEntry,
+  ModuleEducationalDepthBundle,
+  ModuleFutureDesignImpactItem,
+  ModuleOwnershipBoundaryRow,
+  ModulePurposeAndImpactProfile,
+  ModuleSourceAnchorRef,
+};
 
 export type CoreModuleId =
   | 'finance'
@@ -103,6 +129,12 @@ export const CURATED_MODULE_PROJECTION_FIELDS: readonly string[] = [
   'relatedCicIds',
   'relatedFldLabels',
   'educationalComparisonRows',
+  'purposeAndImpact',
+  'designReasoning',
+  'absentPeerScenarios',
+  'ownershipBoundaryMatrix',
+  'deferredBoundaryRationales',
+  'decisions.educationalDetail',
 ];
 
 export const DETERMINISTIC_MODULE_EXTRACTION_FIELDS: readonly string[] = [
@@ -128,6 +160,7 @@ export interface Phase2SourceLocalDecision {
   readonly approvalStatus: 'approved';
   readonly phaseRef: 'phase-2';
   readonly scopeKind: 'phase-2-source-local';
+  readonly educationalDetail: DecisionEducationalDetail;
 }
 
 export interface ModulePcdRequirement {
@@ -187,6 +220,11 @@ export interface CoreModuleArchitecturalProfile {
   readonly educationalComparisonTitle?: LocalizedText;
   readonly educationalComparisonNote?: LocalizedText;
   readonly educationalComparisonRows?: readonly ModuleEducationalComparisonRow[];
+  readonly purposeAndImpact: ModulePurposeAndImpactProfile;
+  readonly designReasoning: readonly ModuleDesignReasoningEntry[];
+  readonly absentPeerScenarios: readonly ModuleAbsentPeerScenario[];
+  readonly ownershipBoundaryMatrix: readonly ModuleOwnershipBoundaryRow[];
+  readonly deferredBoundaryRationales: readonly ModuleDeferredBoundaryRationale[];
   readonly lifecycleBlueprint: readonly ModuleLifecycleSectionSlot[];
 }
 
@@ -962,6 +1000,13 @@ function extractDecisionsFromModuleMarkdown(
     const bodyText = current.bodyLines.join('\n').trim();
     const limitMatch = bodyText.match(/(?:^|\n)\*\*حد القرار:\*\*\s*(.+)$/m);
     const limitNote = limitMatch?.[1]?.trim() ?? null;
+    const depthBundle = MODULE_EDUCATIONAL_DEPTH_BUNDLES[config.id];
+    const educationalDetail = depthBundle.decisionDetails[current.decisionId];
+    if (!educationalDetail) {
+      throw new Error(
+        `Missing curated DecisionEducationalDetail for "${current.decisionId}" in module "${config.id}".`
+      );
+    }
     decisions.push({
       decisionId: current.decisionId,
       family: config.family,
@@ -977,6 +1022,7 @@ function extractDecisionsFromModuleMarkdown(
       approvalStatus: 'approved',
       phaseRef: 'phase-2',
       scopeKind: 'phase-2-source-local',
+      educationalDetail,
     });
     current = null;
   };
@@ -1287,6 +1333,8 @@ export function buildCoreModuleProfileFromSource(
     actualSourceRevision
   );
 
+  const depthBundle = MODULE_EDUCATIONAL_DEPTH_BUNDLES[config.id];
+
   return {
     id: config.id,
     code: config.code,
@@ -1318,6 +1366,11 @@ export function buildCoreModuleProfileFromSource(
     educationalComparisonTitle: config.educationalComparisonTitle,
     educationalComparisonNote: config.educationalComparisonNote,
     educationalComparisonRows: config.educationalComparisonRows,
+    purposeAndImpact: depthBundle.purposeAndImpact,
+    designReasoning: depthBundle.designReasoning,
+    absentPeerScenarios: depthBundle.absentPeerScenarios,
+    ownershipBoundaryMatrix: depthBundle.ownershipBoundaryMatrix,
+    deferredBoundaryRationales: depthBundle.deferredBoundaryRationales,
     lifecycleBlueprint,
   };
 }

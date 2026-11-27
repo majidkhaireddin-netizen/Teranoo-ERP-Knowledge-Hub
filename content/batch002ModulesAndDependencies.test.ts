@@ -33,6 +33,7 @@ import {
   resetExtractedRoadmapCache,
 } from '@/content/extractors/roadmapExtractor';
 import {
+  CURATED_MODULE_PROJECTION_FIELDS,
   CURATED_MODULE_PROJECTION_PINS,
   buildCoreModuleProfileFromSource,
   getCoreModuleProfileById,
@@ -40,6 +41,7 @@ import {
   resetExtractedCoreModulesCache,
   type CoreModuleId,
 } from '@/content/extractors/moduleModelsExtractor';
+import { renderSafeMarkdown } from '@/content/loaders/markdownPipeline';
 import {
   getExtractedDependencyArchitecture,
   resetExtractedDependencyArchitectureCache,
@@ -1318,3 +1320,190 @@ test('FIX-02-R06 (KH-034): simulator catches source pin drift, CIC precondition 
     /Simulator duplicate PCD capability identifier detected/
   );
 });
+
+// ============================================================================
+// 8. TASK-005-FIX-03A — Core Module Educational Depth & Traceability (R01–R07)
+// ============================================================================
+
+test('TASK-005-FIX-03A (R01–R05, R07): every core module covers all 9 educational dimensions, 4-perspective ownership, deferred rationales, and provenance fields', () => {
+  resetExtractedCoreModulesCache();
+  const catalog = getExtractedCoreModulesCatalog();
+  assert.equal(catalog.modules.length, 4);
+
+  const requiredEducationalProjectionFields = [
+    'purposeAndImpact',
+    'designReasoning',
+    'absentPeerScenarios',
+    'ownershipBoundaryMatrix',
+    'deferredBoundaryRationales',
+    'decisions.educationalDetail',
+  ] as const;
+
+  for (const field of requiredEducationalProjectionFields) {
+    assert.ok(
+      CURATED_MODULE_PROJECTION_FIELDS.includes(field),
+      `Expected ${field} in CURATED_MODULE_PROJECTION_FIELDS`
+    );
+  }
+
+  for (const mod of catalog.modules) {
+    // R01: 9 educational dimensions populated in both AR & EN
+    assert.ok(mod.purposeAndImpact.whyModuleExists.ar.length > 40);
+    assert.ok(mod.purposeAndImpact.whyModuleExists.en.length > 40);
+    assert.ok(mod.purposeAndImpact.businessProblemsAddressed.length >= 2);
+    assert.ok(mod.purposeAndImpact.futureDesignImplications.length >= 2);
+    assert.ok(mod.responsibilities.length >= 4);
+    assert.ok(mod.explicitExclusions.length >= 3);
+    assert.ok(mod.standaloneCapabilities.length >= 3);
+    assert.equal(
+      mod.absentPeerScenarios.length,
+      3,
+      `${mod.id} must cover all 3 absent peer modules`
+    );
+    assert.ok(mod.requiredPcds.length >= 2);
+    assert.ok(mod.deferredDesignItems.length >= 2);
+
+    // R02: Architecture Design Reasoning separates official reasoning vs educational interpretation
+    assert.ok(mod.designReasoning.length >= 3);
+    for (const reason of mod.designReasoning) {
+      assert.ok(reason.officialReasoning.ar.length > 20);
+      assert.ok(reason.officialReasoning.en.length > 20);
+      assert.ok(reason.architecturalImplication.ar.length > 20);
+      assert.ok(reason.architecturalImplication.en.length > 20);
+      if (reason.educationalInterpretation) {
+        assert.ok(reason.educationalInterpretation.ar.length > 20);
+        assert.ok(reason.educationalInterpretation.en.length > 20);
+      }
+    }
+
+    // R03: 4-perspective Ownership & Non-Ownership Matrix
+    assert.ok(mod.ownershipBoundaryMatrix.length >= 3);
+    for (const row of mod.ownershipBoundaryMatrix) {
+      assert.ok(row.domainConcept.ar.length > 0 && row.domainConcept.en.length > 0);
+      assert.ok(row.moduleOwns.ar.length > 0 && row.moduleOwns.en.length > 0);
+      assert.ok(row.consumesOrReferences.ar.length > 0 && row.consumesOrReferences.en.length > 0);
+      assert.ok(row.otherModulesOwn.ar.length > 0 && row.otherModulesOwn.en.length > 0);
+      assert.ok(row.unresolvedBoundary.ar.length > 0 && row.unresolvedBoundary.en.length > 0);
+    }
+
+    // R04: Every Phase 2 decision has verbatim body + educational detail
+    assert.ok(mod.decisions.length >= 6);
+    for (const dec of mod.decisions) {
+      assert.ok(dec.verbatimBody.length > 15);
+      assert.ok(dec.educationalDetail.educationalExplanation.ar.length > 20);
+      assert.ok(dec.educationalDetail.educationalExplanation.en.length > 20);
+      assert.ok(dec.educationalDetail.architecturalImplication.ar.length > 20);
+      assert.ok(dec.educationalDetail.architecturalImplication.en.length > 20);
+      assert.ok(dec.educationalDetail.relevantLimitations.ar.length > 20);
+      assert.ok(dec.educationalDetail.relevantLimitations.en.length > 20);
+      assert.ok(dec.educationalDetail.relatedSourceSections.length >= 1);
+    }
+
+    // R05: Deferred design boundary rationales populated while keeping future slots unpopulated
+    assert.ok(mod.deferredBoundaryRationales.length >= 3);
+    const populatedSlots = mod.lifecycleBlueprint.filter(
+      (s) => s.status === 'populated-phase-2'
+    );
+    const futureSlots = mod.lifecycleBlueprint.filter(
+      (s) => s.status === 'future-phase'
+    );
+    assert.equal(populatedSlots.length, 9);
+    assert.equal(futureSlots.length, 8);
+    assert.equal(mod.lifecycleBlueprint.length, 17);
+
+    // R07: Provenance metadata exposes both deterministic and curated educational fields
+    for (const field of requiredEducationalProjectionFields) {
+      assert.ok(mod.projectionMetadata.curatedFields.includes(field));
+    }
+  }
+});
+
+test('TASK-005-FIX-03A (R04, R07): 100% of decision anchors and educational sourceRef anchors resolve to actual rendered headings in official documents', async () => {
+  resetContentRegistryCache();
+  resetExtractedCoreModulesCache();
+  const registry = getContentRegistry();
+  const catalog = getExtractedCoreModulesCatalog();
+
+  assert.equal(catalog.allPhase2Decisions.length, 34);
+
+  const headingIdsBySlug = new Map<string, Set<string>>();
+  for (const mod of catalog.modules) {
+    const doc = registry.getBySlug(mod.documentSlug);
+    assert.ok(doc, `Missing official document for slug ${mod.documentSlug}`);
+    const rendered = await renderSafeMarkdown(doc.bodyMarkdown);
+    const ids = new Set(rendered.headings.map((h) => h.id));
+    headingIdsBySlug.set(mod.documentSlug, ids);
+
+    const assertAnchorExists = (anchor: string, contextLabel: string) => {
+      assert.ok(
+        ids.has(anchor),
+        `Anchor #${anchor} (${contextLabel}) not found in rendered headings for ${mod.documentSlug}`
+      );
+    };
+
+    // Purpose & impact anchors
+    assertAnchorExists(
+      mod.purposeAndImpact.whyModuleExistsSourceRef.sectionAnchor,
+      `${mod.id}.purposeAndImpact.whyModuleExistsSourceRef`
+    );
+    for (const problem of mod.purposeAndImpact.businessProblemsAddressed) {
+      assertAnchorExists(
+        problem.sourceRef.sectionAnchor,
+        `${mod.id}.businessProblemsAddressed[${problem.title.en}]`
+      );
+    }
+    for (const imp of mod.purposeAndImpact.futureDesignImplications) {
+      assertAnchorExists(
+        imp.sourceRef.sectionAnchor,
+        `${mod.id}.futureDesignImplications[${imp.area.en}]`
+      );
+    }
+
+    // Design reasoning anchors
+    for (const reason of mod.designReasoning) {
+      assertAnchorExists(
+        reason.sourceRef.sectionAnchor,
+        `${mod.id}.designReasoning[${reason.id}]`
+      );
+    }
+
+    // Absent peer impact anchors
+    for (const peer of mod.absentPeerScenarios) {
+      assertAnchorExists(
+        peer.sourceRef.sectionAnchor,
+        `${mod.id}.absentPeerScenarios[${peer.absentPeerCode}]`
+      );
+    }
+
+    // Ownership boundary matrix anchors
+    for (const row of mod.ownershipBoundaryMatrix) {
+      assertAnchorExists(
+        row.sourceRef.sectionAnchor,
+        `${mod.id}.ownershipBoundaryMatrix[${row.domainConcept.en}]`
+      );
+    }
+
+    // Deferred boundary rationale anchors
+    for (const def of mod.deferredBoundaryRationales) {
+      assertAnchorExists(
+        def.sourceRef.sectionAnchor,
+        `${mod.id}.deferredBoundaryRationales[${def.topic.en}]`
+      );
+    }
+
+    // Decision anchors + relatedSourceSections anchors
+    for (const dec of mod.decisions) {
+      assertAnchorExists(
+        dec.sectionAnchor,
+        `${mod.id}.decisions[${dec.decisionId}].sectionAnchor`
+      );
+      for (const sec of dec.educationalDetail.relatedSourceSections) {
+        assertAnchorExists(
+          sec.sectionAnchor,
+          `${mod.id}.decisions[${dec.decisionId}].relatedSourceSections[${sec.sectionAnchor}]`
+        );
+      }
+    }
+  }
+});
+

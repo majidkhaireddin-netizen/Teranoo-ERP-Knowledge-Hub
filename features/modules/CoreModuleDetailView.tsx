@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Clock,
   Database,
-  FileText,
   GitBranch,
   Layers,
   Lock,
@@ -33,6 +32,14 @@ import { InformationCallout } from '@/components/documentation/InformationCallou
 import { SourceReference } from '@/components/documentation/SourceReference';
 import { StatusIndicator } from '@/components/ui/StatusIndicator';
 import { cn } from '@/lib/utils';
+import {
+  ModuleAbsentPeerImpactSection,
+  ModuleDeferredRationaleSection,
+  ModuleDesignReasoningSection,
+  ModuleOwnershipBoundaryMatrixSection,
+  ModulePurposeAndImpactSection,
+} from './ModuleEducationalSections';
+import { ModuleDecisionEducationList } from './ModuleDecisionEducationList';
 
 export interface CoreModuleDetailViewProps {
   moduleProfile: CoreModuleArchitecturalProfile;
@@ -255,6 +262,71 @@ export function CoreModuleDetailView({
         </div>
       </InformationCallout>
 
+      {/* In-Page Architectural Depth Navigation */}
+      <nav
+        aria-label={isAr ? 'أقسام الدليل المعماري للنظام' : 'Module Guide Sections'}
+        className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border bg-surface p-2.5"
+      >
+        {[
+          {
+            href: '#module-purpose',
+            ar: '1. الغرض والأثر',
+            en: '1. Purpose & Impact',
+          },
+          {
+            href: '#architecture-reasoning',
+            ar: '2. التعليل المعماري',
+            en: '2. Design Reasoning',
+          },
+          {
+            href: '#absent-peer-impacts',
+            ar: '3. غياب الأنظمة النظيرة',
+            en: '3. Peer Absence',
+          },
+          {
+            href: '#ownership-matrix',
+            ar: '4. مصفوفة الملكية',
+            en: '4. Ownership Matrix',
+          },
+          {
+            href: '#dependencies-and-cics',
+            ar: '5. الاعتماديات وCIC',
+            en: '5. Dependencies & CICs',
+          },
+          {
+            href: '#approved-decisions',
+            ar: `6. القرارات (${moduleProfile.decisions.length})`,
+            en: `6. Decisions (${moduleProfile.decisions.length})`,
+          },
+          {
+            href: '#deferred-rationale',
+            ar: '7. حدود التأجيل',
+            en: '7. Deferred Boundaries',
+          },
+          {
+            href: '#lifecycle-blueprint',
+            ar: '8. خارطة 17 قسمًا',
+            en: '8. 17-Slot Lifecycle',
+          },
+        ].map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            className="rounded-md border border-border bg-surface-secondary/60 px-2.5 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-primary/40 hover:text-primary"
+          >
+            {isAr ? item.ar : item.en}
+          </a>
+        ))}
+      </nav>
+
+      {/* R01 (1, 2, 9): Purpose, Business Problems & Future Functional Impact */}
+      <div className="scroll-mt-20">
+        <ModulePurposeAndImpactSection
+          moduleProfile={moduleProfile}
+          locale={locale}
+        />
+      </div>
+
       {/* Band 2 & 3: Architectural Responsibilities & Standalone Operation */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
@@ -293,17 +365,19 @@ export function CoreModuleDetailView({
           <p className="text-xs leading-relaxed text-text-secondary">
             {resolveLocalizedText(moduleProfile.standaloneSummary, locale)}
           </p>
-          <ul className="space-y-1.5">
-            {moduleProfile.standaloneCapabilities.map((cap) => (
+          <ol className="space-y-1.5">
+            {moduleProfile.standaloneCapabilities.map((cap, idx) => (
               <li
                 key={cap.en}
                 className="flex items-start gap-2 text-xs leading-relaxed text-text-primary"
               >
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                <span className="font-mono text-[11px] font-semibold text-primary tabular-nums">
+                  {String(idx + 1).padStart(2, '0')}.
+                </span>
                 <span>{resolveLocalizedText(cap, locale)}</span>
               </li>
             ))}
-          </ul>
+          </ol>
           <div className="rounded-md border border-warning-border bg-warning-bg/70 p-3 text-xs leading-relaxed text-text-primary">
             <p className="flex items-center gap-1.5 font-semibold text-warning mb-1">
               <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
@@ -313,6 +387,30 @@ export function CoreModuleDetailView({
           </div>
         </div>
       </section>
+
+      {/* R02: Architecture Design Reasoning (Official Reasoning vs. Educational Interpretation) */}
+      <div className="scroll-mt-20">
+        <ModuleDesignReasoningSection
+          moduleProfile={moduleProfile}
+          locale={locale}
+        />
+      </div>
+
+      {/* R01 (5, 6): Standalone Operation vs. What Becomes Unavailable Without Peer Modules */}
+      <div className="scroll-mt-20">
+        <ModuleAbsentPeerImpactSection
+          moduleProfile={moduleProfile}
+          locale={locale}
+        />
+      </div>
+
+      {/* R03: 4-Perspective Ownership & Non-Ownership Comparison Matrix */}
+      <div className="scroll-mt-20">
+        <ModuleOwnershipBoundaryMatrixSection
+          moduleProfile={moduleProfile}
+          locale={locale}
+        />
+      </div>
 
       {/* Module-Specific Architectural Comparison Matrix (e.g., Procurement 6 Concepts) */}
       {moduleProfile.educationalComparisonRows &&
@@ -451,7 +549,7 @@ export function CoreModuleDetailView({
       </section>
 
       {/* Band 5: Dependencies & Integrations (PCD, 0 HBMD, CIC, FLD) */}
-      <section className="space-y-4">
+      <section id="dependencies-and-cics" className="scroll-mt-20 space-y-4">
         <SectionHeader
           title={
             isAr
@@ -586,88 +684,23 @@ export function CoreModuleDetailView({
         </div>
       </section>
 
-      {/* Band 6: Approved Phase 2 Source-Local Decisions (Verbatim) */}
-      <section id="approved-decisions" className="space-y-4">
-        <SectionHeader
-          title={
-            isAr
-              ? `قرارات المرحلة 2 المعتمدة لهذا النظام (${moduleProfile.decisions.length})`
-              : `Approved Phase 2 Source-Local Decisions (${moduleProfile.decisions.length})`
-          }
-          subtitle={
-            isAr
-              ? 'مستخلصة مباشرةً وحرفيًا من الوثيقة الرسمية المالكة — معزولة عن عدّاد سجل القرارات المركزي الـ 126 (المراحل 3–5).'
-              : 'Deterministically extracted verbatim from the owning Phase 2 official document — tracked separately from the centralized 126-decision register (Phases 3–5).'
-          }
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-sm border border-success-border bg-success-bg px-2 py-0.5 text-[10px] font-medium text-success">
-                {isAr ? 'استخلاص حتمي حرفي من المصدر' : 'Deterministic Verbatim Source Extraction'}
-              </span>
-              <Link
-                href="/decisions"
-                className="text-xs font-medium text-primary hover:underline"
-              >
-                {isAr ? 'فتح سجل القرارات الكامل' : 'Open Full Decision Register'}
-              </Link>
-            </div>
-          }
+      {/* Band 6 (R04): Approved Phase 2 Source-Local Decisions (Verbatim + Educational Breakdown) */}
+      <div className="scroll-mt-20">
+        <ModuleDecisionEducationList
+          decisions={moduleProfile.decisions}
+          locale={locale}
         />
+      </div>
 
-        <div className="space-y-3">
-          {moduleProfile.decisions.map((dec) => (
-            <article
-              key={dec.decisionId}
-              id={dec.decisionId}
-              className="rounded-lg border border-border bg-surface p-4 space-y-2.5"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-sm border border-class-decision-border bg-class-decision-bg px-2 py-0.5 font-mono text-xs font-bold text-class-decision bidi-ltr">
-                    {dec.decisionId}
-                  </span>
-                  <h3 className="text-sm font-semibold text-text-primary">
-                    {dec.title}
-                  </h3>
-                </div>
-                <Link
-                  href={`/knowledge/${dec.owningDocumentSlug}#${dec.sectionAnchor}`}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                >
-                  <FileText className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>{isAr ? 'الموضع في المصدر' : 'Source Anchor'}</span>
-                </Link>
-              </div>
-              <p className="whitespace-pre-line text-xs leading-relaxed text-text-secondary">
-                {dec.verbatimBody
-                  .split(/(\*\*[^*]+\*\*|`[^`]+`)/g)
-                  .map((part, idx) => {
-                    if (part.startsWith('**') && part.endsWith('**')) {
-                      return (
-                        <strong key={idx} className="font-semibold text-text-primary">
-                          {part.slice(2, -2)}
-                        </strong>
-                      );
-                    }
-                    if (part.startsWith('`') && part.endsWith('`')) {
-                      return (
-                        <code
-                          key={idx}
-                          className="rounded-xs bg-surface-secondary px-1 py-0.5 font-mono text-[11px] text-text-primary bidi-ltr"
-                        >
-                          {part.slice(1, -1)}
-                        </code>
-                      );
-                    }
-                    return <React.Fragment key={idx}>{part}</React.Fragment>;
-                  })}
-              </p>
-            </article>
-          ))}
-        </div>
-      </section>
+      {/* R05: Deferred Design Boundary Rationales */}
+      <div className="scroll-mt-20">
+        <ModuleDeferredRationaleSection
+          moduleProfile={moduleProfile}
+          locale={locale}
+        />
+      </div>
 
-      {/* Band 7: Explicit Exclusions & Deferred Design */}
+      {/* Band 7: Explicit Exclusions & Deferred Design (Verbatim Extraction) */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -683,17 +716,19 @@ export function CoreModuleDetailView({
               {isAr ? 'استخلاص رسمي' : 'Official Extraction'}
             </span>
           </div>
-          <ul className="space-y-1.5">
-            {moduleProfile.explicitExclusions.map((item) => (
+          <ol className="space-y-1.5">
+            {moduleProfile.explicitExclusions.map((item, idx) => (
               <li
                 key={item}
                 className="flex items-start gap-2 rounded-md border border-border bg-surface-secondary/40 px-3 py-1.5 text-xs text-text-secondary"
               >
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-text-muted" />
+                <span className="font-mono text-[11px] text-text-muted tabular-nums">
+                  {String(idx + 1).padStart(2, '0')}.
+                </span>
                 <span>{item}</span>
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
 
         <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
@@ -725,7 +760,7 @@ export function CoreModuleDetailView({
       </section>
 
       {/* Band 8: Reusable 17-Section Future Knowledge Lifecycle Slots */}
-      <section className="rounded-lg border border-border bg-surface p-5 space-y-3">
+      <section id="lifecycle-blueprint" className="scroll-mt-20 rounded-lg border border-border bg-surface p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-sm font-semibold text-text-primary">
