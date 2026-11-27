@@ -1767,8 +1767,8 @@ export const MODULE_EDUCATIONAL_DEPTH_BUNDLES: Readonly<
             en: 'Credit Risk & Shared Workflow Policies',
           },
           approvedConstraint: {
-            ar: 'حد الائتمان والمخاطر المالية ليست ملك Sales Core؛ Credit Check قد يعمل كنقطة فحص اختيارية على مستوى الميزة تستدعي قدرة Finance/Risk، بينما تعمل الموافقات عبر Shared Workflow بالاعتماد على Configuration.',
-            en: 'Credit limits/financial risk do not belong to Sales Core; Credit Check is an optional FLD checkpoint invoking Finance/Shared Risk, while approvals reuse Shared Platform Workflow.',
+            ar: 'حد الائتمان والمخاطر المالية ليست ملك Sales Core؛ يُذكر Credit Check مفاهيميًا كنقطة فحص اختيارية على مستوى الميزة في D-SALES-08 عبر Credit Capability (C* في مصفوفة PCD)، وليس مسجلاً كـ FLD مستقل في جدول §6 بالمصفوفة؛ أما بنية Credit Management وملكيتها النهائية (Finance أم Shared Risk) فمؤجلة للمرحلة 5/6، بينما تعمل الموافقات عبر Shared Workflow.',
+            en: 'Credit limits and financial risk do not belong to Sales Core; D-SALES-08 references optional Credit Check conceptually alongside Credit Capability (C* in the PCD Matrix) rather than as a separately registered Core FLD in Matrix §6, while final Credit Management architecture and ownership (Finance vs Shared Risk) remain deferred to Phase 5/6 and approvals reuse Shared Platform Workflow.',
           },
           deferredToPhase: {
             ar: 'المرحلة 5/6 لقواعد الائتمان، والتوجيه والموافقات (Routing/SoD/Thresholds).',
@@ -1861,8 +1861,8 @@ export const MODULE_EDUCATIONAL_DEPTH_BUNDLES: Readonly<
           en: 'Educational Interpretation: Keeping CRM external to core Sales prevents pipeline management from blocking order execution while preserving a clean CIC intake path for future CRM quotes/opportunities.',
         },
         architecturalImplication: {
-          ar: 'تُعالج علاقات Billing وStock Sale وDrop Ship وCredit Check كـ FLDs وCICs صريحة، مع 0 HBMD على أي وحدة أخرى.',
-          en: 'Billing, Stock Sale, Drop Ship, and Credit Check operate as explicit FLDs and CICs with 0 HBMDs.',
+          ar: 'تُعالج علاقات Stock Sale (FLD-CORE-01) وCustomer Billing (FLD-CORE-02) وDrop Ship (FLD-CORE-03) كـ FLDs وعقود CIC مسجلة مع 0 HBMD، بينما يرتبط Credit Check المفاهيمي (D-SALES-08) بقدرة Credit Capability (C* — بنية الائتمان وملكيته مؤجلة دون صف FLD/CIC منفصل في المصفوفة).',
+          en: 'Stock Sale (FLD-CORE-01), Customer Billing (FLD-CORE-02), and Drop Ship (FLD-CORE-03) operate as registered Core FLDs and CICs with 0 HBMDs, while conceptual Credit Check (D-SALES-08) relies on Credit Capability (C*, with Credit Management architecture and ownership deferred and no standalone §6 FLD/CIC row).',
         },
         sourceRef: {
           sectionLabel: { ar: '§7 الحجز و§9 حدود CRM', en: '§7 Reservation & §9 CRM Boundary' },
@@ -1896,8 +1896,8 @@ export const MODULE_EDUCATIONAL_DEPTH_BUNDLES: Readonly<
           en: 'Sales handles quote creation, Sales Order confirmation, and commercial customer commitments.',
         },
         unavailableCapabilities: {
-          ar: 'تغيب فوترة العميل المالية (Customer Billing) والذمم المدينة (AR) والتحصيل والإيراد وGL وCredit Check المالي (حد §2 الحرج).',
-          en: 'Financial Customer Billing, AR, collections, Revenue Posting, GL, and financial Credit Check are unavailable (explicit §2 limit).',
+          ar: 'تغيب فوترة العميل المالية (Customer Billing / FLD-CORE-02) والذمم المدينة (AR) والتحصيل والإيراد وGL، وكذلك التحقق الائتماني المالي عند غياب قدرات المخاطر المالية (حد §2 الحرج — مع بقاء بنية Credit Management وملكيتها مؤجلة للمرحلة 5/6).',
+          en: 'Financial Customer Billing (FLD-CORE-02), AR, collections, Revenue Posting, GL, and financial Credit Check exposure checks are unavailable (explicit §2 limit; Credit Management architecture and ownership remain deferred to Phase 5/6).',
         },
         bridgeContractOrFld: 'CIC-CORE-SALES-FIN-001 + FLD Customer Billing',
         sourceRef: {
@@ -1990,12 +1990,12 @@ export const MODULE_EDUCATIONAL_DEPTH_BUNDLES: Readonly<
           en: 'Pricing Capability (C*) and Credit Capability (C*) via contract when enabled.',
         },
         otherModulesOwn: {
-          ar: 'Finance يملك AR، التحصيل، الإيراد المحاسبي، GL Posting، وحدود المخاطر المالية.',
-          en: 'Finance owns AR, Collections, Revenue Accounting, GL Posting, and financial Credit Risk.',
+          ar: 'Finance يملك AR، التحصيل، الإيراد المحاسبي، وGL Posting؛ أما ملكية وبنية Credit Management والمخاطر المالية (Finance أم Shared Risk) فحدّ مؤجل صريح.',
+          en: 'Finance owns AR, Collections, Revenue Accounting, and GL Posting; Credit Management and financial Credit Risk ownership (Finance vs Shared Risk) remains an explicit deferred boundary.',
         },
         unresolvedBoundary: {
-          ar: 'مكان توليد كائن فاتورة العميل (Customer Invoice Generation) وموضع Pricing Engine وتصميم Credit (المرحلة 5/6).',
-          en: 'Customer Invoice generation placement, Pricing Engine placement, and Credit architecture (Phase 5/6).',
+          ar: 'مكان توليد كائن فاتورة العميل (Customer Invoice Generation) وموضع Pricing Engine وتصميم وملكية Credit Management مؤجلة (المرحلة 5/6).',
+          en: 'Customer Invoice generation placement, Pricing Engine placement, and Credit Management architecture/ownership remain deferred (Phase 5/6).',
         },
         sourceRef: {
           sectionLabel: { ar: '§6 و§11 و§16', en: '§6, §11 & §16' },
@@ -2218,16 +2218,16 @@ export const MODULE_EDUCATIONAL_DEPTH_BUNDLES: Readonly<
       'D-SALES-08': {
         decisionId: 'D-SALES-08',
         educationalExplanation: {
-          ar: 'تفسير تعليمي: يضبط كافة الروابط الخارجية (Finance / Inventory / Procurement / CRM / Projects / Manufacturing) كعقود تكامل مشروطة وميزات FLD غير مُغلقة لتفعيل المبيعات.',
-          en: 'Educational Interpretation: Keeps all peer links governed by CICs and classifies Stock Sale, Billing, Drop Ship, Credit Check, Project Sale, and MTO strictly as FLDs.',
+          ar: 'تفسير تعليمي: يضبط كافة الروابط الخارجية كعقود CIC واعتماديات ميزة FLD دون إغلاق لتفعيل المبيعات؛ وتسجّل المصفوفة (§6) ثلاثة FLDs أساسية للمبيعات (Stock Sale: FLD-CORE-01، وCustomer Billing: FLD-CORE-02، وDrop Ship: FLD-CORE-03)، بينما يرتبط Credit Check المفاهيمي بـ Credit Capability (C* — بنية الائتمان وملكيته مؤجلة) وتبقى Project Sale وMTO توسعات مستقبلية.',
+          en: 'Educational Interpretation: Keeps all peer links governed by CICs and FLDs without blocking core Sales activation; Matrix §6 registers three Sales Core FLDs (Stock Sale: FLD-CORE-01, Customer Billing: FLD-CORE-02, Drop Ship: FLD-CORE-03), while conceptual Credit Check relies on Credit Capability (C*, Credit architecture/ownership deferred) and Project Sale/MTO represent future extensions.',
         },
         architecturalImplication: {
           ar: 'يتم عزل تعطل أي طرف خارجي داخل الميزة المتصلة به فقط بينما يظل نظام المبيعات الأساسي قابلًا للتشغيل.',
           en: 'Unavailability of any peer module impacts only its corresponding FLD feature while core Sales stays active.',
         },
         relevantLimitations: {
-          ar: 'التصميم التفصيلي لـ Customer Billing وDrop Ship وCredit Check ينتظر المرحلة 5/6.',
-          en: 'Detailed operational workflows for Customer Billing, Drop Ship, and Credit Check await Phase 5/6.',
+          ar: 'لا يُعد Credit Check اعتمادية ميزة أساسية مسجّلة في §6 ولا عقد CIC مستقلًا، وتبقى ملكية Credit Management والتصميم التفصيلي لـ Customer Billing وDrop Ship وCredit Check مؤجلة للمرحلة 5/6.',
+          en: 'Credit Check is not a separately registered §6 Core FLD or standalone Core CIC; Credit Management ownership and detailed operational workflows for Customer Billing, Drop Ship, and Credit Check remain deferred until Phase 5/6.',
         },
         relatedSourceSections: [
           { sectionLabel: { ar: '§8 و§11 و§16', en: '§8, §11 & §16' }, sectionAnchor: 'kh-h-8-sales-procurement-boundary' },

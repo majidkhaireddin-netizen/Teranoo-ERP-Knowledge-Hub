@@ -47,6 +47,10 @@ import {
   resetExtractedDependencyArchitectureCache,
 } from '@/content/extractors/dependencyArchitectureExtractor';
 import {
+  CURATED_DEPENDENCY_PROJECTION_PINS,
+  buildDependencyEducationalGuidance,
+} from '@/content/extractors/dependencyEducationalContent';
+import {
   DEFAULT_EDUCATIONAL_CONTROLS,
   DEFAULT_PLATFORM_PREREQUISITES,
   SIMULATOR_PINNED_SOURCE,
@@ -1506,4 +1510,273 @@ test('TASK-005-FIX-03A (R04, R07): 100% of decision anchors and educational sour
     }
   }
 });
+
+// ============================================================================
+// 9. TASK-005-FIX-03B — Dependency & Integration Educational Quality (R02–R07, KH-038/039/040)
+// ============================================================================
+
+test('TASK-005-FIX-03B (R02–R06): covers classification guide, 6 CIC guidance records, 5 ownership distinctions, 4 conceptual examples, and KH-038/039/040 semantics', () => {
+  resetExtractedDependencyArchitectureCache();
+  resetExtractedCoreModulesCache();
+
+  const arch = getExtractedDependencyArchitecture();
+  const guidance = arch.educationalGuidance;
+
+  // R02: Dependency Classification Design Guide preserves strictly 4 official types
+  assert.deepEqual(
+    arch.dependencyModel.officialTypes.map((t) => t.code),
+    ['PCD', 'HBMD', 'CIC', 'FLD']
+  );
+  assert.ok(guidance.classificationGuide.separationNotice.ar.length > 20);
+  assert.ok(guidance.classificationGuide.separationNotice.en.length > 20);
+  assert.equal(guidance.classificationGuide.decisionFlowSteps.length, 4);
+  assert.equal(
+    guidance.classificationGuide.classificationComparisonRows.length,
+    4
+  );
+  assert.deepEqual(
+    guidance.classificationGuide.classificationComparisonRows.map((r) => r.code),
+    ['PCD', 'HBMD', 'CIC', 'FLD']
+  );
+  for (const row of guidance.classificationGuide.classificationComparisonRows) {
+    assert.ok(row.decisionQuestion.ar.length > 15 && row.decisionQuestion.en.length > 15);
+    assert.ok(row.enforcementBoundary.ar.length > 15 && row.enforcementBoundary.en.length > 15);
+    assert.ok(row.commonMistakes.ar.length > 15 && row.commonMistakes.en.length > 15);
+    assert.ok(
+      row.architecturalImplication.ar.length > 15 &&
+        row.architecturalImplication.en.length > 15
+    );
+  }
+
+  // R03: All 6 Core CICs remain intact with 15 metadata fields + curated educational guidance
+  assert.equal(arch.matrix.coreCics.length, 6);
+  for (const cic of arch.matrix.coreCics) {
+    assert.equal(Object.keys(cic.metadata).length, 15);
+    const cicGuide = guidance.cicGuidanceByContractId[cic.contractId];
+    assert.ok(cicGuide, `Missing educational guidance for ${cic.contractId}`);
+    assert.equal(cicGuide.contractId, cic.contractId);
+    assert.ok(cicGuide.whyIntegrationExists.ar.length > 25);
+    assert.ok(cicGuide.whyIntegrationExists.en.length > 25);
+    assert.ok(cicGuide.auditAndIdempotencyPrincipleNote.ar.length > 25);
+    assert.ok(cicGuide.auditAndIdempotencyPrincipleNote.en.length > 25);
+    assert.ok(cicGuide.deferredDesignDecisions.ar.length > 25);
+    assert.ok(cicGuide.deferredDesignDecisions.en.length > 25);
+    assert.ok(cicGuide.sourceRefs.length >= 2);
+  }
+
+  // R04: Data Ownership Guide preserves all 15 OWN-CORE records & 4 deferred boundaries
+  assert.equal(arch.matrix.dataOwnershipRecords.length, 15);
+  assert.equal(arch.matrix.deferredOwnershipCount, 4);
+  assert.ok(guidance.ownershipGuide.schemaBoundaryNotice.ar.length > 25);
+  assert.ok(guidance.ownershipGuide.schemaBoundaryNotice.en.length > 25);
+  assert.deepEqual(
+    guidance.ownershipGuide.distinctions.map((d) => d.id),
+    [
+      'shared-identity-vs-context',
+      'authoritative-ownership-vs-consumption',
+      'transaction-ownership-vs-coordination',
+      'physical-quantity-vs-financial-effect',
+      'deferred-ownership-boundaries',
+    ]
+  );
+  assert.equal(guidance.ownershipGuide.architectChecklist.length, 4);
+
+  // R05: All 4 conceptual educational examples
+  assert.deepEqual(
+    guidance.educationalExamples.map((e) => e.id),
+    [
+      'ex-po-vs-physical-receipt',
+      'ex-sales-order-vs-inventory',
+      'ex-standalone-inventory-vs-finance',
+      'ex-fld-must-not-become-hbmd',
+    ]
+  );
+  for (const example of guidance.educationalExamples) {
+    assert.ok(example.title.ar.length > 15 && example.title.en.length > 15);
+    assert.ok(example.scenarioSummary.ar.length > 25 && example.scenarioSummary.en.length > 25);
+    assert.ok(example.boundaryRule.ar.length > 25 && example.boundaryRule.en.length > 25);
+    assert.ok(
+      example.architecturalConsequenceIfViolated.ar.length > 25 &&
+        example.architecturalConsequenceIfViolated.en.length > 25
+    );
+    assert.ok(example.sourceRefs.length >= 2);
+  }
+
+  // R06 (KH-038, KH-039, KH-040): Exact Core FLD semantics & Credit Capability deferred status
+  assert.equal(arch.matrix.coreFlds.length, 5);
+  assert.deepEqual(
+    arch.matrix.coreFlds.map((f) => [f.id, f.sourceModuleFeature]),
+    [
+      ['FLD-CORE-01', 'Sales / Stock Sale / Stock Fulfillment'],
+      ['FLD-CORE-02', 'Sales / Customer Billing'],
+      ['FLD-CORE-03', 'Sales / Drop Ship / Direct Delivery / Back-to-Back'],
+      ['FLD-CORE-04', 'Procurement / Stock Purchase'],
+      ['FLD-CORE-05', 'Procurement / Three-Way Match'],
+    ]
+  );
+  assert.equal(
+    arch.matrix.coreFlds.some((f) => /credit/i.test(f.sourceModuleFeature)),
+    false,
+    'KH-038: Credit Check must not appear as a registered §6 Core FLD'
+  );
+  const creditCapRow = arch.matrix.pcdMatrix.find(
+    (r) => r.capability === 'Credit Capability'
+  );
+  assert.ok(creditCapRow);
+  assert.equal(creditCapRow.sales, 'C*');
+  assert.equal(creditCapRow.finance, '—');
+
+  // Verify Sales module projections preserve KH-038/039/040 corrections
+  const salesMod = getCoreModuleProfileById('sales-order-management');
+  assert.ok(salesMod);
+  const salesCapCombinedEn = salesMod.standaloneCapabilities
+    .map((c) => c.en)
+    .join(' ');
+  assert.match(salesCapCombinedEn, /FLD-CORE-01/);
+  assert.match(salesCapCombinedEn, /FLD-CORE-02/);
+  assert.match(salesCapCombinedEn, /FLD-CORE-03/);
+  assert.match(salesCapCombinedEn, /Credit Capability.*C\*/i);
+
+  const dSales08 = salesMod.decisions.find((d) => d.decisionId === 'D-SALES-08');
+  assert.ok(dSales08);
+  assert.match(dSales08.educationalDetail.relevantLimitations.en, /not.*§6 Core FLD|deferred/i);
+
+  const creditOwnershipRow = salesMod.ownershipBoundaryMatrix.find((row) =>
+    /Credit/i.test(row.domainConcept.en)
+  );
+  assert.ok(creditOwnershipRow);
+  assert.match(creditOwnershipRow.otherModulesOwn.en, /deferred/i);
+  assert.match(creditOwnershipRow.unresolvedBoundary.en, /deferred/i);
+});
+
+test('TASK-005-FIX-03B (R07): dependency educational provenance verifies current pins, flags body/revision drift, and 100% of sourceRef anchors resolve', async () => {
+  resetContentRegistryCache();
+  resetExtractedDependencyArchitectureCache();
+
+  const registry = getContentRegistry();
+  const arch = getExtractedDependencyArchitecture();
+  const { provenance, classificationGuide, cicGuidanceByContractId, ownershipGuide, educationalExamples } =
+    arch.educationalGuidance;
+
+  assert.equal(provenance.kind, 'curated-projection');
+  assert.equal(provenance.mappingFreshnessStatus, 'verified-current');
+  assert.equal(provenance.reviewWarning, null);
+  assert.equal(provenance.sources.length, 4);
+  for (const entry of provenance.sources) {
+    const pin = CURATED_DEPENDENCY_PROJECTION_PINS[entry.key];
+    assert.equal(entry.status, 'verified-current');
+    assert.equal(entry.actualSourceBodySha256, pin.mappedSourceBodySha256);
+    assert.equal(entry.actualSourceRevision, pin.mappedSourceRevision);
+  }
+
+  // Drift detection: mutating dependency-model body or lifecycle revision flips freshness to review-required-source-changed
+  const depModel = registry.getBySlug('dependency-model')!;
+  const matrixDoc = registry.getBySlug('module-dependency-matrix')!;
+  const lifecycleDoc = registry.getBySlug('module-lifecycle-rules')!;
+  const closureDoc = registry.getBySlug('phase-2-closure-review')!;
+
+  const driftedBody = buildDependencyEducationalGuidance({
+    dependencyModel: {
+      key: 'dependencyModel',
+      bodyMarkdown: depModel.bodyMarkdown + '\n<!-- simulated drift -->\n',
+      sourceRevision:
+        depModel.metadata.source.kind === 'official-source'
+          ? depModel.metadata.source.commitSha ?? null
+          : null,
+    },
+    moduleDependencyMatrix: {
+      key: 'moduleDependencyMatrix',
+      bodyMarkdown: matrixDoc.bodyMarkdown,
+      sourceRevision:
+        matrixDoc.metadata.source.kind === 'official-source'
+          ? matrixDoc.metadata.source.commitSha ?? null
+          : null,
+    },
+    moduleLifecycleRules: {
+      key: 'moduleLifecycleRules',
+      bodyMarkdown: lifecycleDoc.bodyMarkdown,
+      sourceRevision:
+        lifecycleDoc.metadata.source.kind === 'official-source'
+          ? lifecycleDoc.metadata.source.commitSha ?? null
+          : null,
+    },
+    phase2ClosureReview: {
+      key: 'phase2ClosureReview',
+      bodyMarkdown: closureDoc.bodyMarkdown,
+      sourceRevision:
+        closureDoc.metadata.source.kind === 'official-source'
+          ? closureDoc.metadata.source.commitSha ?? null
+          : null,
+    },
+  });
+  assert.equal(
+    driftedBody.provenance.mappingFreshnessStatus,
+    'review-required-source-changed'
+  );
+  assert.ok(driftedBody.provenance.reviewWarning !== null);
+
+  const driftedRevision = buildDependencyEducationalGuidance({
+    dependencyModel: {
+      key: 'dependencyModel',
+      bodyMarkdown: depModel.bodyMarkdown,
+      sourceRevision:
+        depModel.metadata.source.kind === 'official-source'
+          ? depModel.metadata.source.commitSha ?? null
+          : null,
+    },
+    moduleDependencyMatrix: {
+      key: 'moduleDependencyMatrix',
+      bodyMarkdown: matrixDoc.bodyMarkdown,
+      sourceRevision: '0000000000000000000000000000000000000000',
+    },
+    moduleLifecycleRules: {
+      key: 'moduleLifecycleRules',
+      bodyMarkdown: lifecycleDoc.bodyMarkdown,
+      sourceRevision:
+        lifecycleDoc.metadata.source.kind === 'official-source'
+          ? lifecycleDoc.metadata.source.commitSha ?? null
+          : null,
+    },
+    phase2ClosureReview: {
+      key: 'phase2ClosureReview',
+      bodyMarkdown: closureDoc.bodyMarkdown,
+      sourceRevision:
+        closureDoc.metadata.source.kind === 'official-source'
+          ? closureDoc.metadata.source.commitSha ?? null
+          : null,
+    },
+  });
+  assert.equal(
+    driftedRevision.provenance.mappingFreshnessStatus,
+    'review-required-source-changed'
+  );
+  assert.ok(driftedRevision.provenance.reviewWarning !== null);
+
+  // Resolve 100% of referenced #kh-h-* section anchors across all referenced documents
+  const allRefs = [
+    ...classificationGuide.decisionFlowSteps.map((s) => s.sourceRef),
+    ...classificationGuide.classificationComparisonRows.map((r) => r.sourceRef),
+    ...Object.values(cicGuidanceByContractId).flatMap((c) => c.sourceRefs),
+    ...ownershipGuide.distinctions.flatMap((d) => d.sourceRefs),
+    ...educationalExamples.flatMap((e) => e.sourceRefs),
+  ];
+  assert.ok(allRefs.length >= 30);
+
+  const headingIdsBySlug = new Map<string, Set<string>>();
+  for (const ref of allRefs) {
+    let ids = headingIdsBySlug.get(ref.documentSlug);
+    if (!ids) {
+      const doc = registry.getBySlug(ref.documentSlug);
+      assert.ok(doc, `Missing document for slug ${ref.documentSlug}`);
+      const rendered = await renderSafeMarkdown(doc.bodyMarkdown);
+      ids = new Set(rendered.headings.map((h) => h.id));
+      headingIdsBySlug.set(ref.documentSlug, ids);
+    }
+    assert.ok(
+      ids.has(ref.sectionAnchor),
+      `Source anchor #${ref.sectionAnchor} not found in rendered headings of ${ref.documentSlug}`
+    );
+  }
+});
+
 

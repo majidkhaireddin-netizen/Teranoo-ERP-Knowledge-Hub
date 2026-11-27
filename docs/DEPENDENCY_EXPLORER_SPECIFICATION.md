@@ -71,3 +71,17 @@ The Dependencies & Integration Architecture Center (`/dependencies`) transforms 
 - All **15** Data Ownership objects (`OWN-CORE-01..15` explicitly marked `knowledge-hub-internal`)
 - All **7** Phase 2 Assumption Safety Guardrails (`G-ASSUMP-01..07` — `official-erp`)
 - Exact-ID structured entity hits score `110` (above multi-entity document hits at `100`) so exact ID queries such as `D-FIN-01` or `CIC-CORE-INV-FIN-001` rank first deterministically.
+
+---
+
+## 5. Dependency & Integration Educational Quality (`TASK-005-FIX-03B`)
+
+- **Curated Guidance & Provenance Module (`content/extractors/dependencyEducationalContent.ts`):**
+  - Strictly separates deterministic Phase 2 extraction from curated bilingual (`ar`/`en`) educational commentary, pinning four authoritative documents (`dependency-model`, `module-dependency-matrix`, `module-lifecycle-rules`, `phase-2-closure-review`) to revision `397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f` and their canonical stored-body SHA-256 digests (`CURATED_DEPENDENCY_PROJECTION_PINS`).
+  - Integrated directly into `dependencyArchitectureExtractor.ts` (`ExtractedDependencyArchitecture['educationalGuidance']`), exposing `DependencyProvenanceStrip` with automatic `review-required-source-changed` drift detection.
+- **UI Educational Enhancements (`features/dependencies/DependencyEducationalGuides.tsx` & sibling views):**
+  - **Model Tab (`R02` + `R05` #4):** Renders `DependencyClassificationDesignGuide` (4-step architect decision flow, 4-type comparison table comparing decision questions, enforcement boundaries, common mistakes, and implications, `KH-038/039/040` note, and Conceptual Example 4 on why `FLD` must never become `HBMD`).
+  - **Ownership Tab (`R04` + `R05` #1–#3):** Preserves all **15** `OWN-CORE-01..15` records and adds `DataOwnershipDesignGuideSection` (5 ownership distinctions, 4-question Architect Checklist, and interactive Conceptual Examples 1–3 covering Purchase Order vs Physical Receipt, Sales Order vs Inventory Reservation, and Standalone Inventory vs Finance Ledger Posting, with zero invented DB schemas).
+  - **Scenarios & Matrix CIC Inspector (`R03`):** Enhances all **6** `CIC-CORE-*` scenario flows (`CrossModuleScenariosView`) and the Matrix CIC Inspector (`DependencyMatrixExplorer`) with `whyIntegrationExists`, `auditAndIdempotencyPrincipleNote`, `deferredDesignDecisions`, and clickable `#kh-h-*` source anchors while reusing `CoreCicContract` without duplicating catalog data or inventing runtime APIs/payloads/accounting entries.
+- **Semantic Corrections (`R06` / `KH-038`, `KH-039`, `KH-040`):** Clarifies across module projections and dependency guides that `Credit Check` is NOT a separately registered `§6` Core FLD or dedicated Core CIC (`Credit Capability` remains `C*` with `Credit Management` ownership deferred), and preserves exact `§6` Core FLD mapping (`FLD-CORE-01` Stock Sale, `FLD-CORE-02` Customer Billing, `FLD-CORE-03` Drop Ship, `FLD-CORE-04` Stock Purchase, `FLD-CORE-05` Three-Way Match).
+

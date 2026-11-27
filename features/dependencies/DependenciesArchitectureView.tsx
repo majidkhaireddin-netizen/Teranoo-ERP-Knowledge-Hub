@@ -319,6 +319,7 @@ export function DependenciesArchitectureView({
         {activeTab === 'matrix' ? (
           <DependencyMatrixExplorer
             matrix={architecture.matrix}
+            guidance={architecture.educationalGuidance}
             initialCicId={deepLinkCicId}
           />
         ) : null}
@@ -326,6 +327,7 @@ export function DependenciesArchitectureView({
         {activeTab === 'model' ? (
           <DependencyModelSection
             data={architecture.dependencyModel}
+            guidance={architecture.educationalGuidance}
             highlightedType={highlightedType}
           />
         ) : null}
@@ -335,11 +337,17 @@ export function DependenciesArchitectureView({
         ) : null}
 
         {activeTab === 'ownership' ? (
-          <DataOwnershipExplorer matrix={architecture.matrix} />
+          <DataOwnershipExplorer
+            matrix={architecture.matrix}
+            guidance={architecture.educationalGuidance}
+          />
         ) : null}
 
         {activeTab === 'scenarios' ? (
-          <CrossModuleScenariosView matrix={architecture.matrix} />
+          <CrossModuleScenariosView
+            matrix={architecture.matrix}
+            guidance={architecture.educationalGuidance}
+          />
         ) : null}
 
         {activeTab === 'lifecycle' ? (

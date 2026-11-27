@@ -3,6 +3,37 @@ import { createHeadingSlug, HEADING_ID_PREFIX } from '@/content/loaders/markdown
 import { computeCanonicalStoredBodySha256 } from '@/content/ingestion/ingestionPipeline';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
 import type { CoreModuleId } from '@/content/extractors/moduleModelsExtractor';
+import {
+  buildDependencyEducationalGuidance,
+  CURATED_DEPENDENCY_PROJECTION_PINS,
+  type ClassificationDecisionRow,
+  type ConceptualEducationalExample,
+  type CoreCicEducationalGuidance,
+  type DataOwnershipDesignGuide,
+  type DecisionFlowStep,
+  type DependencyClassificationGuide,
+  type DependencyEducationalGuidanceBundle,
+  type DependencyEducationalProvenance,
+  type EducationalSourceAnchorRef,
+  type OwnershipDecisionStep,
+  type OwnershipDistinctionTopic,
+} from '@/content/extractors/dependencyEducationalContent';
+
+export {
+  buildDependencyEducationalGuidance,
+  CURATED_DEPENDENCY_PROJECTION_PINS,
+  type ClassificationDecisionRow,
+  type ConceptualEducationalExample,
+  type CoreCicEducationalGuidance,
+  type DataOwnershipDesignGuide,
+  type DecisionFlowStep,
+  type DependencyClassificationGuide,
+  type DependencyEducationalGuidanceBundle,
+  type DependencyEducationalProvenance,
+  type EducationalSourceAnchorRef,
+  type OwnershipDecisionStep,
+  type OwnershipDistinctionTopic,
+};
 
 export type DependencyTypeCode = 'PCD' | 'HBMD' | 'CIC' | 'FLD';
 
@@ -230,6 +261,7 @@ export interface ExtractedDependencyArchitecture {
       readonly deferredCommitmentGroups: readonly DeferredCommitmentGroup[];
     };
   };
+  readonly educationalGuidance: DependencyEducationalGuidanceBundle;
 }
 
 function cleanCell(raw: string): string {
@@ -978,6 +1010,40 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
         ),
       },
     },
+    educationalGuidance: buildDependencyEducationalGuidance({
+      dependencyModel: {
+        key: 'dependencyModel',
+        bodyMarkdown: depDoc.bodyMarkdown,
+        sourceRevision:
+          depDoc.metadata.source.kind === 'official-source'
+            ? (depDoc.metadata.source.commitSha ?? null)
+            : null,
+      },
+      moduleDependencyMatrix: {
+        key: 'moduleDependencyMatrix',
+        bodyMarkdown: matrixDoc.bodyMarkdown,
+        sourceRevision:
+          matrixDoc.metadata.source.kind === 'official-source'
+            ? (matrixDoc.metadata.source.commitSha ?? null)
+            : null,
+      },
+      moduleLifecycleRules: {
+        key: 'moduleLifecycleRules',
+        bodyMarkdown: lifecycleDoc.bodyMarkdown,
+        sourceRevision:
+          lifecycleDoc.metadata.source.kind === 'official-source'
+            ? (lifecycleDoc.metadata.source.commitSha ?? null)
+            : null,
+      },
+      phase2ClosureReview: {
+        key: 'phase2ClosureReview',
+        bodyMarkdown: closureDoc.bodyMarkdown,
+        sourceRevision:
+          closureDoc.metadata.source.kind === 'official-source'
+            ? (closureDoc.metadata.source.commitSha ?? null)
+            : null,
+      },
+    }),
   };
 
   return cachedDependencyArchitecture;

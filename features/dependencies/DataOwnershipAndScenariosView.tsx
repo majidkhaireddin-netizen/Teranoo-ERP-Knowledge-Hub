@@ -13,17 +13,29 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { resolveLocalizedText } from '@/content/models/types';
-import type { ExtractedDependencyArchitecture } from '@/content/extractors/dependencyArchitectureExtractor';
+import type {
+  DependencyEducationalGuidanceBundle,
+  ExtractedDependencyArchitecture,
+} from '@/content/extractors/dependencyArchitectureExtractor';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { InformationCallout } from '@/components/documentation/InformationCallout';
+import {
+  DataOwnershipDesignGuideSection,
+  DependencyProvenanceStrip,
+  SourceAnchorLinksStrip,
+} from '@/features/dependencies/DependencyEducationalGuides';
 import { cn } from '@/lib/utils';
 
 export interface DataOwnershipExplorerProps {
   matrix: ExtractedDependencyArchitecture['matrix'];
+  guidance?: DependencyEducationalGuidanceBundle;
 }
 
-export function DataOwnershipExplorer({ matrix }: DataOwnershipExplorerProps) {
+export function DataOwnershipExplorer({
+  matrix,
+  guidance,
+}: DataOwnershipExplorerProps) {
   const { locale } = useAppLocale();
   const isAr = locale === 'ar';
   const [filterMode, setFilterMode] = useState<
@@ -41,8 +53,16 @@ export function DataOwnershipExplorer({ matrix }: DataOwnershipExplorerProps) {
     });
   }, [matrix.dataOwnershipRecords, filterMode]);
 
+  const ownershipExamples = useMemo(
+    () =>
+      guidance?.educationalExamples.filter(
+        (ex) => ex.placement === 'ownership'
+      ) ?? [],
+    [guidance]
+  );
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <SectionHeader
         title={
           isAr
@@ -55,15 +75,29 @@ export function DataOwnershipExplorer({ matrix }: DataOwnershipExplorerProps) {
             : 'Extracted from MODULE_DEPENDENCY_MATRIX.md Section 8 — strictly independent of Dependency Types (Data Ownership ≠ Dependency Type). OWN-CORE-* tags are Knowledge Hub internal row references, not official ERP IDs.'
         }
         actions={
-          <Link
-            href={`/knowledge/${matrix.documentSlug}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-          >
-            <FileText className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{isAr ? 'القسم 8 في المصدر' : 'Section 8 in Source'}</span>
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            {guidance ? (
+              <a
+                href="#data-ownership-design-guide"
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                {isAr ? 'دليل تصميم الملكية والأمثلة' : 'Ownership Design Guide & Examples'}
+              </a>
+            ) : null}
+            <Link
+              href={`/knowledge/${matrix.documentSlug}#kh-h-8-data-ownership-cross-reference-ليس-dependency-register`}
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{isAr ? 'القسم 8 في المصدر' : 'Section 8 in Source'}</span>
+            </Link>
+          </div>
         }
       />
+
+      {guidance ? (
+        <DependencyProvenanceStrip provenance={guidance.provenance} />
+      ) : null}
 
       {/* Filter buttons */}
       <div className="flex flex-wrap items-center gap-2">
@@ -97,7 +131,7 @@ export function DataOwnershipExplorer({ matrix }: DataOwnershipExplorerProps) {
             onClick={() => setFilterMode(btn.key)}
             aria-pressed={filterMode === btn.key}
             className={cn(
-              'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
+              'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer',
               filterMode === btn.key
                 ? 'border-primary bg-primary-subtle text-primary'
                 : 'border-border bg-surface text-text-secondary hover:border-border-strong'
@@ -183,16 +217,26 @@ export function DataOwnershipExplorer({ matrix }: DataOwnershipExplorerProps) {
           </tbody>
         </table>
       </div>
+
+      {/* R04 Data Ownership Design Guide & R05 Conceptual Examples #1-#3 */}
+      {guidance ? (
+        <DataOwnershipDesignGuideSection
+          guide={guidance.ownershipGuide}
+          examples={ownershipExamples}
+        />
+      ) : null}
     </div>
   );
 }
 
 export interface CrossModuleScenariosViewProps {
   matrix: ExtractedDependencyArchitecture['matrix'];
+  guidance?: DependencyEducationalGuidanceBundle;
 }
 
 export function CrossModuleScenariosView({
   matrix,
+  guidance,
 }: CrossModuleScenariosViewProps) {
   const { locale } = useAppLocale();
   const isAr = locale === 'ar';
@@ -208,8 +252,8 @@ export function CrossModuleScenariosView({
         }
         subtitle={
           isAr
-            ? 'شرح بصري منظم لكيفية تعاون الأنظمة المستقلة عبر عقود التكامل المشروط دون نقل ملكية البيانات أو إنشاء اعتماديات صلبة.'
-            : 'Structured educational visualization of how independent modules collaborate through CICs without transferring ownership or creating HBMDs.'
+            ? 'شرح تعليمي منظم لكيفية تعاون الأنظمة المستقلة عبر عقود التكامل المشروط الـ 6: سبب التكامل، شروطه المسبقة، مراجع البيانات المتبادلة، قواعد الفشل والتدقيق، والقرارات المؤجلة دون اختلاق APIs أو Payloads.'
+            : 'Structured educational visualization of how independent modules collaborate through all 6 Core CICs: why integration exists, preconditions, activation conditions, conceptual refs exchanged, failure/audit/idempotency rules, and deferred Phase 5/6 decisions.'
         }
       />
 
@@ -226,109 +270,196 @@ export function CrossModuleScenariosView({
           : 'These lanes visualize approved Phase 2 conceptual collaboration boundaries (v0.1-conceptual). Full Procure-to-Pay / Order-to-Cash validation and API/event/retry mechanics are formally deferred to Phases 5 and 6.5.'}
       </InformationCallout>
 
+      {guidance ? (
+        <DependencyProvenanceStrip
+          provenance={guidance.provenance}
+          pinnedDocumentSlugs={['moduleDependencyMatrix', 'moduleLifecycleRules'].map((k) =>
+            k === 'moduleDependencyMatrix'
+              ? 'module-dependency-matrix'
+              : 'module-lifecycle-rules'
+          )}
+        />
+      ) : null}
+
       <div className="space-y-4">
-        {matrix.coreCics.map((cic, idx) => (
-          <article
-            key={cic.contractId}
-            className="rounded-lg border border-border bg-surface p-5 space-y-4"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-sm border border-primary/30 bg-primary-subtle px-2 py-0.5 font-mono text-xs font-bold text-primary bidi-ltr">
-                  0{idx + 1} · {cic.contractId}
-                </span>
-                <span className="rounded-sm border border-info-border bg-info-bg px-2 py-0.5 text-[11px] font-medium text-info">
-                  {isAr ? 'مفاهيمي · Phase 2 (التحقق في Phase 6.5)' : 'Conceptual · Phase 2 (Phase 6.5 Validation)'}
-                </span>
-              </div>
-              <Link
-                href={`/dependencies?tab=matrix&cic=${encodeURIComponent(cic.contractId)}`}
-                className="text-xs font-medium text-primary hover:underline"
-              >
-                {isAr ? 'فحص حقول العقد الـ 16' : 'Inspect 16 Contract Fields'}
-              </Link>
-            </div>
-
-            {/* 3-Step Visual Conceptual Lane */}
-            <div className="grid grid-cols-1 items-stretch gap-3 md:grid-cols-11">
-              <div className="rounded-md border border-border bg-surface-secondary/50 p-3.5 md:col-span-3 space-y-1">
-                <p className="font-mono text-[10px] font-semibold uppercase text-text-muted">
-                  {isAr ? 'المبادر / مالك المصدر' : 'Source / Initiator'}
-                </p>
-                <p className="text-sm font-semibold text-text-primary bidi-ltr text-start">
-                  {cic.sourceInitiator}
-                </p>
-                <p className="text-xs leading-relaxed text-text-secondary">
-                  {cic.metadata.sourceOwner}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-center md:col-span-1">
-                <FlowArrow className="h-4 w-4 text-primary" aria-hidden="true" />
-              </div>
-
-              <div className="rounded-md border border-primary/30 bg-primary-subtle/30 p-3.5 md:col-span-3 space-y-1">
-                <p className="flex items-center gap-1 font-mono text-[10px] font-semibold uppercase text-primary">
-                  <GitBranch className="h-3 w-3" aria-hidden="true" />
-                  <span>{isAr ? 'عقد التكامل (CIC)' : 'Integration Contract'}</span>
-                </p>
-                <p className="text-xs font-semibold text-text-primary">
-                  {cic.metadata.businessScenario}
-                </p>
-                <p className="text-[11px] leading-relaxed text-text-secondary">
-                  <strong className="text-text-primary">{isAr ? 'المُحفّز: ' : 'Trigger: '}</strong>
-                  {cic.metadata.triggerInitiator}
-                </p>
+        {matrix.coreCics.map((cic, idx) => {
+          const cicGuide = guidance?.cicGuidanceByContractId[cic.contractId];
+          return (
+            <article
+              key={cic.contractId}
+              id={`scenario-${cic.contractId}`}
+              className="rounded-lg border border-border bg-surface p-5 space-y-4"
+            >
+              {/* Header */}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-sm border border-primary/30 bg-primary-subtle px-2 py-0.5 font-mono text-xs font-bold text-primary bidi-ltr">
+                    0{idx + 1} · {cic.contractId}
+                  </span>
+                  <span className="text-xs font-medium text-text-muted">
+                    {isAr
+                      ? 'مفاهيمي · Phase 2 (التحقق التنفيذي في Phase 6.5)'
+                      : 'Conceptual · Phase 2 (Phase 6.5 Validation)'}
+                  </span>
+                  {cic.hasDeferredBoundary ? (
+                    <span className="text-xs font-medium text-warning">
+                      · {isAr ? 'يتضمن حدودًا مؤجلة' : 'Includes Deferred Boundary'}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-xs">
+                  <Link
+                    href={`/knowledge/${matrix.documentSlug}#${cic.sectionAnchor}`}
+                    className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                  >
+                    <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>{isAr ? 'القسم الرسمي في المصفوفة' : 'Matrix Source Section'}</span>
+                  </Link>
+                  <Link
+                    href={`/dependencies?tab=matrix&cic=${encodeURIComponent(cic.contractId)}`}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    {isAr ? 'فحص حقول العقد الـ 16' : 'Inspect 16 Contract Fields'}
+                  </Link>
+                </div>
               </div>
 
-              <div className="flex items-center justify-center md:col-span-1">
-                <FlowArrow className="h-4 w-4 text-primary" aria-hidden="true" />
+              {/* Educational Rationale: Why Integration Exists */}
+              {cicGuide ? (
+                <div className="rounded-md border border-border bg-surface-secondary/35 px-3.5 py-2.5 text-xs leading-relaxed text-text-secondary">
+                  {resolveLocalizedText(cicGuide.whyIntegrationExists, locale)}
+                </div>
+              ) : null}
+
+              {/* 3-Step Visual Conceptual Lane */}
+              <div className="grid grid-cols-1 items-stretch gap-3 md:grid-cols-11">
+                <div className="rounded-md border border-border bg-surface-secondary/50 p-3.5 md:col-span-3 space-y-1">
+                  <p className="text-[11px] font-semibold text-text-muted">
+                    {isAr ? 'المبادر / مالك المصدر' : 'Source / Initiator Owner'}
+                  </p>
+                  <p className="text-sm font-semibold text-text-primary bidi-ltr text-start">
+                    {cic.sourceInitiator}
+                  </p>
+                  <p className="text-xs leading-relaxed text-text-secondary">
+                    {cic.metadata.sourceOwner}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-center md:col-span-1">
+                  <FlowArrow className="h-4 w-4 text-primary" aria-hidden="true" />
+                </div>
+
+                <div className="rounded-md border border-primary/30 bg-primary-subtle/30 p-3.5 md:col-span-3 space-y-1.5">
+                  <p className="flex items-center gap-1 text-[11px] font-semibold text-primary">
+                    <GitBranch className="h-3 w-3" aria-hidden="true" />
+                    <span>{isAr ? 'عقد التكامل المشروط (CIC)' : 'Integration Contract (CIC)'}</span>
+                  </p>
+                  <p className="text-xs font-semibold text-text-primary">
+                    {cic.metadata.businessScenario}
+                  </p>
+                  <p className="text-[11px] leading-relaxed text-text-secondary">
+                    <strong className="text-text-primary">{isAr ? 'المُحفّز: ' : 'Trigger: '}</strong>
+                    {cic.metadata.triggerInitiator}
+                  </p>
+                  <p className="text-[11px] leading-relaxed text-text-secondary">
+                    <strong className="text-text-primary">{isAr ? 'شرط التفعيل: ' : 'Activation Condition: '}</strong>
+                    {cic.metadata.activationCondition}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-center md:col-span-1">
+                  <FlowArrow className="h-4 w-4 text-primary" aria-hidden="true" />
+                </div>
+
+                <div className="rounded-md border border-border bg-surface-secondary/50 p-3.5 md:col-span-3 space-y-1">
+                  <p className="text-[11px] font-semibold text-text-muted">
+                    {isAr ? 'المستقبل / مالك الهدف' : 'Target Owner'}
+                  </p>
+                  <p className="text-sm font-semibold text-text-primary bidi-ltr text-start">
+                    {cic.target}
+                  </p>
+                  <p className="text-xs leading-relaxed text-text-secondary">
+                    {cic.metadata.targetOwner}
+                  </p>
+                </div>
               </div>
 
-              <div className="rounded-md border border-border bg-surface-secondary/50 p-3.5 md:col-span-3 space-y-1">
-                <p className="font-mono text-[10px] font-semibold uppercase text-text-muted">
-                  {isAr ? 'المستقبل / مالك الهدف' : 'Target Owner'}
-                </p>
-                <p className="text-sm font-semibold text-text-primary bidi-ltr text-start">
-                  {cic.target}
-                </p>
-                <p className="text-xs leading-relaxed text-text-secondary">
-                  {cic.metadata.targetOwner}
-                </p>
+              {/* Required Preconditions & Conceptual Business Object References Exchanged */}
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 text-xs">
+                <div className="rounded-md border border-border bg-surface-secondary/25 p-3 space-y-1">
+                  <p className="font-semibold text-text-primary">
+                    {isAr ? 'الشروط المسبقة المطلوبة (Required Preconditions)' : 'Required Preconditions'}
+                  </p>
+                  <p className="leading-relaxed text-text-secondary">
+                    {cic.metadata.requiredPreconditions}
+                  </p>
+                </div>
+                <div className="rounded-md border border-border bg-surface-secondary/25 p-3 space-y-1">
+                  <p className="font-semibold text-text-primary">
+                    {isAr
+                      ? 'المراجع المفاهيمية المتبادلة (بدون Payloads/APIs)'
+                      : 'Conceptual Business Object References Exchanged'}
+                  </p>
+                  <p className="leading-relaxed text-text-secondary">
+                    {cic.metadata.businessObjectRefs}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Outcome, Failure & Audit guardrails */}
-            <div className="grid grid-cols-1 gap-2.5 md:grid-cols-3 text-xs">
-              <div className="rounded-md border border-border bg-surface-secondary/30 p-3">
-                <p className="font-semibold text-text-primary mb-0.5">
-                  {isAr ? 'النتيجة المتوقعة وحفظ الملكية' : 'Expected Outcome & Ownership'}
-                </p>
-                <p className="text-text-secondary leading-relaxed">
-                  {cic.metadata.expectedOutcome}
-                </p>
+              {/* Outcome, Failure & Audit guardrails */}
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3 text-xs">
+                <div className="rounded-md border border-border bg-surface-secondary/30 p-3 space-y-1">
+                  <p className="font-semibold text-text-primary">
+                    {isAr ? 'النتيجة المتوقعة وحفظ الملكية' : 'Expected Outcome & Ownership'}
+                  </p>
+                  <p className="text-text-secondary leading-relaxed">
+                    {cic.metadata.expectedOutcome}
+                  </p>
+                </div>
+                <div className="rounded-md border border-border bg-surface-secondary/30 p-3 space-y-1">
+                  <p className="font-semibold text-text-primary">
+                    {isAr ? 'سلوك الفشل والتعذر (منع Silent Success)' : 'Failure / Unavailable Behavior'}
+                  </p>
+                  <p className="text-text-secondary leading-relaxed">
+                    {cic.metadata.failureBehavior}
+                  </p>
+                </div>
+                <div className="rounded-md border border-border bg-surface-secondary/30 p-3 space-y-1">
+                  <p className="flex items-center gap-1 font-semibold text-text-primary">
+                    <ShieldCheck className="h-3.5 w-3.5 text-success shrink-0" aria-hidden="true" />
+                    <span>{isAr ? 'مبادئ التدقيق ومنع التكرار' : 'Audit & Idempotency Principles'}</span>
+                  </p>
+                  <p className="text-text-secondary leading-relaxed">
+                    {cic.metadata.auditRequirement} — {cic.metadata.idempotencyPrinciple}
+                  </p>
+                  {cicGuide ? (
+                    <p className="text-[11px] leading-relaxed text-text-muted pt-0.5">
+                      {resolveLocalizedText(cicGuide.auditAndIdempotencyPrincipleNote, locale)}
+                    </p>
+                  ) : null}
+                </div>
               </div>
-              <div className="rounded-md border border-border bg-surface-secondary/30 p-3">
-                <p className="font-semibold text-text-primary mb-0.5">
-                  {isAr ? 'سلوك الفشل (منع Silent Success)' : 'Failure / Unavailable Behavior'}
-                </p>
-                <p className="text-text-secondary leading-relaxed">
-                  {cic.metadata.failureBehavior}
-                </p>
-              </div>
-              <div className="rounded-md border border-border bg-surface-secondary/30 p-3">
-                <p className="flex items-center gap-1 font-semibold text-text-primary mb-0.5">
-                  <ShieldCheck className="h-3.5 w-3.5 text-success" aria-hidden="true" />
-                  <span>{isAr ? 'التدقيق ومنع التكرار' : 'Audit & Idempotency'}</span>
-                </p>
-                <p className="text-text-secondary leading-relaxed">
-                  {cic.metadata.auditRequirement} — {cic.metadata.idempotencyPrinciple}
-                </p>
-              </div>
-            </div>
-          </article>
-        ))}
+
+              {/* Deferred Design Decisions & Source Anchors */}
+              {cicGuide ? (
+                <div className="border-t border-border pt-3 space-y-2 text-xs">
+                  <p className="leading-relaxed text-text-secondary">
+                    <strong className="text-warning">
+                      {isAr ? 'قرارات تصميمية مؤجلة (Phase 5/6): ' : 'Deferred Design Decisions (Phase 5/6): '}
+                    </strong>
+                    {resolveLocalizedText(cicGuide.deferredDesignDecisions, locale)}
+                  </p>
+                  <SourceAnchorLinksStrip
+                    label={isAr ? 'روابط المصادر:' : 'Source Anchors:'}
+                    refs={cicGuide.sourceRefs}
+                  />
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </div>
   );
 }
+

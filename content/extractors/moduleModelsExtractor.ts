@@ -885,8 +885,8 @@ const CORE_MODULE_CONFIGS: readonly CoreModuleStaticConfig[] = [
         en: 'Consuming Shared Customer/Party Identity, Shared Product/Service Identity, UOM, and Currency Foundation.',
       },
       {
-        ar: 'التوسع لاحقًا بميزات Stock Sale وCustomer Billing وDrop Ship وCredit Check كـ FLDs وCICs منفصلة.',
-        en: 'Activating Stock Sale, Customer Billing, Drop Ship, and Credit Check cleanly as separate FLDs and CICs.',
+        ar: 'التوسع لاحقًا بميزات Stock Sale (FLD-CORE-01) وCustomer Billing (FLD-CORE-02) وDrop Ship (FLD-CORE-03) عبر عقود CIC المعتمدة، مع بقاء Credit Check نقطة فحص مفاهيمية عبر Credit Capability (C* — بنية الائتمان وملكيته مؤجلة).',
+        en: 'Activating registered Sales Core FLDs—Stock Sale (FLD-CORE-01), Customer Billing (FLD-CORE-02), and Drop Ship (FLD-CORE-03)—via approved CICs, while conceptual Credit Check relies on Credit Capability (C*, with Credit Management architecture and ownership deferred).',
       },
     ],
     ownedDataDomains: [

@@ -9,20 +9,31 @@ import {
   Scale,
   ShieldCheck,
 } from 'lucide-react';
-import type { ExtractedDependencyArchitecture } from '@/content/extractors/dependencyArchitectureExtractor';
+import { resolveLocalizedText } from '@/content/models/types';
+import type {
+  DependencyEducationalGuidanceBundle,
+  ExtractedDependencyArchitecture,
+} from '@/content/extractors/dependencyArchitectureExtractor';
 import type { CoreModuleId } from '@/content/extractors/moduleModelsExtractor';
 import { useAppLocale } from '@/providers/LocaleProvider';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { InformationCallout } from '@/components/documentation/InformationCallout';
+import {
+  DependencyClassificationDesignGuide,
+  DependencyProvenanceStrip,
+  SourceAnchorLinksStrip,
+} from '@/features/dependencies/DependencyEducationalGuides';
 import { cn } from '@/lib/utils';
 
 export interface DependencyModelSectionProps {
   data: ExtractedDependencyArchitecture['dependencyModel'];
+  guidance?: DependencyEducationalGuidanceBundle;
   highlightedType?: string | null;
 }
 
 export function DependencyModelSection({
   data,
+  guidance,
   highlightedType,
 }: DependencyModelSectionProps) {
   const { locale } = useAppLocale();
@@ -42,13 +53,23 @@ export function DependencyModelSection({
             : 'Strictly four approved dependency types (PCD / HBMD / CIC / FLD) — explicitly prohibiting parallel ad-hoc labels or implicit HBMDs.'
         }
         actions={
-          <Link
-            href={`/knowledge/${data.documentSlug}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-          >
-            <FileText className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{isAr ? 'النص الرسمي الكامل' : 'Full Official Source'}</span>
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            {guidance ? (
+              <a
+                href="#classification-design-guide"
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                {isAr ? 'دليل التصنيف المعماري' : 'Classification Design Guide'}
+              </a>
+            ) : null}
+            <Link
+              href={`/knowledge/${data.documentSlug}`}
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{isAr ? 'النص الرسمي الكامل' : 'Full Official Source'}</span>
+            </Link>
+          </div>
         }
       />
 
@@ -200,6 +221,22 @@ export function DependencyModelSection({
         </div>
       </div>
 
+      {/* Curated Provenance & Classification Design Guide (R02 + R05 Example #4) */}
+      {guidance ? (
+        <div className="space-y-4">
+          <DependencyProvenanceStrip
+            provenance={guidance.provenance}
+            pinnedDocumentSlugs={['dependency-model', 'module-dependency-matrix', 'module-lifecycle-rules']}
+          />
+          <DependencyClassificationDesignGuide
+            guide={guidance.classificationGuide}
+            fldExample={guidance.educationalExamples.find(
+              (ex) => ex.id === 'ex-fld-must-not-become-hbmd'
+            )}
+          />
+        </div>
+      ) : null}
+
       {/* 12 Governance Rules */}
       <div className="rounded-lg border border-border bg-surface p-5 space-y-3">
         <h3 className="flex items-center gap-2 text-sm font-semibold text-text-primary">
@@ -230,6 +267,7 @@ export function DependencyModelSection({
 
 export interface DependencyMatrixExplorerProps {
   matrix: ExtractedDependencyArchitecture['matrix'];
+  guidance?: DependencyEducationalGuidanceBundle;
   initialCicId?: string | null;
 }
 
@@ -242,6 +280,7 @@ const MATRIX_COLS: readonly { id: CoreModuleId; label: string }[] = [
 
 export function DependencyMatrixExplorer({
   matrix,
+  guidance,
   initialCicId,
 }: DependencyMatrixExplorerProps) {
   const { locale } = useAppLocale();
@@ -586,6 +625,35 @@ export function DependencyMatrixExplorer({
                 </div>
               ))}
             </dl>
+
+            {guidance?.cicGuidanceByContractId[activeCic.contractId] ? (
+              <div className="border-t border-border pt-3.5 space-y-2.5 text-xs">
+                <p className="font-semibold text-primary">
+                  {isAr
+                    ? 'شرح تعليمي مساند (منفصل عن الحقول الرسمية أعلاه)'
+                    : 'Curated Educational Context (Distinct from Official Contract Fields Above)'}
+                </p>
+                <p className="leading-relaxed text-text-secondary">
+                  {resolveLocalizedText(
+                    guidance.cicGuidanceByContractId[activeCic.contractId]!.whyIntegrationExists,
+                    locale
+                  )}
+                </p>
+                <p className="leading-relaxed text-text-secondary">
+                  <strong className="text-text-primary">
+                    {isAr ? 'القرارات المؤجلة (Phase 5/6): ' : 'Deferred Design Decisions (Phase 5/6): '}
+                  </strong>
+                  {resolveLocalizedText(
+                    guidance.cicGuidanceByContractId[activeCic.contractId]!.deferredDesignDecisions,
+                    locale
+                  )}
+                </p>
+                <SourceAnchorLinksStrip
+                  label={isAr ? 'مراجع العقد والوحدات:' : 'Contract & Module Anchors:'}
+                  refs={guidance.cicGuidanceByContractId[activeCic.contractId]!.sourceRefs}
+                />
+              </div>
+            ) : null}
           </article>
         </div>
       </section>
