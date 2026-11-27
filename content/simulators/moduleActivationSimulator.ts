@@ -7,6 +7,27 @@ import type {
   PcdMatrixRow,
 } from '@/content/extractors/dependencyArchitectureExtractor';
 
+export type SimulatorGoverningSourceKey =
+  | 'moduleDependencyMatrix'
+  | 'dependencyModel'
+  | 'moduleLifecycleRules';
+
+export interface SimulatorGoverningSourcePin {
+  readonly key: SimulatorGoverningSourceKey;
+  readonly documentSlug: string;
+  readonly officialSourcePath: string;
+  readonly mappedSourceRevision: string;
+  readonly mappedSourceBodySha256: string;
+  readonly lastReviewedDate: string;
+}
+
+export interface SimulatorGoverningSourceSnapshot {
+  readonly documentSlug: string;
+  readonly officialSourcePath: string;
+  readonly sourceRevision: string | null;
+  readonly sourceBodySha256: string;
+}
+
 /**
  * Authoritative subset of ExtractedDependencyArchitecture['matrix'] passed from
  * server-side extraction into the pure client-safe simulator.
@@ -18,6 +39,7 @@ export type DependencySimulationCatalog = Pick<
   | 'officialSourcePath'
   | 'sourceRevision'
   | 'sourceBodySha256'
+  | 'governingSources'
   | 'hbmdEdgeCount'
   | 'hbmdCycleCount'
   | 'coreCics'
@@ -26,9 +48,8 @@ export type DependencySimulationCatalog = Pick<
 >;
 
 /**
- * Authoritative source pin for the simulator's executable CIC, FLD, and PCD mappings
- * (KH-034 / FIX-02-R06). Any revision or canonical body SHA-256 change to
- * MODULE_DEPENDENCY_MATRIX.md invalidates the executable mappings until reviewed.
+ * Authoritative primary source pin for the simulator's executable CIC, FLD, and PCD mappings
+ * (KH-034 / FIX-02-R06). Kept alongside SIMULATOR_PINNED_GOVERNING_SOURCES for full KH-036 coverage.
  */
 export const SIMULATOR_PINNED_SOURCE = {
   officialSourcePath:
@@ -36,8 +57,47 @@ export const SIMULATOR_PINNED_SOURCE = {
   mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
   mappedSourceBodySha256:
     '34700c3027731399dd8a3276cf41f1fa3f5bc9234453502901589f8a46c55c43',
-  lastReviewedDate: '2026-11-26',
+  lastReviewedDate: '2026-11-27',
 } as const;
+
+/**
+ * Complete governing source pins for the simulator's architectural and lifecycle semantics
+ * (KH-036 / TASK-005-QA R02). Drift in any of these three documents invalidates the simulator
+ * mappings fail-closed until reviewed and re-pinned.
+ */
+export const SIMULATOR_PINNED_GOVERNING_SOURCES: Readonly<
+  Record<SimulatorGoverningSourceKey, SimulatorGoverningSourcePin>
+> = {
+  moduleDependencyMatrix: {
+    key: 'moduleDependencyMatrix',
+    documentSlug: 'module-dependency-matrix',
+    officialSourcePath:
+      'teranoo-erp-planning/03-modules/MODULE_DEPENDENCY_MATRIX.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '34700c3027731399dd8a3276cf41f1fa3f5bc9234453502901589f8a46c55c43',
+    lastReviewedDate: '2026-11-27',
+  },
+  dependencyModel: {
+    key: 'dependencyModel',
+    documentSlug: 'dependency-model',
+    officialSourcePath: 'teranoo-erp-planning/03-modules/DEPENDENCY_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '6ca9bff934962b679d43a881ddd343a04fe2fbe250550440bc6db982dc83d629',
+    lastReviewedDate: '2026-11-27',
+  },
+  moduleLifecycleRules: {
+    key: 'moduleLifecycleRules',
+    documentSlug: 'module-lifecycle-rules',
+    officialSourcePath:
+      'teranoo-erp-planning/03-modules/MODULE_LIFECYCLE_RULES.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '48b2e498841e8f97ea88837ff249359200e8abc8531f350fe3bddfc218f07658',
+    lastReviewedDate: '2026-11-27',
+  },
+};
 
 export type ConditionEvalState = 'satisfied' | 'unsatisfied' | 'unknown';
 
@@ -194,6 +254,7 @@ export interface CatalogConsistencySummary {
   readonly valid: true;
   readonly sourceRevision: string;
   readonly sourceBodySha256: string;
+  readonly pinnedSources: readonly SimulatorGoverningSourceSnapshot[];
   readonly mappingFreshnessStatus: 'verified-current';
   readonly cicCount: number;
   readonly fldCount: number;
@@ -747,7 +808,7 @@ export function validateSimulatorCatalogConsistency(
     );
   }
 
-  // 1. Source revision & canonical stored-body SHA-256 pin check (KH-034)
+  // 1. Source revision & canonical stored-body SHA-256 pin check across all governing documents (KH-034 + KH-036)
   if (catalog.sourceRevision !== SIMULATOR_PINNED_SOURCE.mappedSourceRevision) {
     throw new Error(
       `Simulator source revision drift (KH-034): executable mappings are pinned to "${SIMULATOR_PINNED_SOURCE.mappedSourceRevision}", received "${catalog.sourceRevision ?? 'null'}". Review and re-pin simulator mappings before enabling.`
@@ -759,6 +820,32 @@ export function validateSimulatorCatalogConsistency(
     throw new Error(
       `Simulator source body digest drift (KH-034): executable mappings are pinned to SHA-256 "${SIMULATOR_PINNED_SOURCE.mappedSourceBodySha256}", received "${catalog.sourceBodySha256}". Review MODULE_DEPENDENCY_MATRIX.md changes before re-pinning.`
     );
+  }
+
+  const pinnedSources: SimulatorGoverningSourceSnapshot[] = [];
+  for (const key of [
+    'moduleDependencyMatrix',
+    'dependencyModel',
+    'moduleLifecycleRules',
+  ] as const) {
+    const pin = SIMULATOR_PINNED_GOVERNING_SOURCES[key];
+    const snap = catalog.governingSources?.[key];
+    if (!snap) {
+      throw new Error(
+        `Simulator governing source snapshot missing (KH-036): expected pin for "${pin.officialSourcePath}".`
+      );
+    }
+    if (snap.sourceRevision !== pin.mappedSourceRevision) {
+      throw new Error(
+        `Simulator governing source revision drift (KH-036) for "${pin.officialSourcePath}": executable mappings are pinned to "${pin.mappedSourceRevision}", received "${snap.sourceRevision ?? 'null'}".`
+      );
+    }
+    if (snap.sourceBodySha256 !== pin.mappedSourceBodySha256) {
+      throw new Error(
+        `Simulator governing source body digest drift (KH-036) for "${pin.officialSourcePath}": executable mappings are pinned to SHA-256 "${pin.mappedSourceBodySha256}", received "${snap.sourceBodySha256}".`
+      );
+    }
+    pinnedSources.push(snap);
   }
 
   // 2. Identifier uniqueness validation across CICs, FLDs, and PCD rows (KH-034)
@@ -994,6 +1081,7 @@ export function validateSimulatorCatalogConsistency(
     valid: true,
     sourceRevision: catalog.sourceRevision,
     sourceBodySha256: catalog.sourceBodySha256,
+    pinnedSources,
     mappingFreshnessStatus: 'verified-current',
     cicCount: catalog.coreCics.length,
     fldCount: catalog.coreFlds.length,

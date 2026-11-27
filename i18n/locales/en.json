@@ -5,8 +5,8 @@
     "subtitle": "The Complete Journey of Building an Enterprise ERP System",
     "subtitleEn": "The Complete Journey of Building an Enterprise ERP System",
     "skipToContent": "Skip to main content",
-    "currentPhaseBadge": "Phase 5 Completed · Phase 6 Awaiting Authorization",
-    "planningProgressNotice": "Indicators reflect verified architectural planning and approval status from BATCH-001 & BATCH-002 — not ERP software implementation completion."
+    "currentPhaseBadge": "Pinned Snapshot (2026-11-26): Phase 5 Complete · Phase 6 Awaiting Auth",
+    "planningProgressNotice": "Indicators reflect the pinned historical repository snapshot (TeranooErp commit 397a94e0d82f, ingested 2026-11-26 across BATCH-001 & BATCH-002), NOT live Teranoo ERP repository or runtime status. Statuses inside that snapshot (such as Phase 6 awaiting authorization or Deferred to Phase 5/6) record the snapshot date only."
   },
   "nav": {
     "groups": {
@@ -611,18 +611,18 @@
       "tracksTitle": "Four Distinct Progress Dimensions (Never Combined)",
       "tracksSubtitle": "ERP planning, ERP software engineering, Knowledge Hub platform tasks, and operational readiness are tracked independently.",
       "tracks": {
-        "erpPlanning": "1. ERP Product Planning",
-        "erpPlanningValue": "Phases 1–5 Complete (13/13) · Gate A Conditional · Phase 6 Awaiting Auth",
-        "erpPlanningNote": "Phases 1–5 and Decision Gate A (D-MKT-01) are closed; Phase 6 has NOT started and requires explicit separate authorization.",
-        "erpEngineering": "2. ERP Engineering Implementation",
-        "erpEngineeringValue": "Not Started",
-        "erpEngineeringNote": "Active ERP software coding has not begun; tracked separately from architectural planning.",
+        "erpPlanning": "1. ERP Product Planning (Pinned Historical Baseline)",
+        "erpPlanningValue": "Pinned Snapshot: Phases 1–5 Complete (13/13) · Gate A Conditional · Phase 6 Awaiting Auth",
+        "erpPlanningNote": "In the pinned repository snapshot as of 2026-11-26 (commit 397a94e0d82f), Phases 1–5 and Gate A (D-MKT-01) were closed and Phase 6 awaited authorization; this does not assert live repository state today.",
+        "erpEngineering": "2. ERP Engineering Implementation (In Snapshot)",
+        "erpEngineeringValue": "Not Started in Pinned Snapshot",
+        "erpEngineeringNote": "Active ERP software coding had not begun in the 2026-11-26 historical snapshot; tracked independently from architectural planning.",
         "hubDevelopment": "3. Knowledge Hub Platform Development",
         "hubDevelopmentValue": "TASK-005 (BATCH-002 — Core Modules & Dependencies)",
         "hubDevelopmentNote": "Documentation platform milestones — never represents ERP product implementation progress.",
-        "operationalReadiness": "4. ERP Operational Readiness",
-        "operationalReadinessValue": "Not Started",
-        "operationalReadinessNote": "Production deployment and enterprise operations readiness begin only after implementation and verification."
+        "operationalReadiness": "4. ERP Operational Readiness (In Snapshot)",
+        "operationalReadinessValue": "Not Started in Pinned Snapshot",
+        "operationalReadinessNote": "Production deployment and enterprise operations readiness begin only after implementation and verification; status reflects the pinned historical snapshot."
       },
       "verifiedPhasesTitle": "Complete Official Roadmap (Phase 1 — Phase 12 + Decision Gate A + Phase 6.5)",
       "futureSupportTitle": "Source Discrepancy Note (PROJECT_WORK_PLAN.md Preserved Verbatim)",
@@ -709,7 +709,19 @@
       "importedOfficialSourcesNote": "{published} published / {total} official sources Git-blob verified",
       "ingestionReadiness": "Phase 3–5 Owning Decision Docs",
       "ingestionReadinessValue": "0 / 126 (Index Complete)",
-      "ingestionReadinessNote": "All 126 centralized decisions indexed + 34 Phase 2 decisions published verbatim; Phase 3–5 owning docs await later batches"
+      "ingestionReadinessNote": "All 126 centralized decisions indexed + 34 Phase 2 decisions published verbatim; Phase 3–5 owning docs await later ingestion batches (non-live snapshot)"
+    },
+    "historicalBaseline": {
+      "badge": "Pinned Historical Baseline · commit 397a94e0d82f · 2026-11-26",
+      "title": "Historical Repository Baseline Disclosure (Non-Live Snapshot)",
+      "body": "All imported planning documents reflect the pinned historical repository baseline of TeranooErp (commit 397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f, tree db531de6b2ab, BATCH-001 & BATCH-002, Phase 2 closure 2026-09-09, ingested 2026-11-26) rather than live repository synchronization. Labels such as awaiting authorization, deferred, or not-started describe the pinned snapshot and do not imply those items remain unresolved in the live project today."
+    },
+    "knowledgeStates": {
+      "heading": "Four Explicit Knowledge Authority States",
+      "verbatim": "Verbatim Official Source — Deterministically extracted or verbatim from the approved official Markdown document.",
+      "reviewed": "Reviewed Educational Projection — Curated explanation verified against pinned source revision and body SHA-256.",
+      "stale": "Projection Requiring Review — Source digest or revision drifted; do NOT treat curated summaries as current verified knowledge.",
+      "historical": "Historical Architectural Baseline — Snapshot of pinned repository commit 397a94e0d82f (not live project state)."
     }
   },
   "states": {

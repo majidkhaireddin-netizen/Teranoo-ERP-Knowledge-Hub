@@ -42,6 +42,7 @@ import {
   type CoreModuleId,
 } from '@/content/extractors/moduleModelsExtractor';
 import { renderSafeMarkdown } from '@/content/loaders/markdownPipeline';
+import { loadApprovedCollections } from '@/content/loaders/contentLoader';
 import {
   getExtractedDependencyArchitecture,
   resetExtractedDependencyArchitectureCache,
@@ -49,14 +50,18 @@ import {
 import {
   CURATED_DEPENDENCY_PROJECTION_PINS,
   buildDependencyEducationalGuidance,
+  type DependencySourceSnapshotInput,
+  type PinnedDependencySourceKey,
 } from '@/content/extractors/dependencyEducationalContent';
 import {
   DEFAULT_EDUCATIONAL_CONTROLS,
   DEFAULT_PLATFORM_PREREQUISITES,
+  SIMULATOR_PINNED_GOVERNING_SOURCES,
   SIMULATOR_PINNED_SOURCE,
   simulateModuleActivation,
   validateSimulatorCatalogConsistency,
   type DependencySimulationCatalog,
+  type SimulatorGoverningSourceKey,
 } from '@/content/simulators/moduleActivationSimulator';
 import {
   buildUnifiedSearchIndex,
@@ -64,7 +69,10 @@ import {
 } from '@/content/search/knowledgeSearch';
 import { getExtractedFacRegister } from '@/content/extractors/facRegisterExtractor';
 import { getExtractedGuardrails } from '@/content/extractors/guardrailsExtractor';
-import { PROJECT_REFERENCE_SNAPSHOT } from '@/content/seed/projectSnapshot';
+import {
+  HISTORICAL_REFERENCE_SNAPSHOT,
+  PROJECT_REFERENCE_SNAPSHOT,
+} from '@/content/seed/projectSnapshot';
 
 // ============================================================================
 // 1. BATCH-002 Manifest, Verbatim Ingestion & Git Blob SHA Verification (16/16)
@@ -1193,8 +1201,9 @@ test('FIX-02-R06 (KH-034): simulator catches source pin drift, CIC precondition 
     validSummary.sourceBodySha256,
     SIMULATOR_PINNED_SOURCE.mappedSourceBodySha256
   );
+  assert.equal(validSummary.pinnedSources.length, 3);
 
-  // 1. Source revision / body SHA-256 drift rejected
+  // 1. Source revision / body SHA-256 drift rejected across legacy pin AND all 3 governing sources (KH-034 + KH-036)
   assert.throws(
     () =>
       validateSimulatorCatalogConsistency({
@@ -1207,10 +1216,77 @@ test('FIX-02-R06 (KH-034): simulator catches source pin drift, CIC precondition 
     () =>
       validateSimulatorCatalogConsistency({
         ...catalog,
+        sourceRevision: null,
+      }),
+    /Simulator source revision drift/
+  );
+  assert.throws(
+    () =>
+      validateSimulatorCatalogConsistency({
+        ...catalog,
         sourceBodySha256: '0'.repeat(64),
       }),
     /Simulator source body digest drift/
   );
+
+  for (const govKey of [
+    'moduleDependencyMatrix',
+    'dependencyModel',
+    'moduleLifecycleRules',
+  ] as const satisfies readonly SimulatorGoverningSourceKey[]) {
+    const baseSnap = catalog.governingSources[govKey];
+    assert.equal(
+      baseSnap.sourceRevision,
+      SIMULATOR_PINNED_GOVERNING_SOURCES[govKey].mappedSourceRevision
+    );
+    assert.equal(
+      baseSnap.sourceBodySha256,
+      SIMULATOR_PINNED_GOVERNING_SOURCES[govKey].mappedSourceBodySha256
+    );
+
+    assert.throws(
+      () =>
+        validateSimulatorCatalogConsistency({
+          ...catalog,
+          governingSources: {
+            ...catalog.governingSources,
+            [govKey]: {
+              ...baseSnap,
+              sourceRevision: '0000000000000000000000000000000000000000',
+            },
+          },
+        }),
+      /Simulator governing source revision drift \(KH-036\)/
+    );
+    assert.throws(
+      () =>
+        validateSimulatorCatalogConsistency({
+          ...catalog,
+          governingSources: {
+            ...catalog.governingSources,
+            [govKey]: {
+              ...baseSnap,
+              sourceRevision: null,
+            },
+          },
+        }),
+      /Simulator governing source revision drift \(KH-036\)/
+    );
+    assert.throws(
+      () =>
+        validateSimulatorCatalogConsistency({
+          ...catalog,
+          governingSources: {
+            ...catalog.governingSources,
+            [govKey]: {
+              ...baseSnap,
+              sourceBodySha256: 'f'.repeat(64),
+            },
+          },
+        }),
+      /Simulator governing source body digest drift \(KH-036\)/
+    );
+  }
 
   // 2. Changed CIC Required Preconditions (contractId unchanged) rejected
   const mutatedCicPrecond: DependencySimulationCatalog = {
@@ -1661,7 +1737,7 @@ test('TASK-005-FIX-03B (R07): dependency educational provenance verifies current
   assert.equal(provenance.kind, 'curated-projection');
   assert.equal(provenance.mappingFreshnessStatus, 'verified-current');
   assert.equal(provenance.reviewWarning, null);
-  assert.equal(provenance.sources.length, 4);
+  assert.equal(provenance.sources.length, 8);
   for (const entry of provenance.sources) {
     const pin = CURATED_DEPENDENCY_PROJECTION_PINS[entry.key];
     assert.equal(entry.status, 'verified-current');
@@ -1669,88 +1745,87 @@ test('TASK-005-FIX-03B (R07): dependency educational provenance verifies current
     assert.equal(entry.actualSourceRevision, pin.mappedSourceRevision);
   }
 
-  // Drift detection: mutating dependency-model body or lifecycle revision flips freshness to review-required-source-changed
-  const depModel = registry.getBySlug('dependency-model')!;
-  const matrixDoc = registry.getBySlug('module-dependency-matrix')!;
-  const lifecycleDoc = registry.getBySlug('module-lifecycle-rules')!;
-  const closureDoc = registry.getBySlug('phase-2-closure-review')!;
+  // Helper to construct complete 8-source guidance input from live registry
+  const buildBaselineGuidanceInputs = (): Record<
+    PinnedDependencySourceKey,
+    DependencySourceSnapshotInput
+  > => {
+    const entries = Object.entries(CURATED_DEPENDENCY_PROJECTION_PINS) as [
+      PinnedDependencySourceKey,
+      (typeof CURATED_DEPENDENCY_PROJECTION_PINS)[PinnedDependencySourceKey],
+    ][];
+    const map = {} as Record<
+      PinnedDependencySourceKey,
+      DependencySourceSnapshotInput
+    >;
+    for (const [key, pin] of entries) {
+      const doc = registry.getBySlug(pin.documentSlug);
+      assert.ok(doc, `Missing pinned document ${pin.documentSlug}`);
+      map[key] = {
+        key,
+        bodyMarkdown: doc.bodyMarkdown,
+        sourceRevision:
+          doc.metadata.source.kind === 'official-source'
+            ? (doc.metadata.source.commitSha ?? null)
+            : null,
+      };
+    }
+    return map;
+  };
 
-  const driftedBody = buildDependencyEducationalGuidance({
-    dependencyModel: {
-      key: 'dependencyModel',
-      bodyMarkdown: depModel.bodyMarkdown + '\n<!-- simulated drift -->\n',
-      sourceRevision:
-        depModel.metadata.source.kind === 'official-source'
-          ? depModel.metadata.source.commitSha ?? null
-          : null,
-    },
-    moduleDependencyMatrix: {
-      key: 'moduleDependencyMatrix',
-      bodyMarkdown: matrixDoc.bodyMarkdown,
-      sourceRevision:
-        matrixDoc.metadata.source.kind === 'official-source'
-          ? matrixDoc.metadata.source.commitSha ?? null
-          : null,
-    },
-    moduleLifecycleRules: {
-      key: 'moduleLifecycleRules',
-      bodyMarkdown: lifecycleDoc.bodyMarkdown,
-      sourceRevision:
-        lifecycleDoc.metadata.source.kind === 'official-source'
-          ? lifecycleDoc.metadata.source.commitSha ?? null
-          : null,
-    },
-    phase2ClosureReview: {
-      key: 'phase2ClosureReview',
-      bodyMarkdown: closureDoc.bodyMarkdown,
-      sourceRevision:
-        closureDoc.metadata.source.kind === 'official-source'
-          ? closureDoc.metadata.source.commitSha ?? null
-          : null,
-    },
-  });
-  assert.equal(
-    driftedBody.provenance.mappingFreshnessStatus,
-    'review-required-source-changed'
-  );
-  assert.ok(driftedBody.provenance.reviewWarning !== null);
+  // KH-042: Mutating ANY of the 8 pinned sources (body digest, revision, or null revision) flips freshness to review-required-source-changed
+  const allPinKeys = Object.keys(
+    CURATED_DEPENDENCY_PROJECTION_PINS
+  ) as PinnedDependencySourceKey[];
+  assert.equal(allPinKeys.length, 8);
 
-  const driftedRevision = buildDependencyEducationalGuidance({
-    dependencyModel: {
-      key: 'dependencyModel',
-      bodyMarkdown: depModel.bodyMarkdown,
-      sourceRevision:
-        depModel.metadata.source.kind === 'official-source'
-          ? depModel.metadata.source.commitSha ?? null
-          : null,
-    },
-    moduleDependencyMatrix: {
-      key: 'moduleDependencyMatrix',
-      bodyMarkdown: matrixDoc.bodyMarkdown,
-      sourceRevision: '0000000000000000000000000000000000000000',
-    },
-    moduleLifecycleRules: {
-      key: 'moduleLifecycleRules',
-      bodyMarkdown: lifecycleDoc.bodyMarkdown,
-      sourceRevision:
-        lifecycleDoc.metadata.source.kind === 'official-source'
-          ? lifecycleDoc.metadata.source.commitSha ?? null
-          : null,
-    },
-    phase2ClosureReview: {
-      key: 'phase2ClosureReview',
-      bodyMarkdown: closureDoc.bodyMarkdown,
-      sourceRevision:
-        closureDoc.metadata.source.kind === 'official-source'
-          ? closureDoc.metadata.source.commitSha ?? null
-          : null,
-    },
-  });
-  assert.equal(
-    driftedRevision.provenance.mappingFreshnessStatus,
-    'review-required-source-changed'
-  );
-  assert.ok(driftedRevision.provenance.reviewWarning !== null);
+  for (const key of allPinKeys) {
+    const baseInputs = buildBaselineGuidanceInputs();
+    const driftedBody = buildDependencyEducationalGuidance({
+      ...baseInputs,
+      [key]: {
+        ...baseInputs[key],
+        bodyMarkdown:
+          baseInputs[key].bodyMarkdown + '\n<!-- simulated drift -->\n',
+      },
+    });
+    assert.equal(
+      driftedBody.provenance.mappingFreshnessStatus,
+      'review-required-source-changed',
+      `Expected body drift detection for ${key}`
+    );
+    assert.ok(driftedBody.provenance.reviewWarning !== null);
+    const driftedEntry = driftedBody.provenance.sources.find(
+      (s) => s.key === key
+    );
+    assert.equal(driftedEntry?.status, 'review-required-source-changed');
+
+    const driftedRevision = buildDependencyEducationalGuidance({
+      ...baseInputs,
+      [key]: {
+        ...baseInputs[key],
+        sourceRevision: '0000000000000000000000000000000000000000',
+      },
+    });
+    assert.equal(
+      driftedRevision.provenance.mappingFreshnessStatus,
+      'review-required-source-changed',
+      `Expected revision drift detection for ${key}`
+    );
+
+    const missingRevision = buildDependencyEducationalGuidance({
+      ...baseInputs,
+      [key]: {
+        ...baseInputs[key],
+        sourceRevision: null,
+      },
+    });
+    assert.equal(
+      missingRevision.provenance.mappingFreshnessStatus,
+      'review-required-source-changed',
+      `Expected null-revision drift detection for ${key}`
+    );
+  }
 
   // Resolve 100% of referenced #kh-h-* section anchors across all referenced documents
   const allRefs = [
@@ -1778,5 +1853,328 @@ test('TASK-005-FIX-03B (R07): dependency educational provenance verifies current
     );
   }
 });
+
+// ============================================================================
+// 10. TASK-005-QA — Strict Provenance (KH-035), Stale Guards (KH-037),
+//     Lifecycle/Extensions Audit (R05), Historical Baseline (R06), Locale Parity
+// ============================================================================
+
+test('TASK-005-QA R01 (KH-035): missing required provenance fields or unlinked manifest entries fail validation across all 16 official docs', () => {
+  resetContentRegistryCache();
+  const registry = getContentRegistry();
+  const officialDocs = loadApprovedCollections()
+    .filter(
+      (entry) =>
+        entry.ok &&
+        entry.document.metadata.source.kind === 'official-source' &&
+        entry.document.metadata.editorialStatus !== 'superseded'
+    )
+    .map((entry) => {
+      if (!entry.ok) throw new Error('Unexpected invalid official entry');
+      return entry.document;
+    });
+  assert.equal(officialDocs.length, 16);
+
+  // Every single one of the 16 official documents verifies cleanly against OFFICIAL_SOURCE_MANIFEST
+  for (const doc of officialDocs) {
+    const manifestEntry = OFFICIAL_SOURCE_MANIFEST.find(
+      (m) => m.publishedContentId === doc.metadata.id
+    );
+    assert.ok(manifestEntry, `Missing manifest entry for ${doc.metadata.id}`);
+    const integrity = verifyStoredOfficialDocumentIntegrity(doc, manifestEntry);
+    assert.equal(integrity.ok, true, `Failed integrity check for ${doc.metadata.id}`);
+  }
+
+  // Baseline passes strict validation
+  const baseValidation = validateApprovedCollections();
+  assert.equal(baseValidation.ok, true);
+
+  const sampleDoc = officialDocs[0]!;
+  const sampleManifest = OFFICIAL_SOURCE_MANIFEST.find(
+    (m) => m.publishedContentId === sampleDoc.metadata.id
+  )!;
+  assert.ok(sampleManifest);
+
+  // 1. Missing required frontmatter provenance fields fail verifyStoredOfficialDocumentIntegrity
+  if (sampleDoc.metadata.source.kind === 'official-source') {
+    const missingCommit = verifyStoredOfficialDocumentIntegrity(
+      {
+        ...sampleDoc,
+        metadata: {
+          ...sampleDoc.metadata,
+          source: { ...sampleDoc.metadata.source, commitSha: undefined },
+        },
+      },
+      sampleManifest
+    );
+    assert.equal(missingCommit.ok, false);
+    assert.ok(
+      missingCommit.issues.some((i) => i.code === 'MISSING_SOURCE_REVISION')
+    );
+
+    const missingBlob = verifyStoredOfficialDocumentIntegrity(
+      {
+        ...sampleDoc,
+        metadata: {
+          ...sampleDoc.metadata,
+          source: { ...sampleDoc.metadata.source, gitBlobSha: undefined },
+        },
+      },
+      sampleManifest
+    );
+    assert.equal(missingBlob.ok, false);
+    assert.ok(
+      missingBlob.issues.some((i) => i.code === 'MISSING_GIT_BLOB_SHA')
+    );
+
+    const missingRawSha = verifyStoredOfficialDocumentIntegrity(
+      {
+        ...sampleDoc,
+        metadata: {
+          ...sampleDoc.metadata,
+          source: { ...sampleDoc.metadata.source, rawSourceSha256: undefined },
+        },
+      },
+      sampleManifest
+    );
+    assert.equal(missingRawSha.ok, false);
+    assert.ok(
+      missingRawSha.issues.some((i) => i.code === 'MISSING_RAW_SOURCE_DIGEST')
+    );
+
+    const missingStoredSha = verifyStoredOfficialDocumentIntegrity(
+      {
+        ...sampleDoc,
+        metadata: {
+          ...sampleDoc.metadata,
+          source: { ...sampleDoc.metadata.source, storedBodySha256: undefined },
+        },
+      },
+      sampleManifest
+    );
+    assert.equal(missingStoredSha.ok, false);
+    assert.ok(
+      missingStoredSha.issues.some((i) => i.code === 'MISSING_STORED_BODY_DIGEST')
+    );
+  }
+
+  // 2. Missing manifest provenance fields fail verifyStoredOfficialDocumentIntegrity & validateSourceManifest
+  const missingManifestRev = verifyStoredOfficialDocumentIntegrity(sampleDoc, {
+    ...sampleManifest,
+    sourceRevision: null,
+  });
+  assert.equal(missingManifestRev.ok, false);
+  assert.ok(
+    missingManifestRev.issues.some((i) => i.code === 'MISSING_SOURCE_REVISION')
+  );
+
+  const missingManifestBlob = verifyStoredOfficialDocumentIntegrity(sampleDoc, {
+    ...sampleManifest,
+    expectedGitBlobSha: null,
+  });
+  assert.equal(missingManifestBlob.ok, false);
+  assert.ok(
+    missingManifestBlob.issues.some((i) => i.code === 'MISSING_GIT_BLOB_SHA')
+  );
+
+  const missingManifestBodyHash = verifyStoredOfficialDocumentIntegrity(
+    sampleDoc,
+    {
+      ...sampleManifest,
+      sourceFileHash: null,
+    }
+  );
+  assert.equal(missingManifestBodyHash.ok, false);
+  assert.ok(
+    missingManifestBodyHash.issues.some(
+      (i) => i.code === 'MISSING_STORED_BODY_DIGEST'
+    )
+  );
+
+  const publishedIds = new Set(
+    registry.getAllPublicMetadata().map((m) => m.id)
+  );
+  const manifestResult = validateSourceManifest(
+    OFFICIAL_SOURCE_MANIFEST.map((m, idx) =>
+      idx === 0 ? { ...m, sourceFileHash: null } : m
+    ),
+    publishedIds
+  );
+  assert.equal(manifestResult.ok, false);
+
+  // 3. Unlinked official document (manifest link missing) fails validateLoadedEntries (not silently bypassed)
+  const unlinkedValidation = validateLoadedEntries(
+    [
+      ...loadApprovedCollections(),
+      {
+        ok: true,
+        document: {
+          ...sampleDoc,
+          metadata: {
+            ...sampleDoc.metadata,
+            id: 'kh-doc-unlinked-synthetic-test',
+            slug: 'unlinked-synthetic-test',
+            source:
+              sampleDoc.metadata.source.kind === 'official-source'
+                ? {
+                    ...sampleDoc.metadata.source,
+                    sourcePath: 'teranoo-erp-planning/99-synthetic/UNLINKED_TEST.md',
+                  }
+                : sampleDoc.metadata.source,
+          },
+        },
+        unsafeUrlsFound: [],
+      },
+    ],
+    { manifestEntries: OFFICIAL_SOURCE_MANIFEST }
+  );
+  assert.equal(unlinkedValidation.ok, false);
+  assert.ok(
+    unlinkedValidation.errors.some(
+      (e) => e.code === 'UNLINKED_OFFICIAL_MANIFEST_ENTRY'
+    )
+  );
+});
+
+test('TASK-005-QA R03 (KH-037): null sourceRevision flips module and roadmap projections to review-required-source-changed', () => {
+  resetContentRegistryCache();
+  const registry = getContentRegistry();
+
+  const financeDoc = registry.getBySlug('finance-module-model')!;
+  const staleFinance = buildCoreModuleProfileFromSource(
+    'finance',
+    financeDoc.bodyMarkdown,
+    {
+      documentId: financeDoc.metadata.id,
+      sourceRevision: null,
+      sourceDocumentDate: null,
+    }
+  );
+  assert.equal(
+    staleFinance.projectionMetadata.mappingFreshnessStatus,
+    'review-required-source-changed'
+  );
+  assert.ok(staleFinance.projectionMetadata.reviewWarning !== null);
+
+  const workPlanDoc = registry.getBySlug('project-work-plan')!;
+  const staleRoadmap = parseRoadmapMarkdown(workPlanDoc.bodyMarkdown, {
+    sourceDocumentId: workPlanDoc.metadata.id,
+    sourceDocumentSlug: workPlanDoc.metadata.slug,
+    sourceRevision: null,
+  });
+  assert.equal(
+    staleRoadmap.projectionMetadata.mappingFreshnessStatus,
+    'review-required-source-changed'
+  );
+  assert.ok(staleRoadmap.projectionMetadata.reviewWarning !== null);
+});
+
+test('TASK-005-QA R05: Lifecycle (§§2,5,6,9,10,11), Future Extensions (§§5-11), and Phase 2 Review section anchors all resolve to real rendered headings', async () => {
+  resetContentRegistryCache();
+  resetExtractedDependencyArchitectureCache();
+
+  const registry = getContentRegistry();
+  const arch = getExtractedDependencyArchitecture();
+
+  // Lifecycle R05 completeness
+  assert.ok(arch.lifecycle.entitlementSeparationSummary.length > 30);
+  assert.ok(arch.lifecycle.entitlementOutOfScopeNote.length > 20);
+  assert.equal(arch.lifecycle.featureActivationRules.length, 5);
+  assert.equal(arch.lifecycle.cicRuntimeReadinessRules.length, 5);
+  assert.ok(arch.lifecycle.cicRuntimeOutOfScopeNote.length > 20);
+  assert.ok(arch.lifecycle.openWorkPrinciple.length > 30);
+  assert.equal(arch.lifecycle.openWorkExamples.length, 4);
+  assert.equal(arch.lifecycle.deactivationFldRules.length, 3);
+  assert.ok(arch.lifecycle.deactivationFldExample.length > 20);
+  assert.equal(arch.lifecycle.deactivationCicRules.length, 5);
+
+  // Future Extensions R05 completeness
+  assert.equal(arch.futureExtensions.dependencyClassificationTypes.length, 4);
+  assert.equal(arch.futureExtensions.hbmdStrictRequirements.length, 4);
+  assert.equal(arch.futureExtensions.sharedCapabilityDirections.length, 4);
+  assert.ok(arch.futureExtensions.sharedCapabilityProhibition.length > 20);
+  assert.equal(arch.futureExtensions.integrationEvolutionRules.length, 5);
+  assert.equal(arch.futureExtensions.featureExtensionRules.length, 4);
+  assert.equal(arch.futureExtensions.dataOwnershipEvolutionFields.length, 6);
+  assert.ok(arch.futureExtensions.dataOwnershipConflictRule.length > 20);
+  assert.equal(arch.futureExtensions.matrixUpdateRequirements.length, 7);
+  assert.ok(arch.futureExtensions.coreBaselineImmutabilityNote.length > 20);
+  assert.equal(arch.futureExtensions.industryExtensionRules.length, 5);
+  assert.ok(arch.futureExtensions.industryExtensionRationale.length > 20);
+
+  // Verify every sectionAnchor on lifecycle, futureExtensions, assumptionSafety, closureReview resolves in rendered headings
+  const checkAnchorMap = async (
+    slug: string,
+    anchors: Record<string, string>
+  ) => {
+    const doc = registry.getBySlug(slug);
+    assert.ok(doc, `Missing document ${slug}`);
+    const rendered = await renderSafeMarkdown(doc.bodyMarkdown);
+    const ids = new Set(rendered.headings.map((h) => h.id));
+    for (const [key, anchor] of Object.entries(anchors)) {
+      assert.ok(
+        ids.has(anchor),
+        `Section anchor "${key}" -> #${anchor} not found in rendered headings of ${slug}`
+      );
+    }
+  };
+
+  await checkAnchorMap(
+    arch.lifecycle.documentSlug,
+    arch.lifecycle.sectionAnchors
+  );
+  await checkAnchorMap(
+    arch.futureExtensions.documentSlug,
+    arch.futureExtensions.sectionAnchors
+  );
+  await checkAnchorMap(
+    arch.phase2Reviews.assumptionSafety.documentSlug,
+    arch.phase2Reviews.assumptionSafety.sectionAnchors
+  );
+  await checkAnchorMap(
+    arch.phase2Reviews.closureReview.documentSlug,
+    arch.phase2Reviews.closureReview.sectionAnchors
+  );
+});
+
+test('TASK-005-QA R06 & i18n: historical baseline provenance flags non-live snapshot and ar.json / en.json share 100% recursive key parity', () => {
+  assert.equal(HISTORICAL_REFERENCE_SNAPSHOT.provenance.isLiveSynced, false);
+  assert.equal(
+    HISTORICAL_REFERENCE_SNAPSHOT.provenance.reviewedTreeSha,
+    'a922a69b54bc0cc611ae46d8e7434907cde0046a'
+  );
+  assert.equal(PROJECT_REFERENCE_SNAPSHOT.provenance.isLiveSynced, false);
+  assert.equal(
+    PROJECT_REFERENCE_SNAPSHOT.provenance.reviewedTreeSha,
+    'db531de6b2ab452578a550e07c5fd80e4bfe6b64'
+  );
+
+  const ar = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), 'i18n', 'locales', 'ar.json'), 'utf8')
+  ) as Record<string, unknown>;
+  const en = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), 'i18n', 'locales', 'en.json'), 'utf8')
+  ) as Record<string, unknown>;
+
+  const collectLeafKeys = (
+    node: Record<string, unknown>,
+    prefix = ''
+  ): string[] => {
+    const keys: string[] = [];
+    for (const key of Object.keys(node).sort()) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      const val = node[key];
+      if (val && typeof val === 'object' && !Array.isArray(val)) {
+        keys.push(...collectLeafKeys(val as Record<string, unknown>, fullKey));
+      } else {
+        keys.push(fullKey);
+      }
+    }
+    return keys;
+  };
+
+  assert.deepEqual(collectLeafKeys(ar), collectLeafKeys(en));
+});
+
 
 

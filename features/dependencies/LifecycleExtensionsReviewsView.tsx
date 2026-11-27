@@ -218,14 +218,124 @@ export function ModuleLifecycleExplorer({
         </div>
       </div>
 
-      {/* Activation vs Deactivation Preconditions + Freeze not Delete */}
+      {/* Entitlement vs Functional State & Open Work Handling (§2, §9) */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§2 الفصل بين الترخيص (Entitlement) والحالة الوظيفية'
+                : '§2 Entitlement vs. Functional Lifecycle State'}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.entitlement}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§2 المصدر' : '§2 Source'}
+            </Link>
+          </div>
+          <p className="text-xs leading-relaxed text-text-secondary">
+            {lifecycle.entitlementSeparationSummary}
+          </p>
+          <p className="rounded-md border border-border bg-surface-secondary/50 px-3 py-1.5 text-[11px] text-text-muted">
+            {lifecycle.entitlementOutOfScopeNote}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§9 التعامل مع الأعمال المفتوحة عند الإيقاف (Open Work Handling)'
+                : '§9 Open Work Handling on Deactivation'}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.openWork}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§9 المصدر' : '§9 Source'}
+            </Link>
+          </div>
+          <p className="rounded-md border border-warning-border bg-warning-bg/40 px-3 py-2 text-[11px] font-medium text-text-primary bidi-ltr text-start">
+            {lifecycle.openWorkPrinciple}
+          </p>
+          <ul className="space-y-1 text-[11px] text-text-secondary">
+            {lifecycle.openWorkExamples.map((ex) => (
+              <li key={ex}>• {ex}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* §5 Feature Activation Rules & §6 CIC Runtime Readiness */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
-          <h3 className="text-xs font-semibold text-text-primary">
-            {isAr
-              ? `شروط التفعيل المسبقة (${lifecycle.activationPreconditions.length})`
-              : `Module Activation Preconditions (${lifecycle.activationPreconditions.length})`}
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? `§5 قواعد تفعيل الميزات (${lifecycle.featureActivationRules.length})`
+                : `§5 Feature Activation Rules (${lifecycle.featureActivationRules.length})`}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.featureActivation}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§5 المصدر' : '§5 Source'}
+            </Link>
+          </div>
+          <ol className="space-y-1.5 text-xs text-text-secondary">
+            {lifecycle.featureActivationRules.map((rule, idx) => (
+              <li key={rule} className="flex items-start gap-2 leading-relaxed">
+                <span className="font-mono font-bold text-primary">{idx + 1}.</span>
+                <span>{rule}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? `§6 جاهزية تشغيل عقود التكامل (${lifecycle.cicRuntimeReadinessRules.length})`
+                : `§6 CIC Runtime Readiness (${lifecycle.cicRuntimeReadinessRules.length})`}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.cicReadiness}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§6 المصدر' : '§6 Source'}
+            </Link>
+          </div>
+          <ul className="space-y-1.5 text-xs text-text-secondary">
+            {lifecycle.cicRuntimeReadinessRules.map((rule) => (
+              <li key={rule} className="leading-relaxed">
+                • {rule}
+              </li>
+            ))}
+          </ul>
+          <p className="rounded-md border border-border bg-surface-secondary/50 px-3 py-1.5 text-[11px] text-text-muted">
+            {lifecycle.cicRuntimeOutOfScopeNote}
+          </p>
+        </div>
+      </div>
+
+      {/* Activation vs Deactivation Preconditions + Shared Data Safety */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? `§4 شروط التفعيل المسبقة (${lifecycle.activationPreconditions.length})`
+                : `§4 Module Activation Preconditions (${lifecycle.activationPreconditions.length})`}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.activation}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§4 المصدر' : '§4 Source'}
+            </Link>
+          </div>
           <ol className="space-y-1.5 text-xs text-text-secondary">
             {lifecycle.activationPreconditions.map((item, idx) => (
               <li key={item} className="flex items-start gap-2 leading-relaxed">
@@ -237,11 +347,19 @@ export function ModuleLifecycleExplorer({
         </div>
 
         <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
-          <h3 className="text-xs font-semibold text-text-primary">
-            {isAr
-              ? `فحص أثر الإيقاف وحماية البيانات المشتركة (${lifecycle.deactivationPreconditions.length})`
-              : `Deactivation Impact Checklist & Shared Data Safety (${lifecycle.deactivationPreconditions.length})`}
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? `§7 فحص أثر الإيقاف وحماية البيانات المشتركة (${lifecycle.deactivationPreconditions.length})`
+                : `§7 Deactivation Impact Checklist & Shared Data Safety (${lifecycle.deactivationPreconditions.length})`}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.deactivation}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§7 المصدر' : '§7 Source'}
+            </Link>
+          </div>
           <ol className="space-y-1.5 text-xs text-text-secondary">
             {lifecycle.deactivationPreconditions.map((item, idx) => (
               <li key={item} className="flex items-start gap-2 leading-relaxed">
@@ -252,7 +370,7 @@ export function ModuleLifecycleExplorer({
           </ol>
           <div className="border-t border-border pt-2.5 space-y-1">
             <p className="text-xs font-semibold text-text-primary">
-              {isAr ? 'أمثلة حماية البيانات المشتركة:' : 'Shared Data Safety Examples:'}
+              {isAr ? '§12 أمثلة حماية البيانات المشتركة:' : '§12 Shared Data Safety Examples:'}
             </p>
             {lifecycle.sharedDataSafetyExamples.map((ex) => (
               <p key={ex} className="text-[11px] text-text-secondary">
@@ -260,6 +378,54 @@ export function ModuleLifecycleExplorer({
               </p>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* §10 FLD Deactivation Impact & §11 CIC Deactivation Impact */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§10 أثر إيقاف النظام على اعتماديات الميزات (FLD)'
+                : '§10 Deactivation Impact on Feature Dependencies (FLD)'}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.fldImpact}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§10 المصدر' : '§10 Source'}
+            </Link>
+          </div>
+          <ul className="space-y-1 text-xs text-text-secondary">
+            {lifecycle.deactivationFldRules.map((rule) => (
+              <li key={rule}>• {rule}</li>
+            ))}
+          </ul>
+          <p className="rounded-md border border-border bg-surface-secondary/50 px-3 py-1.5 text-[11px] text-text-primary">
+            {lifecycle.deactivationFldExample}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§11 أثر إيقاف النظام على عقود التكامل (CIC)'
+                : '§11 Deactivation Impact on Integration Contracts (CIC)'}
+            </h3>
+            <Link
+              href={`/knowledge/${lifecycle.documentSlug}#${lifecycle.sectionAnchors.cicImpact}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§11 المصدر' : '§11 Source'}
+            </Link>
+          </div>
+          <ul className="space-y-1 text-xs text-text-secondary">
+            {lifecycle.deactivationCicRules.map((rule) => (
+              <li key={rule}>• {rule}</li>
+            ))}
+          </ul>
         </div>
       </div>
 
@@ -419,6 +585,144 @@ export function FutureExtensionGovernanceView({
         </div>
       </div>
 
+      {/* §§ 5–11 Detailed Extension Rules (Classification, Shared Capability, CIC/Feature/Ownership Evolution, Matrix Update, Industry Extensions) */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§5 تصنيف الاعتماديات والقيود الأربعة لأي HBMD جديد'
+                : '§5 Strict Dependency Classification & HBMD Requirements'}
+            </h3>
+            <Link
+              href={`/knowledge/${extensions.documentSlug}#${extensions.sectionAnchors.classification}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§5 المصدر' : '§5 Source'}
+            </Link>
+          </div>
+          <p className="font-mono text-[11px] text-text-muted bidi-ltr text-start">
+            {extensions.dependencyClassificationTypes.join(' · ')}
+          </p>
+          <ul className="space-y-1 text-xs text-text-secondary">
+            {extensions.hbmdStrictRequirements.map((req) => (
+              <li key={req}>• {req}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§6 قاعدة استخراج القدرات المشتركة (منع التكرار)'
+                : '§6 Shared Capability Extraction Rule'}
+            </h3>
+            <Link
+              href={`/knowledge/${extensions.documentSlug}#${extensions.sectionAnchors.sharedCapability}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§6 المصدر' : '§6 Source'}
+            </Link>
+          </div>
+          <ol className="space-y-1 text-xs text-text-secondary">
+            {extensions.sharedCapabilityDirections.map((dir, i) => (
+              <li key={dir} className="flex items-start gap-2">
+                <span className="font-mono font-bold text-primary">{i + 1}.</span>
+                <span>{dir}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="rounded-md border border-warning-border bg-warning-bg/40 px-3 py-1.5 text-[11px] text-text-primary">
+            {extensions.sharedCapabilityProhibition}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§7 & §8 تطور عقود التكامل وتوسعة الميزات'
+                : '§7 Integration Contract Evolution & §8 Feature Extension'}
+            </h3>
+            <Link
+              href={`/knowledge/${extensions.documentSlug}#${extensions.sectionAnchors.integrationEvolution}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§7–8 المصدر' : '§7–8 Source'}
+            </Link>
+          </div>
+          <ul className="space-y-1 text-xs text-text-secondary">
+            {extensions.integrationEvolutionRules.map((r) => (
+              <li key={r}>• {r}</li>
+            ))}
+          </ul>
+          <ul className="space-y-1 border-t border-border pt-2 text-xs text-text-secondary">
+            {extensions.featureExtensionRules.map((r) => (
+              <li key={r}>• {r}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="rounded-lg border border-border bg-surface p-4 space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold text-text-primary">
+              {isAr
+                ? '§9 تطور ملكية البيانات & §10 تحديث المصفوفات'
+                : '§9 Data Ownership Evolution & §10 Matrix Update Requirement'}
+            </h3>
+            <Link
+              href={`/knowledge/${extensions.documentSlug}#${extensions.sectionAnchors.ownershipEvolution}`}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              {isAr ? '§9–10 المصدر' : '§9–10 Source'}
+            </Link>
+          </div>
+          <p className="text-[11px] font-medium text-text-primary">
+            {extensions.dataOwnershipEvolutionFields.join(' · ')}
+          </p>
+          <p className="text-[11px] text-text-secondary">
+            {extensions.dataOwnershipConflictRule}
+          </p>
+          <ol className="grid grid-cols-1 gap-1 border-t border-border pt-2 sm:grid-cols-2 text-[11px] text-text-secondary">
+            {extensions.matrixUpdateRequirements.map((req, i) => (
+              <li key={req} className="flex items-start gap-1.5">
+                <span className="font-mono font-bold text-primary">{i + 1}.</span>
+                <span>{req}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="rounded-md border border-border bg-surface-secondary/50 px-3 py-1.5 text-[11px] text-text-muted">
+            {extensions.coreBaselineImmutabilityNote}
+          </p>
+        </div>
+      </div>
+
+      {/* §11 Industry Extensions */}
+      <div className="rounded-lg border border-border bg-surface p-4 space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-xs font-semibold text-text-primary">
+            {isAr
+              ? `§11 الامتدادات القطاعية (${extensions.industryExtensionRules.length} ضوابط)`
+              : `§11 Industry Extensions Governance (${extensions.industryExtensionRules.length} Guardrails)`}
+          </h3>
+          <Link
+            href={`/knowledge/${extensions.documentSlug}#${extensions.sectionAnchors.industryExtensions}`}
+            className="text-[11px] font-medium text-primary hover:underline"
+          >
+            {isAr ? '§11 المصدر' : '§11 Source'}
+          </Link>
+        </div>
+        <ul className="grid grid-cols-1 gap-1.5 md:grid-cols-2 text-xs text-text-secondary">
+          {extensions.industryExtensionRules.map((rule) => (
+            <li key={rule}>• {rule}</li>
+          ))}
+        </ul>
+        <p className="text-[11px] font-medium text-text-primary">
+          {extensions.industryExtensionRationale}
+        </p>
+      </div>
+
       {/* Illustrative Directional Examples — Strictly Labeled Non-Approved Scope */}
       <div className="rounded-lg border border-class-illustrative-border bg-class-illustrative-bg/40 p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -472,18 +776,18 @@ export function Phase2ReviewsSection({ reviews }: Phase2ReviewsSectionProps) {
         }
       />
 
-      {/* Explicit Authority Separation from External Advisory Reviews */}
+      {/* Explicit Authority Separation & Historical Baseline Snapshot Disclosure (R06) */}
       <InformationCallout
         className="border-info-border bg-info-bg/50"
         title={
           isAr
-            ? 'فصل المرجعية: بوابات مراجعة معمارية رسمية للمشروع ≠ المراجعات الاستشارية المستقلة'
-            : 'Authority Separation: Official Project Review Gates ≠ External Independent Advisory Reviews'
+            ? 'فصل المرجعية وخط الأساس التاريخي: بوابات مراجعة المرحلة 2 ≠ المراجعات المستقلة'
+            : 'Authority Separation & Pinned Historical Baseline (Not Live Repo Status)'
         }
       >
         {isAr
-          ? 'تُعد هاتان الوثيقتان بوابتي مراجعة وإغلاق رسميتين ضمن مسار تخطيط Teranoo ERP الرسمي، وتختلفان تصنيفيًا عن المراجعات الاستشارية الخارجية المستقلة (Independent Analysis).'
-          : 'Both documents are official internal project architecture gates closing Phase 2; they are strictly separated from external independent advisory analyses.'}
+          ? 'تُعد هاتان الوثيقتان بوابتي مراجعة وإغلاق رسميتين ضمن مسار تخطيط Teranoo ERP الرسمي (تاريخ إغلاق المرحلة 2: 2026-09-09 ضمن اللقطة التاريخية المثبتة 397a94e0d82f)، وتختلفان تصنيفيًا عن المراجعات الاستشارية الخارجية المستقلة (Independent Analysis). تشير حالات «جاهز للمرحلة 3» أو «مؤجل للمرحلة 5/6» إلى لقطة إغلاق المرحلة 2 المثبتة فقط.'
+          : 'Both documents are official internal project architecture gates closing Phase 2 (2026-09-09 in pinned baseline commit 397a94e0d82f), strictly distinct from external independent advisory analyses. Statuses such as "Ready for Phase 3" or "Deferred to Phase 5/6" describe that pinned Phase 2 snapshot rather than asserting live project state today.'}
       </InformationCallout>
 
       {/* Two Gate Cards */}
@@ -500,16 +804,20 @@ export function Phase2ReviewsSection({ reviews }: Phase2ReviewsSectionProps) {
                   : 'Phase 2 Assumption Safety Review'}
               </h3>
               <p className="font-mono text-[11px] text-text-muted bidi-ltr">
-                {reviews.assumptionSafety.reviewDate} · 0 Reopens · 0 Conflicts · 1 Doc Sync (D-SALES-06)
+                {reviews.assumptionSafety.reviewDate} · {reviews.assumptionSafety.reopensRequired} Reopens · {reviews.assumptionSafety.materialConflicts} Conflicts · {reviews.assumptionSafety.docSyncCount} Doc Sync
               </p>
             </div>
             <Link
-              href={`/knowledge/${reviews.assumptionSafety.documentSlug}`}
+              href={`/knowledge/${reviews.assumptionSafety.documentSlug}#${reviews.assumptionSafety.sectionAnchors.executiveResult}`}
               className="text-xs font-medium text-primary hover:underline"
             >
               {isAr ? 'النص الكامل' : 'Full Doc'}
             </Link>
           </div>
+
+          <p className="rounded-md border border-info-border bg-info-bg/40 px-3 py-2 text-[11px] text-text-primary bidi-ltr text-start">
+            {reviews.assumptionSafety.docSyncDetail}
+          </p>
 
           {/* 4 Module Verdicts */}
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
@@ -533,36 +841,58 @@ export function Phase2ReviewsSection({ reviews }: Phase2ReviewsSectionProps) {
 
           {/* 7 Binding Guardrails G-ASSUMP-01..07 */}
           <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-text-primary">
-              {isAr
-                ? `الضوابط الملزمة للمرحلة 3 وما بعدها (${reviews.assumptionSafety.guardrails.length})`
-                : `Binding Guardrails for Phase 3+ (${reviews.assumptionSafety.guardrails.length})`}
-            </h4>
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="text-xs font-semibold text-text-primary">
+                {isAr
+                  ? `الضوابط الملزمة للمرحلة 3 وما بعدها (${reviews.assumptionSafety.guardrails.length})`
+                  : `Binding Guardrails for Phase 3+ (${reviews.assumptionSafety.guardrails.length})`}
+              </h4>
+              <Link
+                href={`/knowledge/${reviews.assumptionSafety.documentSlug}#${reviews.assumptionSafety.sectionAnchors.guardrails}`}
+                className="text-[11px] text-primary hover:underline"
+              >
+                {isAr ? '§4 المصدر' : '§4 Source'}
+              </Link>
+            </div>
             <div className="space-y-1.5">
               {reviews.assumptionSafety.guardrails.map((g) => (
-                <div
+                <Link
                   key={g.code}
-                  className="rounded-md border border-border bg-surface-secondary/30 px-3 py-2 text-xs"
+                  href={`/knowledge/${reviews.assumptionSafety.documentSlug}#${g.sectionAnchor}`}
+                  className="block rounded-md border border-border bg-surface-secondary/30 px-3 py-2 text-xs space-y-0.5 hover:border-primary/40"
                 >
-                  <span className="font-mono font-bold text-primary bidi-ltr">
-                    {g.code}
-                  </span>
-                  <span className="mx-1.5 text-text-muted">—</span>
-                  <span className="font-medium text-text-primary bidi-ltr">
-                    {g.title}
-                  </span>
-                </div>
+                  <div>
+                    <span className="font-mono font-bold text-primary bidi-ltr">
+                      {g.code}
+                    </span>
+                    <span className="mx-1.5 text-text-muted">—</span>
+                    <span className="font-medium text-text-primary bidi-ltr">
+                      {g.title}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-text-secondary line-clamp-2">
+                    {g.summary}
+                  </p>
+                </Link>
               ))}
             </div>
           </div>
 
           {/* 12 Phase 3 Handoffs */}
           <div className="space-y-1.5 border-t border-border pt-3">
-            <h4 className="text-xs font-semibold text-text-primary">
-              {isAr
-                ? `عناصر التسليم للمرحلة 3 (${reviews.assumptionSafety.phase3Handoffs.length})`
-                : `Phase 3 Hand-Off Items (${reviews.assumptionSafety.phase3Handoffs.length})`}
-            </h4>
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="text-xs font-semibold text-text-primary">
+                {isAr
+                  ? `عناصر التسليم للمرحلة 3 (${reviews.assumptionSafety.phase3Handoffs.length})`
+                  : `Phase 3 Hand-Off Items (${reviews.assumptionSafety.phase3Handoffs.length})`}
+              </h4>
+              <Link
+                href={`/knowledge/${reviews.assumptionSafety.documentSlug}#${reviews.assumptionSafety.sectionAnchors.phase3Handoffs}`}
+                className="text-[11px] text-primary hover:underline"
+              >
+                {isAr ? '§5 المصدر' : '§5 Source'}
+              </Link>
+            </div>
             <ol className="grid grid-cols-1 gap-1 sm:grid-cols-2 text-[11px] text-text-secondary">
               {reviews.assumptionSafety.phase3Handoffs.map((h, i) => (
                 <li key={h} className="flex items-start gap-1.5">
@@ -591,7 +921,7 @@ export function Phase2ReviewsSection({ reviews }: Phase2ReviewsSectionProps) {
               </p>
             </div>
             <Link
-              href={`/knowledge/${reviews.closureReview.documentSlug}`}
+              href={`/knowledge/${reviews.closureReview.documentSlug}#${reviews.closureReview.sectionAnchors.closureDecision}`}
               className="text-xs font-medium text-primary hover:underline"
             >
               {isAr ? 'النص الكامل' : 'Full Doc'}

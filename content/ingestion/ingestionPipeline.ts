@@ -412,6 +412,9 @@ ${sequenceBlock}---
 export interface StoredBodyIntegrityIssue {
   readonly code:
     | 'MISSING_STORED_BODY_DIGEST'
+    | 'MISSING_RAW_SOURCE_DIGEST'
+    | 'MISSING_GIT_BLOB_SHA'
+    | 'MISSING_SOURCE_REVISION'
     | 'STORED_BODY_DIGEST_MISMATCH'
     | 'STORED_BODY_GIT_BLOB_MISMATCH'
     | 'STORED_BODY_REVISION_MISMATCH'
@@ -471,6 +474,9 @@ export function computeCanonicalStoredBodySha256(
  * Verifies a stored official KnowledgeDocument body directly against its recorded
  * frontmatter digests and (when linked) its OFFICIAL_SOURCE_MANIFEST entry —
  * completely independent of raw attachment copies under `/files/`.
+ *
+ * KH-035: Missing required source revision, Git blob identity, raw source digest, or
+ * canonical stored-body digest MUST fail validation rather than bypass verification.
  */
 export function verifyStoredOfficialDocumentIntegrity(
   doc: Pick<KnowledgeDocument, 'metadata' | 'bodyMarkdown'>,
@@ -494,8 +500,11 @@ export function verifyStoredOfficialDocumentIntegrity(
     source.kind === 'official-source' ? (source.commitSha ?? null) : null;
 
   const manifestSourceFileHash = manifestEntry?.sourceFileHash ?? null;
-  const expectedGitBlobSha =
-    manifestEntry?.expectedGitBlobSha ?? recordedGitBlobSha;
+  const manifestRawSourceSha256 = manifestEntry?.rawSourceSha256 ?? null;
+  const manifestSourceRevision = manifestEntry?.sourceRevision ?? null;
+  const manifestExpectedGitBlobSha = manifestEntry?.expectedGitBlobSha ?? null;
+  const manifestActualGitBlobSha = manifestEntry?.actualGitBlobSha ?? null;
+  const expectedGitBlobSha = manifestExpectedGitBlobSha ?? recordedGitBlobSha;
 
   // Reject unexpected CRLF line endings inside canonical LF-stored official files
   if (canonicalBody.includes('\r\n')) {
@@ -507,22 +516,74 @@ export function verifyStoredOfficialDocumentIntegrity(
     });
   }
 
-  // Require storedBodySha256 on manifest-backed official documents
+  // KH-035: Mandatory frontmatter provenance fields on official-source documents
+  if (!recordedCommitSha) {
+    issues.push({
+      code: 'MISSING_SOURCE_REVISION',
+      field: 'source.commitSha',
+      message: `Official-source document "${doc.metadata.id}" is missing required frontmatter source.commitSha.`,
+    });
+  }
+  if (!recordedGitBlobSha) {
+    issues.push({
+      code: 'MISSING_GIT_BLOB_SHA',
+      field: 'source.gitBlobSha',
+      message: `Official-source document "${doc.metadata.id}" is missing required frontmatter source.gitBlobSha.`,
+    });
+  }
+  if (!recordedRawSourceSha256) {
+    issues.push({
+      code: 'MISSING_RAW_SOURCE_DIGEST',
+      field: 'source.rawSourceSha256',
+      message: `Official-source document "${doc.metadata.id}" is missing required frontmatter source.rawSourceSha256.`,
+    });
+  }
+  if (!recordedStoredBodySha256) {
+    issues.push({
+      code: 'MISSING_STORED_BODY_DIGEST',
+      field: 'source.storedBodySha256',
+      message: `Official-source document "${doc.metadata.id}" is missing required frontmatter source.storedBodySha256.`,
+    });
+  }
+
+  // KH-035: Mandatory manifest provenance alignment when linked to a manifest entry
   if (manifestEntry) {
-    if (!recordedStoredBodySha256) {
+    if (!manifestSourceRevision) {
       issues.push({
-        code: 'MISSING_STORED_BODY_DIGEST',
-        field: 'source.storedBodySha256',
-        message: `Published official document "${doc.metadata.id}" linked to manifest entry "${manifestEntry.sourceRefId}" is missing frontmatter source.storedBodySha256.`,
+        code: 'MISSING_SOURCE_REVISION',
+        field: 'manifest.sourceRevision',
+        message: `Manifest entry "${manifestEntry.sourceRefId}" is missing required sourceRevision.`,
+      });
+    }
+    if (!manifestExpectedGitBlobSha) {
+      issues.push({
+        code: 'MISSING_GIT_BLOB_SHA',
+        field: 'manifest.expectedGitBlobSha',
+        message: `Manifest entry "${manifestEntry.sourceRefId}" is missing required expectedGitBlobSha.`,
+      });
+    }
+    if (!manifestActualGitBlobSha) {
+      issues.push({
+        code: 'MISSING_GIT_BLOB_SHA',
+        field: 'manifest.actualGitBlobSha',
+        message: `Manifest entry "${manifestEntry.sourceRefId}" is missing required actualGitBlobSha.`,
+      });
+    }
+    if (!manifestRawSourceSha256) {
+      issues.push({
+        code: 'MISSING_RAW_SOURCE_DIGEST',
+        field: 'manifest.rawSourceSha256',
+        message: `Manifest entry "${manifestEntry.sourceRefId}" is missing required rawSourceSha256.`,
       });
     }
     if (!manifestSourceFileHash) {
       issues.push({
         code: 'MISSING_STORED_BODY_DIGEST',
         field: 'manifest.sourceFileHash',
-        message: `Manifest entry "${manifestEntry.sourceRefId}" is missing canonical sourceFileHash.`,
+        message: `Manifest entry "${manifestEntry.sourceRefId}" is missing required canonical sourceFileHash.`,
       });
     }
+
     if (
       recordedStoredBodySha256 &&
       manifestSourceFileHash &&
@@ -535,14 +596,47 @@ export function verifyStoredOfficialDocumentIntegrity(
       });
     }
     if (
-      manifestEntry.sourceRevision &&
+      recordedRawSourceSha256 &&
+      manifestRawSourceSha256 &&
+      recordedRawSourceSha256 !== manifestRawSourceSha256
+    ) {
+      issues.push({
+        code: 'STORED_BODY_DIGEST_MISMATCH',
+        field: 'source.rawSourceSha256',
+        message: `Frontmatter source.rawSourceSha256 (${recordedRawSourceSha256}) does not match OFFICIAL_SOURCE_MANIFEST rawSourceSha256 (${manifestRawSourceSha256}).`,
+      });
+    }
+    if (
+      manifestSourceRevision &&
       recordedCommitSha &&
-      recordedCommitSha !== manifestEntry.sourceRevision
+      recordedCommitSha !== manifestSourceRevision
     ) {
       issues.push({
         code: 'STORED_BODY_REVISION_MISMATCH',
         field: 'source.commitSha',
-        message: `Frontmatter source.commitSha (${recordedCommitSha}) does not match manifest sourceRevision (${manifestEntry.sourceRevision}).`,
+        message: `Frontmatter source.commitSha (${recordedCommitSha}) does not match manifest sourceRevision (${manifestSourceRevision}).`,
+      });
+    }
+    if (
+      manifestExpectedGitBlobSha &&
+      recordedGitBlobSha &&
+      recordedGitBlobSha !== manifestExpectedGitBlobSha
+    ) {
+      issues.push({
+        code: 'STORED_BODY_GIT_BLOB_MISMATCH',
+        field: 'source.gitBlobSha',
+        message: `Frontmatter source.gitBlobSha (${recordedGitBlobSha}) does not match manifest expectedGitBlobSha (${manifestExpectedGitBlobSha}).`,
+      });
+    }
+    if (
+      manifestExpectedGitBlobSha &&
+      manifestActualGitBlobSha &&
+      manifestActualGitBlobSha !== manifestExpectedGitBlobSha
+    ) {
+      issues.push({
+        code: 'STORED_BODY_GIT_BLOB_MISMATCH',
+        field: 'manifest.actualGitBlobSha',
+        message: `Manifest actualGitBlobSha (${manifestActualGitBlobSha}) does not match expectedGitBlobSha (${manifestExpectedGitBlobSha}).`,
       });
     }
   }
@@ -578,10 +672,8 @@ export function verifyStoredOfficialDocumentIntegrity(
       field: 'body',
       message: `Recomputed Git blob SHA-1 (${actualStoredGitBlobSha1}) from stored canonical body does not match expected Git blob SHA (${expectedGitBlobSha}).`,
     });
-  } else if (
-    recordedGitBlobSha &&
-    actualStoredGitBlobSha1 !== recordedGitBlobSha
-  ) {
+  }
+  if (recordedGitBlobSha && actualStoredGitBlobSha1 !== recordedGitBlobSha) {
     issues.push({
       code: 'STORED_BODY_GIT_BLOB_MISMATCH',
       field: 'source.gitBlobSha',

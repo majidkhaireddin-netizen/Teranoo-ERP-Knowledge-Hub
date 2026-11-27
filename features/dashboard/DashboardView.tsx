@@ -184,9 +184,14 @@ export function DashboardView({
         }
       />
 
-      {/* Explicit Planning vs Implementation Integrity Notice */}
-      <InformationCallout title={t('dashboard.snapshotBanner')}>
-        {t('app.planningProgressNotice')}
+      {/* Explicit Planning vs Implementation & Historical Baseline Integrity Notice (R06) */}
+      <InformationCallout title={t('foundations.historicalBaseline.title')}>
+        <div className="space-y-1">
+          <p>{t('app.planningProgressNotice')}</p>
+          <p className="text-xs text-text-secondary">
+            {t('foundations.historicalBaseline.body')}
+          </p>
+        </div>
       </InformationCallout>
 
       {/* 2A. ERP Project Status Strip (Official Planning Reference Snapshot) */}

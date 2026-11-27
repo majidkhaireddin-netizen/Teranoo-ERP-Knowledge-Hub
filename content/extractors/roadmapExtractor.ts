@@ -118,14 +118,16 @@ export function parseRoadmapMarkdown(
   options?: {
     readonly sourceDocumentId?: string;
     readonly sourceDocumentSlug?: string;
-    readonly sourceRevision?: string;
+    readonly sourceRevision?: string | null;
   }
 ): ExtractedRoadmap {
   const sourceDocumentId =
     options?.sourceDocumentId ?? 'kh-doc-project-work-plan-ar';
   const sourceDocumentSlug = options?.sourceDocumentSlug ?? 'project-work-plan';
   const sourceRevision =
-    options?.sourceRevision ?? CURATED_ROADMAP_PINNED_SOURCE.mappedSourceRevision;
+    options && 'sourceRevision' in options
+      ? (options.sourceRevision ?? 'missing')
+      : CURATED_ROADMAP_PINNED_SOURCE.mappedSourceRevision;
 
   const normalized = markdown.replace(/\r\n/g, '\n');
   const actualSourceBodySha256 = createHash('sha256')
@@ -1144,8 +1146,8 @@ export function getExtractedRoadmap(): ExtractedRoadmap {
     sourceDocumentSlug: doc.metadata.slug,
     sourceRevision:
       doc.metadata.source.kind === 'official-source'
-        ? doc.metadata.source.commitSha ?? BATCH_001_SOURCE_REVISION.commitSha
-        : BATCH_001_SOURCE_REVISION.commitSha,
+        ? (doc.metadata.source.commitSha ?? null)
+        : null,
   });
 
   return cachedRoadmap;

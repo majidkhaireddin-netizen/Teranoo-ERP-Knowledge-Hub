@@ -822,13 +822,13 @@ export function validateSourceManifest(
       entry.importStatus === 'published';
 
     if (requiresBodyProvenance) {
-      if (!entry.sourceRevision && !entry.sourceFileHash) {
+      if (!entry.sourceRevision || !entry.sourceFileHash) {
         errors.push({
           severity: 'error',
           code: 'MISSING_SOURCE_PROVENANCE',
           sourceRefId: entry.sourceRefId,
-          field: 'sourceRevision',
-          message: `Source "${entry.sourcePath}" with status "${entry.importStatus}" must record a verified sourceRevision or SHA-256 sourceFileHash.`,
+          field: !entry.sourceRevision ? 'sourceRevision' : 'sourceFileHash',
+          message: `Source "${entry.sourcePath}" with status "${entry.importStatus}" must record both verified sourceRevision and SHA-256 sourceFileHash.`,
         });
       }
       if (entry.completeness === 'not-imported') {
@@ -842,8 +842,40 @@ export function validateSourceManifest(
       }
     }
 
-    // Publication governance enforcement
+    // Publication governance & full provenance enforcement (KH-035)
     if (entry.importStatus === 'published') {
+      if (!entry.expectedGitBlobSha || !entry.actualGitBlobSha) {
+        errors.push({
+          severity: 'error',
+          code: 'MISSING_GIT_BLOB_SHA',
+          sourceRefId: entry.sourceRefId,
+          field: !entry.expectedGitBlobSha
+            ? 'expectedGitBlobSha'
+            : 'actualGitBlobSha',
+          message: `Published source "${entry.sourcePath}" must record both expectedGitBlobSha and actualGitBlobSha.`,
+        });
+      }
+      if (!entry.rawSourceSha256) {
+        errors.push({
+          severity: 'error',
+          code: 'MISSING_RAW_SOURCE_DIGEST',
+          sourceRefId: entry.sourceRefId,
+          field: 'rawSourceSha256',
+          message: `Published source "${entry.sourcePath}" must record rawSourceSha256.`,
+        });
+      }
+      if (
+        entry.sourceVerificationStatus !== 'git-blob-verified' &&
+        entry.sourceVerificationStatus !== 'git-blob-verified-lf-normalized'
+      ) {
+        errors.push({
+          severity: 'error',
+          code: 'UNVERIFIED_PUBLISHED_SOURCE',
+          sourceRefId: entry.sourceRefId,
+          field: 'sourceVerificationStatus',
+          message: `Published source "${entry.sourcePath}" must hold verified Git blob status ("git-blob-verified" or "git-blob-verified-lf-normalized"), got "${entry.sourceVerificationStatus}".`,
+        });
+      }
       if (entry.publicationAuthorizationStatus !== 'authorized') {
         errors.push({
           severity: 'error',

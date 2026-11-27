@@ -3,6 +3,10 @@ import { createHeadingSlug, HEADING_ID_PREFIX } from '@/content/loaders/markdown
 import { computeCanonicalStoredBodySha256 } from '@/content/ingestion/ingestionPipeline';
 import { getContentRegistry } from '@/content/registry/contentRegistry';
 import type { CoreModuleId } from '@/content/extractors/moduleModelsExtractor';
+import type {
+  SimulatorGoverningSourceKey,
+  SimulatorGoverningSourceSnapshot,
+} from '@/content/simulators/moduleActivationSimulator';
 import {
   buildDependencyEducationalGuidance,
   CURATED_DEPENDENCY_PROJECTION_PINS,
@@ -200,6 +204,9 @@ export interface ExtractedDependencyArchitecture {
     readonly officialSourcePath: string;
     readonly sourceRevision: string | null;
     readonly sourceBodySha256: string;
+    readonly governingSources: Readonly<
+      Record<SimulatorGoverningSourceKey, SimulatorGoverningSourceSnapshot>
+    >;
     readonly summaryRows: readonly SummaryMatrixRow[];
     readonly hbmdAbsenceRegister: readonly HbmdAbsenceRecord[];
     readonly hbmdEdgeCount: 0;
@@ -218,14 +225,39 @@ export interface ExtractedDependencyArchitecture {
     readonly documentSlug: string;
     readonly officialSourcePath: string;
     readonly topRules: readonly string[];
+    readonly entitlementSeparationSummary: string;
+    readonly entitlementOutOfScopeNote: string;
     readonly functionalStates: readonly LifecycleStateDefinition[];
     readonly activationPreconditions: readonly string[];
+    readonly featureActivationRules: readonly string[];
+    readonly cicRuntimeReadinessRules: readonly string[];
+    readonly cicRuntimeOutOfScopeNote: string;
     readonly deactivationPreconditions: readonly string[];
     readonly freezeNotDeletePoints: readonly string[];
+    readonly openWorkPrinciple: string;
+    readonly openWorkExamples: readonly string[];
+    readonly deactivationFldRules: readonly string[];
+    readonly deactivationFldExample: string;
+    readonly deactivationCicRules: readonly string[];
     readonly sharedDataSafetyExamples: readonly string[];
     readonly reactivationRules: readonly string[];
     readonly consistencyRows: readonly ModuleLifecycleConsistencyRow[];
     readonly finalRules: readonly string[];
+    readonly sectionAnchors: {
+      readonly entitlement: string;
+      readonly states: string;
+      readonly activation: string;
+      readonly featureActivation: string;
+      readonly cicReadiness: string;
+      readonly deactivation: string;
+      readonly freezeNotDelete: string;
+      readonly openWork: string;
+      readonly fldImpact: string;
+      readonly cicImpact: string;
+      readonly sharedData: string;
+      readonly reactivation: string;
+      readonly consistency: string;
+    };
   };
   readonly futureExtensions: {
     readonly documentSlug: string;
@@ -234,8 +266,35 @@ export interface ExtractedDependencyArchitecture {
     readonly newModuleRequirements: readonly string[];
     readonly coreOwnershipGuardrails: readonly string[];
     readonly noBackDependencyExamples: readonly string[];
+    readonly dependencyClassificationTypes: readonly string[];
+    readonly hbmdStrictRequirements: readonly string[];
+    readonly sharedCapabilityDirections: readonly string[];
+    readonly sharedCapabilityProhibition: string;
+    readonly integrationEvolutionRules: readonly string[];
+    readonly featureExtensionRules: readonly string[];
+    readonly dataOwnershipEvolutionFields: readonly string[];
+    readonly dataOwnershipConflictRule: string;
+    readonly matrixUpdateRequirements: readonly string[];
+    readonly coreBaselineImmutabilityNote: string;
+    readonly industryExtensionRules: readonly string[];
+    readonly industryExtensionRationale: string;
     readonly compatibilityReviewChecklist: readonly string[];
     readonly illustrativeDirectionalExamples: readonly string[];
+    readonly sectionAnchors: {
+      readonly supremeRule: string;
+      readonly newModule: string;
+      readonly ownership: string;
+      readonly noBackDependency: string;
+      readonly classification: string;
+      readonly sharedCapability: string;
+      readonly integrationEvolution: string;
+      readonly featureExtension: string;
+      readonly ownershipEvolution: string;
+      readonly matrixUpdate: string;
+      readonly industryExtensions: string;
+      readonly compatibilityReview: string;
+      readonly directionalExamples: string;
+    };
   };
   readonly phase2Reviews: {
     readonly reviewKind: 'official-project-review-gate';
@@ -251,6 +310,11 @@ export interface ExtractedDependencyArchitecture {
       readonly moduleVerdicts: readonly AssumptionSafetyModuleVerdict[];
       readonly guardrails: readonly AssumptionSafetyGuardrail[];
       readonly phase3Handoffs: readonly string[];
+      readonly sectionAnchors: {
+        readonly executiveResult: string;
+        readonly guardrails: string;
+        readonly phase3Handoffs: string;
+      };
     };
     readonly closureReview: {
       readonly documentSlug: string;
@@ -259,6 +323,11 @@ export interface ExtractedDependencyArchitecture {
       readonly exitGateResult: string;
       readonly exitCriteria: readonly Phase2ExitCriterion[];
       readonly deferredCommitmentGroups: readonly DeferredCommitmentGroup[];
+      readonly sectionAnchors: {
+        readonly deferredCommitments: string;
+        readonly exitCriteria: string;
+        readonly closureDecision: string;
+      };
     };
   };
   readonly educationalGuidance: DependencyEducationalGuidanceBundle;
@@ -527,12 +596,32 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
   const extDoc = registry.getBySlug('future-module-extension-rules');
   const assumpDoc = registry.getBySlug('phase-2-assumption-safety-review');
   const closureDoc = registry.getBySlug('phase-2-closure-review');
+  const financeDoc = registry.getBySlug('finance-module-model');
+  const inventoryDoc = registry.getBySlug('inventory-module-model');
+  const procurementDoc = registry.getBySlug('procurement-module-model');
+  const salesDoc = registry.getBySlug('sales-order-management-module-model');
 
-  if (!depDoc || !matrixDoc || !lifecycleDoc || !extDoc || !assumpDoc || !closureDoc) {
+  if (
+    !depDoc ||
+    !matrixDoc ||
+    !lifecycleDoc ||
+    !extDoc ||
+    !assumpDoc ||
+    !closureDoc ||
+    !financeDoc ||
+    !inventoryDoc ||
+    !procurementDoc ||
+    !salesDoc
+  ) {
     throw new Error(
-      'One or more required BATCH-002 Phase 2 governance documents are missing from Content Registry.'
+      'One or more required BATCH-002 Phase 2 governance or core module documents are missing from Content Registry.'
     );
   }
+
+  const getRevision = (doc: typeof depDoc): string | null =>
+    doc.metadata.source.kind === 'official-source'
+      ? (doc.metadata.source.commitSha ?? null)
+      : null;
 
   // 1. DEPENDENCY_MODEL.md
   const depTypesRows = parseMarkdownTableUnderHeading(
@@ -885,11 +974,37 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
       documentSlug: matrixDoc.metadata.slug,
       officialSourcePath:
         'teranoo-erp-planning/03-modules/MODULE_DEPENDENCY_MATRIX.md',
-      sourceRevision:
-        matrixDoc.metadata.source.kind === 'official-source'
-          ? (matrixDoc.metadata.source.commitSha ?? null)
-          : null,
+      sourceRevision: getRevision(matrixDoc),
       sourceBodySha256: computeCanonicalStoredBodySha256(matrixDoc.bodyMarkdown),
+      governingSources: {
+        moduleDependencyMatrix: {
+          documentSlug: matrixDoc.metadata.slug,
+          officialSourcePath:
+            'teranoo-erp-planning/03-modules/MODULE_DEPENDENCY_MATRIX.md',
+          sourceRevision: getRevision(matrixDoc),
+          sourceBodySha256: computeCanonicalStoredBodySha256(
+            matrixDoc.bodyMarkdown
+          ),
+        },
+        dependencyModel: {
+          documentSlug: depDoc.metadata.slug,
+          officialSourcePath:
+            'teranoo-erp-planning/03-modules/DEPENDENCY_MODEL.md',
+          sourceRevision: getRevision(depDoc),
+          sourceBodySha256: computeCanonicalStoredBodySha256(
+            depDoc.bodyMarkdown
+          ),
+        },
+        moduleLifecycleRules: {
+          documentSlug: lifecycleDoc.metadata.slug,
+          officialSourcePath:
+            'teranoo-erp-planning/03-modules/MODULE_LIFECYCLE_RULES.md',
+          sourceRevision: getRevision(lifecycleDoc),
+          sourceBodySha256: computeCanonicalStoredBodySha256(
+            lifecycleDoc.bodyMarkdown
+          ),
+        },
+      },
       summaryRows,
       hbmdAbsenceRegister,
       hbmdEdgeCount: 0,
@@ -915,12 +1030,28 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
         /^##\s+1\.\s+القواعد العليا/,
         'numbered'
       ),
+      entitlementSeparationSummary:
+        'يفصل Teranoo مفاهيميًا بين حالة الترخيص (Entitlement / Licensing: هل يُسمح للمستأجر باستخدام النظام؟) والحالة الوظيفية (Functional Lifecycle: هل النظام مهيأ وقابل للتشغيل وظيفيًا الآن؟)، لمنع اعتبار انتهاء الترخيص مساويًا لحذف البيانات أو كسر التاريخ.',
+      entitlementOutOfScopeNote:
+        'ملاحظة: نموذج التسعير، grace periods، مدة Historical Access، وسياسة الترخيص التفصيلية خارج Phase 2.',
       functionalStates,
       activationPreconditions: parseListUnderHeading(
         lifecycleDoc.bodyMarkdown,
         /^##\s+4\.\s+Module Activation Preconditions/,
         'numbered'
       ),
+      featureActivationRules: parseListUnderHeading(
+        lifecycleDoc.bodyMarkdown,
+        /^##\s+5\.\s+Feature Activation Rules/,
+        'numbered'
+      ),
+      cicRuntimeReadinessRules: parseListUnderHeading(
+        lifecycleDoc.bodyMarkdown,
+        /^##\s+6\.\s+CIC Runtime Readiness/,
+        'bullet'
+      ),
+      cicRuntimeOutOfScopeNote:
+        'لا تحدد Phase 2 transport أو retry أو queue implementation.',
       deactivationPreconditions: parseListUnderHeading(
         lifecycleDoc.bodyMarkdown,
         /^##\s+7\.\s+Deactivation Preconditions/,
@@ -929,6 +1060,25 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
       freezeNotDeletePoints: parseListUnderHeading(
         lifecycleDoc.bodyMarkdown,
         /^##\s+8\.\s+Freeze, not Delete/,
+        'bullet'
+      ),
+      openWorkPrinciple:
+        'Open work must be resolved, closed, transferred through an approved mechanism, or explicitly frozen with a known state before final deactivation.',
+      openWorkExamples: parseListUnderHeading(
+        lifecycleDoc.bodyMarkdown,
+        /^##\s+9\.\s+Open Work Handling/,
+        'bullet'
+      ),
+      deactivationFldRules: parseListUnderHeading(
+        lifecycleDoc.bodyMarkdown,
+        /^##\s+10\.\s+أثر Deactivation على FLD/,
+        'bullet'
+      ),
+      deactivationFldExample:
+        'Sales يبقى Active بدون Inventory، لكن Stock Fulfillment feature لا تكون جاهزة.',
+      deactivationCicRules: parseListUnderHeading(
+        lifecycleDoc.bodyMarkdown,
+        /^##\s+11\.\s+أثر Deactivation على CIC/,
         'bullet'
       ),
       sharedDataSafetyExamples: parseListUnderHeading(
@@ -947,6 +1097,21 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
         /^##\s+15\.\s+قواعد الحوكمة النهائية/,
         'numbered'
       ),
+      sectionAnchors: {
+        entitlement: `${HEADING_ID_PREFIX}${createHeadingSlug('2. الفصل بين Entitlement وFunctional State')}`,
+        states: `${HEADING_ID_PREFIX}${createHeadingSlug('3. Functional Lifecycle States المعتمدة مفاهيميًا')}`,
+        activation: `${HEADING_ID_PREFIX}${createHeadingSlug('4. Module Activation Preconditions')}`,
+        featureActivation: `${HEADING_ID_PREFIX}${createHeadingSlug('5. Feature Activation Rules')}`,
+        cicReadiness: `${HEADING_ID_PREFIX}${createHeadingSlug('6. CIC Runtime Readiness')}`,
+        deactivation: `${HEADING_ID_PREFIX}${createHeadingSlug('7. Deactivation Preconditions')}`,
+        freezeNotDelete: `${HEADING_ID_PREFIX}${createHeadingSlug('8. Freeze, not Delete')}`,
+        openWork: `${HEADING_ID_PREFIX}${createHeadingSlug('9. Open Work Handling عند Deactivation')}`,
+        fldImpact: `${HEADING_ID_PREFIX}${createHeadingSlug('10. أثر Deactivation على FLD')}`,
+        cicImpact: `${HEADING_ID_PREFIX}${createHeadingSlug('11. أثر Deactivation على CIC')}`,
+        sharedData: `${HEADING_ID_PREFIX}${createHeadingSlug('12. Shared Data Safety')}`,
+        reactivation: `${HEADING_ID_PREFIX}${createHeadingSlug('13. Reactivation Principle')}`,
+        consistency: `${HEADING_ID_PREFIX}${createHeadingSlug('14. Core Module Consistency Check')}`,
+      },
     },
     futureExtensions: {
       documentSlug: extDoc.metadata.slug,
@@ -957,8 +1122,71 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
       newModuleRequirements,
       coreOwnershipGuardrails,
       noBackDependencyExamples,
+      dependencyClassificationTypes: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^##\s+5\.\s+Dependency Classification Requirement/,
+        'bullet'
+      ),
+      hbmdStrictRequirements: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^###\s+HBMD/,
+        'bullet'
+      ),
+      sharedCapabilityDirections: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^##\s+6\.\s+Shared Capability Extraction Rule/,
+        'numbered'
+      ),
+      sharedCapabilityProhibition:
+        'التكرار الذي يخلق Ownership ambiguity ممنوع معماريًا؛ ولا يجوز تكرار القدرة المشتركة داخل كل Module ثم ربطها بعلاقات دائرية.',
+      integrationEvolutionRules: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^##\s+7\.\s+Integration Contract Evolution/,
+        'bullet'
+      ),
+      featureExtensionRules: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^##\s+8\.\s+Feature Extension Rule/,
+        'bullet'
+      ),
+      dataOwnershipEvolutionFields: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^##\s+9\.\s+Data Ownership Evolution/,
+        'bullet'
+      ),
+      dataOwnershipConflictRule:
+        'إذا تعارض Object جديد مع Ownership قائم، لا يُحل التعارض بالنسخ أو dual-write غير المنضبط؛ يجب رفع Architecture Decision صريح.',
+      matrixUpdateRequirements: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^##\s+10\.\s+Matrix Update Requirement/,
+        'numbered'
+      ),
+      coreBaselineImmutabilityNote:
+        'MODULE_DEPENDENCY_MATRIX.md الحالية هي Core Baseline؛ يمكن توسيعها أو إنشاء Matrix أوسع لاحقًا، لكن Core baseline لا يُعدل ضمنيًا.',
+      industryExtensionRules: parseListUnderHeading(
+        extDoc.bodyMarkdown,
+        /^##\s+11\.\s+Industry Extensions/,
+        'bullet'
+      ),
+      industryExtensionRationale:
+        'هذا يحافظ على Teranoo كمنتج ERP عام قابل للتوسع بدل تحويل Core إلى Implementation خاص بعميل أو قطاع.',
       compatibilityReviewChecklist,
       illustrativeDirectionalExamples,
+      sectionAnchors: {
+        supremeRule: `${HEADING_ID_PREFIX}${createHeadingSlug('1. القاعدة العليا')}`,
+        newModule: `${HEADING_ID_PREFIX}${createHeadingSlug('2. متطلبات أي Business Module جديد')}`,
+        ownership: `${HEADING_ID_PREFIX}${createHeadingSlug('3. Core Ownership Guardrails')}`,
+        noBackDependency: `${HEADING_ID_PREFIX}${createHeadingSlug('4. No Core Back-Dependency by Accident')}`,
+        classification: `${HEADING_ID_PREFIX}${createHeadingSlug('5. Dependency Classification Requirement')}`,
+        sharedCapability: `${HEADING_ID_PREFIX}${createHeadingSlug('6. Shared Capability Extraction Rule')}`,
+        integrationEvolution: `${HEADING_ID_PREFIX}${createHeadingSlug('7. Integration Contract Evolution')}`,
+        featureExtension: `${HEADING_ID_PREFIX}${createHeadingSlug('8. Feature Extension Rule')}`,
+        ownershipEvolution: `${HEADING_ID_PREFIX}${createHeadingSlug('9. Data Ownership Evolution')}`,
+        matrixUpdate: `${HEADING_ID_PREFIX}${createHeadingSlug('10. Matrix Update Requirement')}`,
+        industryExtensions: `${HEADING_ID_PREFIX}${createHeadingSlug('11. Industry Extensions')}`,
+        compatibilityReview: `${HEADING_ID_PREFIX}${createHeadingSlug('12. Compatibility Review')}`,
+        directionalExamples: `${HEADING_ID_PREFIX}${createHeadingSlug('13. أمثلة اتجاهية للمستقبل')}`,
+      },
     },
     phase2Reviews: {
       reviewKind: 'official-project-review-gate',
@@ -997,6 +1225,11 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
         ],
         guardrails,
         phase3Handoffs,
+        sectionAnchors: {
+          executiveResult: `${HEADING_ID_PREFIX}${createHeadingSlug('2. النتيجة التنفيذية')}`,
+          guardrails: `${HEADING_ID_PREFIX}${createHeadingSlug('4. Guardrails ملزمة لـ Phase 3 وما بعده')}`,
+          phase3Handoffs: `${HEADING_ID_PREFIX}${createHeadingSlug('5. عناصر يجب أن يجيب عنها Phase 3')}`,
+        },
       },
       closureReview: {
         documentSlug: closureDoc.metadata.slug,
@@ -1008,40 +1241,53 @@ export function getExtractedDependencyArchitecture(): ExtractedDependencyArchite
         deferredCommitmentGroups: parseDeferredCommitmentGroups(
           closureDoc.bodyMarkdown
         ),
+        sectionAnchors: {
+          deferredCommitments: `${HEADING_ID_PREFIX}${createHeadingSlug('9. Deferred Architecture Commitments — ليست Blockers')}`,
+          exitCriteria: `${HEADING_ID_PREFIX}${createHeadingSlug('12. Exit Criteria')}`,
+          closureDecision: `${HEADING_ID_PREFIX}${createHeadingSlug('13. قرار الإغلاق')}`,
+        },
       },
     },
     educationalGuidance: buildDependencyEducationalGuidance({
       dependencyModel: {
         key: 'dependencyModel',
         bodyMarkdown: depDoc.bodyMarkdown,
-        sourceRevision:
-          depDoc.metadata.source.kind === 'official-source'
-            ? (depDoc.metadata.source.commitSha ?? null)
-            : null,
+        sourceRevision: getRevision(depDoc),
       },
       moduleDependencyMatrix: {
         key: 'moduleDependencyMatrix',
         bodyMarkdown: matrixDoc.bodyMarkdown,
-        sourceRevision:
-          matrixDoc.metadata.source.kind === 'official-source'
-            ? (matrixDoc.metadata.source.commitSha ?? null)
-            : null,
+        sourceRevision: getRevision(matrixDoc),
       },
       moduleLifecycleRules: {
         key: 'moduleLifecycleRules',
         bodyMarkdown: lifecycleDoc.bodyMarkdown,
-        sourceRevision:
-          lifecycleDoc.metadata.source.kind === 'official-source'
-            ? (lifecycleDoc.metadata.source.commitSha ?? null)
-            : null,
+        sourceRevision: getRevision(lifecycleDoc),
       },
       phase2ClosureReview: {
         key: 'phase2ClosureReview',
         bodyMarkdown: closureDoc.bodyMarkdown,
-        sourceRevision:
-          closureDoc.metadata.source.kind === 'official-source'
-            ? (closureDoc.metadata.source.commitSha ?? null)
-            : null,
+        sourceRevision: getRevision(closureDoc),
+      },
+      financeModuleModel: {
+        key: 'financeModuleModel',
+        bodyMarkdown: financeDoc.bodyMarkdown,
+        sourceRevision: getRevision(financeDoc),
+      },
+      inventoryModuleModel: {
+        key: 'inventoryModuleModel',
+        bodyMarkdown: inventoryDoc.bodyMarkdown,
+        sourceRevision: getRevision(inventoryDoc),
+      },
+      procurementModuleModel: {
+        key: 'procurementModuleModel',
+        bodyMarkdown: procurementDoc.bodyMarkdown,
+        sourceRevision: getRevision(procurementDoc),
+      },
+      salesModuleModel: {
+        key: 'salesModuleModel',
+        bodyMarkdown: salesDoc.bodyMarkdown,
+        sourceRevision: getRevision(salesDoc),
       },
     }),
   };

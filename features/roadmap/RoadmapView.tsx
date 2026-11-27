@@ -330,7 +330,7 @@ export function RoadmapView({
         </div>
       </section>
 
-      {/* KH-025 Curated Projection Provenance & Freshness Notice */}
+      {/* KH-025 / KH-037 Curated Projection Provenance, 4 Knowledge States & Historical Baseline */}
       <InformationCallout
         className={
           extractedRoadmap.projectionMetadata.mappingFreshnessStatus ===
@@ -343,32 +343,74 @@ export function RoadmapView({
             ? `إسقاط منظم مُراجع (Curated Projection · ${
                 extractedRoadmap.projectionMetadata.mappingFreshnessStatus ===
                 'verified-current'
-                  ? 'متطابق مع مراجعة المصدر'
-                  : 'يلزم مراجعة تغير المصدر'
+                  ? 'مُراجع ومطابق للمصدر المثبت'
+                  : 'يتطلب مراجعة — لا يُعتمد كمعرفة حالية'
               })`
             : `Curated Roadmap Projection (${
                 extractedRoadmap.projectionMetadata.mappingFreshnessStatus ===
                 'verified-current'
-                  ? 'Verified Current Against Pinned Source'
-                  : 'Mapping Review Required — Source Changed'
+                  ? 'Reviewed Against Pinned Source'
+                  : 'Review Required — Do Not Treat as Current Verified Knowledge'
               })`
         }
       >
-        <div className="space-y-1.5">
+        <div className="space-y-2 text-xs">
           <p>
             {resolveLocalizedText(
               extractedRoadmap.projectionMetadata.projectionDisclosure,
               locale
             )}
           </p>
+          <p className="text-text-secondary">
+            {t('foundations.historicalBaseline.body')}
+          </p>
           {extractedRoadmap.projectionMetadata.reviewWarning ? (
-            <p className="font-semibold text-danger">
-              {resolveLocalizedText(
-                extractedRoadmap.projectionMetadata.reviewWarning,
-                locale
-              )}
-            </p>
+            <div className="rounded-md border border-danger-border bg-surface px-3 py-2 space-y-1">
+              <p className="font-semibold text-danger">
+                {resolveLocalizedText(
+                  extractedRoadmap.projectionMetadata.reviewWarning,
+                  locale
+                )}
+              </p>
+              <Link
+                href="/knowledge/project-work-plan"
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+              >
+                <BookOpen className="h-3 w-3" aria-hidden="true" />
+                <span>{t('foundations.roadmap.readWorkPlan')}</span>
+              </Link>
+            </div>
           ) : null}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border/70 bg-surface px-2.5 py-1.5 text-[11px] text-text-secondary">
+            <span className="font-semibold text-text-primary">
+              {t('foundations.knowledgeStates.heading')}:
+            </span>
+            <span>{isAr ? '1. مصدر رسمي حرفي' : '1. Verbatim Official Source'}</span>
+            <span>·</span>
+            <span
+              className={
+                extractedRoadmap.projectionMetadata.mappingFreshnessStatus ===
+                'verified-current'
+                  ? 'font-semibold text-success'
+                  : 'text-text-muted line-through'
+              }
+            >
+              {isAr ? '2. إسقاط تعليمي مُراجع' : '2. Reviewed Educational Projection'}
+            </span>
+            <span>·</span>
+            <span
+              className={
+                extractedRoadmap.projectionMetadata.mappingFreshnessStatus !==
+                'verified-current'
+                  ? 'font-semibold text-danger'
+                  : 'text-text-muted'
+              }
+            >
+              {isAr ? '3. إسقاط يتطلب مراجعة' : '3. Projection Requiring Review'}
+            </span>
+            <span>·</span>
+            <span>{isAr ? '4. خط أساس تاريخي (397a94e0d82f)' : '4. Historical Baseline (397a94e0d82f)'}</span>
+          </div>
           <p className="font-mono text-[11px] text-text-muted bidi-ltr text-start">
             pinned-revision:{' '}
             {extractedRoadmap.projectionMetadata.mappedSourceRevision.slice(0, 12)}{' '}

@@ -18,12 +18,12 @@ export const HISTORICAL_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
     referenceReviewDate: '2026-11-25',
     isLiveSynced: false,
     snapshotNatureNote: {
-      ar: 'لقطة مرجعية تاريخية سابقة (2026-11-25) محفوظة للتوثيق التاريخي قبل إغلاق المرحلة الخامسة واعتماد بوابة القرار A.',
-      en: 'Prior historical reference snapshot (2026-11-25) preserved for provenance before Phase 5 completion and Decision Gate A conditional approval.',
+      ar: 'لقطة تاريخية غير متزامنة حيًا (2026-11-25) محفوظة للتوثيق التاريخي لمرحلة سابقة في مستودع TeranooErp قبل إغلاق المرحلة الخامسة واعتماد بوابة القرار A.',
+      en: 'Prior non-live historical repository snapshot (2026-11-25) preserved for provenance prior to Phase 5 completion and Decision Gate A conditional approval.',
     },
     reviewDateNote: {
-      ar: 'تاريخ 2026-11-25 هو تاريخ المراجعة المرجعية التاريخية السابقة قبل دفعة BATCH-001.',
-      en: '2026-11-25 was the prior independent reference review date prior to BATCH-001.',
+      ar: 'تاريخ 2026-11-25 يوثق المراجعة المرجعية التاريخية السابقة وليس حالة المستودع الحي حاليًا.',
+      en: '2026-11-25 records the prior independent snapshot review date, not live TeranooErp repository state today.',
     },
     metricsOriginNote: {
       ar: 'اللقطة التاريخية (2026-11-25): 120 قرارًا معماريًا معتمدًا، المرحلة 5 قيد التنفيذ (7 من 13 بندًا)، 24 اعتبارًا مستقبليًا، 13 حزمة بحثية، و57 ملاحظة مراجعة مستقلة.',
@@ -31,8 +31,8 @@ export const HISTORICAL_REFERENCE_SNAPSHOT: ProjectReferenceSnapshot = {
     },
   },
   snapshotScopeNote: {
-    ar: 'لقطة تاريخية محفوظة لحالة التخطيط قبل إغلاق المرحلة الخامسة.',
-    en: 'Preserved historical planning snapshot prior to Phase 5 closure.',
+    ar: 'لقطة مرجعية تاريخية غير حية محفوظة لحالة التخطيط قبل إغلاق المرحلة الخامسة.',
+    en: 'Preserved non-live historical planning snapshot prior to Phase 5 closure.',
   },
   identity: {
     productName: 'Teranoo ERP',

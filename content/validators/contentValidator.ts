@@ -393,11 +393,26 @@ export function validateLoadedEntries(
       manifestByPublishedId.get(doc.metadata.id) ??
       manifestBySourcePath.get(doc.metadata.source.sourcePath);
 
+    const isPublishable = isPubliclyPublishableRecord(doc);
+
+    if (options?.manifestEntries && isPublishable && !matchedManifest) {
+      errors.push({
+        severity: 'error',
+        code: 'UNLINKED_OFFICIAL_MANIFEST_ENTRY',
+        file: doc.sourceFileRelativePath,
+        field: 'source.sourcePath',
+        message: `Published official-source document "${doc.metadata.id}" (${doc.metadata.source.sourcePath}) is not linked to any entry in OFFICIAL_SOURCE_MANIFEST.`,
+      });
+    }
+
     const hasRecordedIntegrityDigests = Boolean(
-      doc.metadata.source.storedBodySha256 || doc.metadata.source.gitBlobSha
+      doc.metadata.source.storedBodySha256 ||
+        doc.metadata.source.gitBlobSha ||
+        doc.metadata.source.rawSourceSha256 ||
+        doc.metadata.source.commitSha
     );
 
-    if (matchedManifest || hasRecordedIntegrityDigests) {
+    if (matchedManifest || isPublishable || hasRecordedIntegrityDigests) {
       const integrityCheck = verifyStoredOfficialDocumentIntegrity(
         doc,
         matchedManifest
@@ -413,14 +428,6 @@ export function validateLoadedEntries(
           });
         }
       }
-    } else if (options?.manifestEntries && isPubliclyPublishableRecord(doc)) {
-      errors.push({
-        severity: 'error',
-        code: 'MISSING_STORED_BODY_DIGEST',
-        file: doc.sourceFileRelativePath,
-        field: 'source.storedBodySha256',
-        message: `Published official-source document "${doc.metadata.id}" is neither linked to OFFICIAL_SOURCE_MANIFEST nor carrying recorded storedBodySha256/gitBlobSha integrity digests.`,
-      });
     }
   }
 

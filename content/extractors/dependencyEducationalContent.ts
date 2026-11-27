@@ -9,7 +9,11 @@ export type PinnedDependencySourceKey =
   | 'dependencyModel'
   | 'moduleDependencyMatrix'
   | 'moduleLifecycleRules'
-  | 'phase2ClosureReview';
+  | 'phase2ClosureReview'
+  | 'financeModuleModel'
+  | 'inventoryModuleModel'
+  | 'procurementModuleModel'
+  | 'salesModuleModel';
 
 export interface CuratedDependencySourcePin {
   readonly key: PinnedDependencySourceKey;
@@ -172,6 +176,46 @@ export const CURATED_DEPENDENCY_PROJECTION_PINS: Readonly<
     mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
     mappedSourceBodySha256:
       'eb1a9b11debd223aae17480cc05e2c352de8fe14509dadc37de84e0234717c4b',
+    lastCuratedReviewDate: '2026-11-27',
+  },
+  financeModuleModel: {
+    key: 'financeModuleModel',
+    documentSlug: 'finance-module-model',
+    sourcePath:
+      'teranoo-erp-planning/03-modules/finance/FINANCE_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '4638fa9334a96274a7c5ddf5ebbd2642ac435d84a00b6f1ff71877fa4399ad2b',
+    lastCuratedReviewDate: '2026-11-27',
+  },
+  inventoryModuleModel: {
+    key: 'inventoryModuleModel',
+    documentSlug: 'inventory-module-model',
+    sourcePath:
+      'teranoo-erp-planning/03-modules/inventory/INVENTORY_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      'c28df337e23ca9cc1cb086e69b0e1a60de86a25ba55a31818881598630d66729',
+    lastCuratedReviewDate: '2026-11-27',
+  },
+  procurementModuleModel: {
+    key: 'procurementModuleModel',
+    documentSlug: 'procurement-module-model',
+    sourcePath:
+      'teranoo-erp-planning/03-modules/procurement/PROCUREMENT_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '89c207dd693b93fae802b1b55e8424e5bcae00c0b1b67a5c28ffe5507a7e46f9',
+    lastCuratedReviewDate: '2026-11-27',
+  },
+  salesModuleModel: {
+    key: 'salesModuleModel',
+    documentSlug: 'sales-order-management-module-model',
+    sourcePath:
+      'teranoo-erp-planning/03-modules/sales/SALES_ORDER_MANAGEMENT_MODULE_MODEL.md',
+    mappedSourceRevision: '397a94e0d82fe9afc99bc5f0dddd7cfef1438f5f',
+    mappedSourceBodySha256:
+      '331bcac1def77d6114e5114d25e6c22b80adabca2246e9c2a2ea21c4544528c1',
     lastCuratedReviewDate: '2026-11-27',
   },
 };
@@ -961,6 +1005,10 @@ export function buildDependencyEducationalGuidance(
     'moduleDependencyMatrix',
     'moduleLifecycleRules',
     'phase2ClosureReview',
+    'financeModuleModel',
+    'inventoryModuleModel',
+    'procurementModuleModel',
+    'salesModuleModel',
   ];
 
   const entries: DependencySourceFreshnessEntry[] = keys.map((key) => {
@@ -970,9 +1018,7 @@ export function buildDependencyEducationalGuidance(
       input.bodyMarkdown
     );
     const bodyChanged = actualSourceBodySha256 !== pin.mappedSourceBodySha256;
-    const revisionChanged =
-      input.sourceRevision !== null &&
-      input.sourceRevision !== pin.mappedSourceRevision;
+    const revisionChanged = input.sourceRevision !== pin.mappedSourceRevision;
 
     return {
       key,

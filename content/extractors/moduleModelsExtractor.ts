@@ -1242,7 +1242,6 @@ function buildModuleProjectionMetadata(
 
   const bodyChanged = actualSourceBodySha256 !== pin.mappedSourceBodySha256;
   const revisionChanged =
-    actualSourceRevision !== null &&
     actualSourceRevision !== pin.mappedSourceRevision;
 
   const mappingFreshnessStatus: ModuleProjectionFreshnessStatus =

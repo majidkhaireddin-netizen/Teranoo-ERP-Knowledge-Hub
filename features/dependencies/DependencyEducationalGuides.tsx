@@ -66,37 +66,47 @@ export function DependencyProvenanceStrip({
       )
     : provenance.sources;
 
-  const isStale = provenance.mappingFreshnessStatus === 'review-required-source-changed';
+  const isStale =
+    provenance.mappingFreshnessStatus === 'review-required-source-changed' ||
+    relevantSources.some((s) => s.status === 'review-required-source-changed');
 
   return (
     <div
       className={cn(
-        'rounded-lg border px-4 py-3 text-xs space-y-2',
+        'rounded-lg border px-4 py-3 text-xs space-y-2.5',
         isStale
-          ? 'border-warning-border bg-warning-bg/70 text-text-primary'
+          ? 'border-danger-border bg-danger-bg/60 text-text-primary'
           : 'border-border bg-surface-secondary/50 text-text-secondary'
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2 text-text-primary font-medium">
           {isStale ? (
-            <AlertTriangle className="h-3.5 w-3.5 text-warning shrink-0" aria-hidden="true" />
+            <AlertTriangle className="h-3.5 w-3.5 text-danger shrink-0" aria-hidden="true" />
           ) : (
             <ShieldCheck className="h-3.5 w-3.5 text-success shrink-0" aria-hidden="true" />
           )}
           <span>
             {isAr
-              ? 'إرشادات تعليمية مُراجعة (منفصلة عن النص الرسمي)'
-              : 'Curated Educational Projections (Distinct from Official Decision Text)'}
+              ? 'إسقاط تعليمي مُراجع (منفصل عن النص الرسمي وخط الأساس التاريخي)'
+              : 'Curated Educational Projection (Distinct from Verbatim Source & Historical Baseline)'}
           </span>
           <span aria-hidden="true" className="text-text-muted">·</span>
           <span
             className={cn(
-              'font-mono text-[11px] bidi-ltr',
-              isStale ? 'text-warning font-semibold' : 'text-success font-semibold'
+              'rounded-sm border px-1.5 py-0.5 text-[11px] font-semibold',
+              isStale
+                ? 'border-danger-border bg-danger-bg text-danger'
+                : 'border-success-border bg-success-bg text-success'
             )}
           >
-            {provenance.mappingFreshnessStatus}
+            {isStale
+              ? isAr
+                ? 'يتطلب مراجعة — لا يُعتمد كمعرفة حالية'
+                : 'Review Required — Do Not Treat as Current Verified Knowledge'
+              : isAr
+                ? 'مُراجَع ومطابق للمصدر المثبت'
+                : 'Reviewed Against Pinned Source'}
           </span>
         </div>
 
@@ -112,31 +122,69 @@ export function DependencyProvenanceStrip({
         {resolveLocalizedText(provenance.disclosure, locale)}
       </p>
 
-      {provenance.reviewWarning ? (
-        <p className="font-medium text-warning leading-relaxed">
-          {resolveLocalizedText(provenance.reviewWarning, locale)}
-        </p>
+      {isStale && provenance.reviewWarning ? (
+        <div className="rounded-md border border-danger-border bg-surface px-3 py-2 text-danger space-y-1">
+          <p className="font-semibold leading-relaxed">
+            {resolveLocalizedText(provenance.reviewWarning, locale)}
+          </p>
+          <p className="text-[11px] text-text-primary">
+            {isAr
+              ? 'تعليمات الحوكمة (KH-037): لا تعامل الشروحات المنظمة هنا كمعرفة موثقة حالية حتى تجري مراجعتها؛ افتح الوثائق الرسمية الكاملة أدناه كمرجع أعلى.'
+              : 'Governance guard (KH-037): do NOT treat curated summaries here as current verified knowledge until reviewed; read the verbatim official sources linked below directly.'}
+          </p>
+        </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 border-t border-border/70 text-[11px] text-text-muted">
-        {relevantSources.map((src) => (
-          <Link
-            key={src.key}
-            href={`/knowledge/${src.documentSlug}`}
-            dir="ltr"
-            className="inline-flex items-center gap-1.5 hover:text-primary hover:underline"
-          >
-            <span className="font-mono">{src.documentSlug}</span>
-            <span aria-hidden="true">·</span>
-            <span className="font-mono tabular-nums">
-              rev {src.mappedSourceRevision.slice(0, 8)}
-            </span>
-            <span aria-hidden="true">·</span>
-            <span className="font-mono tabular-nums">
-              sha {src.mappedSourceBodySha256.slice(0, 8)}
-            </span>
-          </Link>
-        ))}
+      {/* Four Explicit Knowledge States Distinction (KH-037) */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border/70 bg-surface px-2.5 py-1.5 text-[11px] text-text-secondary">
+        <span className="font-semibold text-text-primary">
+          {isAr ? 'حالات المعرفة الأربع:' : '4 Knowledge States:'}
+        </span>
+        <span>
+          {isAr ? '1. مصدر رسمي حرفي' : '1. Verbatim Official Source'}
+        </span>
+        <span aria-hidden="true">·</span>
+        <span className={!isStale ? 'font-semibold text-success' : 'text-text-muted line-through'}>
+          {isAr ? '2. إسقاط تعليمي مُراجع' : '2. Reviewed Educational Projection'}
+        </span>
+        <span aria-hidden="true">·</span>
+        <span className={isStale ? 'font-semibold text-danger' : 'text-text-muted'}>
+          {isAr ? '3. إسقاط يتطلب مراجعة' : '3. Projection Requiring Review'}
+        </span>
+        <span aria-hidden="true">·</span>
+        <span>
+          {isAr ? '4. خط أساس تاريخي (397a94e0d82f)' : '4. Historical Baseline (397a94e0d82f)'}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1 border-t border-border/70 text-[11px] text-text-muted">
+        {relevantSources.map((src) => {
+          const srcStale = src.status === 'review-required-source-changed';
+          return (
+            <Link
+              key={src.key}
+              href={`/knowledge/${src.documentSlug}`}
+              dir="ltr"
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 hover:underline',
+                srcStale
+                  ? 'border border-danger-border bg-danger-bg text-danger font-semibold'
+                  : 'hover:text-primary'
+              )}
+            >
+              <span className="font-mono">{src.documentSlug}</span>
+              <span aria-hidden="true">·</span>
+              <span className="font-mono tabular-nums">
+                rev {(src.actualSourceRevision ?? 'missing').slice(0, 8)}
+              </span>
+              <span aria-hidden="true">·</span>
+              <span className="font-mono tabular-nums">
+                sha {src.actualSourceBodySha256.slice(0, 8)}
+              </span>
+              {srcStale ? <span>(DRIFT)</span> : null}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

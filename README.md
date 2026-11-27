@@ -1,7 +1,7 @@
 # Teranoo ERP Knowledge Hub
 
 **Subtitle:** The Complete Journey of Building an Enterprise ERP System (`الرحلة الكاملة لبناء نظام ERP مؤسسي`)  
-**Current Scope:** `TASK-005-FIX-02` — Source Integrity & Structured Knowledge Governance (corrective pass addressing independent review findings `KH-028` through `KH-034`; `16/16` canonical official files verified unconditionally by stored-body SHA-256 & Git blob SHA-1)
+**Current Scope:** `TASK-005-QA` — Final Quality Gate & Closure for `TASK-005` (`BATCH-002`: `16/16` canonical official files verified unconditionally by stored-body SHA-256 & Git blob SHA-1; `69/69` tests passing; Ready for Independent Review)
 
 Teranoo ERP Knowledge Hub is a dedicated enterprise documentation, encyclopedia, engineering guide, living architecture, research library, and build-in-public knowledge platform for the **Teranoo ERP** product. It is not an operational ERP system, not a marketing website, and not a plain Markdown viewer.
 
@@ -124,6 +124,11 @@ docs/                 # Vision, architecture, ingestion, manifest, schema, autho
 - [`docs/TASK-005-COMPLETION_REPORT.md`](docs/TASK-005-COMPLETION_REPORT.md)
 - [`docs/TASK-005-FIX-01-COMPLETION_REPORT.md`](docs/TASK-005-FIX-01-COMPLETION_REPORT.md)
 - [`docs/TASK-005-FIX-02-COMPLETION_REPORT.md`](docs/TASK-005-FIX-02-COMPLETION_REPORT.md)
+- [`docs/TASK-005-FIX-03A-COMPLETION_REPORT.md`](docs/TASK-005-FIX-03A-COMPLETION_REPORT.md)
+- [`docs/TASK-005-FIX-03B-COMPLETION_REPORT.md`](docs/TASK-005-FIX-03B-COMPLETION_REPORT.md)
+- [`docs/CURATED_CONTENT_MAINTAINABILITY.md`](docs/CURATED_CONTENT_MAINTAINABILITY.md)
+- [`docs/TASK-005-FINAL-TRACEABILITY_MATRIX.md`](docs/TASK-005-FINAL-TRACEABILITY_MATRIX.md)
+- [`docs/TASK-005-QA-COMPLETION_REPORT.md`](docs/TASK-005-QA-COMPLETION_REPORT.md)
 
 ---
 

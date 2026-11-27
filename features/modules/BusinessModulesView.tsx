@@ -156,7 +156,7 @@ export function BusinessModulesView({
         </div>
       </section>
 
-      {/* Architectural Scope Boundary & Curated Projection Provenance Notice */}
+      {/* Architectural Scope Boundary, Historical Baseline & Curated Projection Provenance Notice */}
       <InformationCallout
         className={
           catalog.anyProjectionRequiresReview
@@ -166,23 +166,23 @@ export function BusinessModulesView({
         title={
           catalog.anyProjectionRequiresReview
             ? isAr
-              ? 'تنبيه صلاحية: تغيّر مصدر رسمي واحد على الأقل لملخصات الأنظمة (Review Required)'
-              : 'Projection Freshness Alert: Official Module Source Changed (Review Required)'
+              ? 'تنبيه صلاحية: تغيّر مصدر رسمي — لا تعتمد الملخصات كمعرفة حالية (Review Required)'
+              : 'Projection Freshness Alert: Official Module Source Changed — Do Not Treat Summaries as Current Verified Knowledge'
             : isAr
-              ? 'نطاق المرحلة 2 المعتمدة ومصدرية التلخيص التعليمي (Verified Current)'
-              : 'Phase 2 Scope Boundary & Curated Projection Provenance (Verified Current)'
+              ? 'نطاق المرحلة 2 المعتمدة وخط الأساس التاريخي (مُراجع ومطابق للمصدر المثبت)'
+              : 'Phase 2 Scope Boundary, Historical Baseline & Reviewed Projection Provenance'
         }
       >
-        <div className="space-y-1">
+        <div className="space-y-1.5 text-xs">
           <p>
             {isAr
-              ? 'توثّق هذه الصفحات النماذج المعمارية المعتمدة والمغلقة للمرحلة 2 فقط (الاستقلالية، ملكية البيانات، اعتماديات المنصة، وعقود التكامل المفاهيمية). المخططات الوظيفية التفصيلية، الشاشات، نماذج قواعد البيانات، والتنفيذ البرمجي مؤجلة للمرحلة 6 وما بعدها وتظهر صراحةً كأقسام مستقبلية غير مُعبّأة.'
-              : 'These pages document closed Phase 2 architectural models only (standalone capability, data ownership, platform dependencies, and conceptual CIC boundaries). Detailed Functional Blueprints, screens, database schemas, and ERP software code belong to Phase 6 and later phases and are explicitly marked as future unpopulated sections.'}
+              ? 'توثّق هذه الصفحات النماذج المعمارية المعتمدة والمغلقة للمرحلة 2 فقط ضمن خط الأساس التاريخي المثبت لمستودع TeranooErp (commit 397a94e0d82f · تاريخ إغلاق المرحلة 2: 2026-09-09). المخططات الوظيفية التفصيلية والتنفيذ البرمجي مؤجلة للمرحلة 6 وما بعدها في تلك اللقطة، ولا تفترض هذه الحالة توقف التقدم الحي للمشروع اليوم.'
+              : 'These pages document closed Phase 2 architectural models from the pinned historical TeranooErp repository baseline (commit 397a94e0d82f · Phase 2 closed 2026-09-09). Functional Blueprints and ERP software code belonged to Phase 6+ in that snapshot, without claiming live project progress has not advanced since.'}
           </p>
           <p className="text-[11px] text-text-secondary">
             {isAr
-              ? 'بطاقات التلخيص التعليمية مربوطة ببصمة SHA-256 ومراجعة المصدر الرسمي لكل نظام، بينما تُستخلص القرارات وجداول PCD والاستبعادات والمؤجلات استخلاصًا حتميًا مباشرًا من النص الرسمي.'
-              : 'Educational summary projections are pinned to each official module document revision and canonical body SHA-256 digest, while Phase 2 decisions, PCD tables, exclusions, and deferred items are deterministically extracted verbatim from the official source.'}
+              ? 'التمييز الرباعي: 1) نص رسمي حرفي (القرارات وجداول PCD) · 2) إسقاط تعليمي مُراجع · 3) إسقاط يتطلب مراجعة عند انجراف SHA-256 · 4) خط أساس تاريخي مثبت (397a94e0d82f).'
+              : 'Four Knowledge States: 1) Verbatim Official Source (decisions & PCD tables) · 2) Reviewed Educational Projection · 3) Projection Requiring Review on SHA-256 drift · 4) Historical Baseline (397a94e0d82f).'}
           </p>
         </div>
       </InformationCallout>

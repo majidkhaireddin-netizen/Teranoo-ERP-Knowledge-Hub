@@ -499,10 +499,34 @@ export function ModuleActivationSimulatorView({
               ? `السجل المصدر المُتحقق منه: ${result.catalogValidation.cicCount} عقود CIC رسمية · ${result.catalogValidation.fldCount} سجلات FLD (بمراجع داخلية) · ${result.catalogValidation.pcdRowCount} صفًا في مصفوفة PCD · ${result.catalogValidation.hbmdEdgeCount} حواف HBMD.`
               : `Validated authoritative catalog: ${result.catalogValidation.cicCount} Official Core CICs · ${result.catalogValidation.fldCount} Core FLDs (KH internal refs) · ${result.catalogValidation.pcdRowCount} PCD matrix rows · ${result.catalogValidation.hbmdEdgeCount} Core HBMD edges.`}
           </p>
-          <p className="font-mono text-[10px] text-text-muted bidi-ltr">
-            Pinned Matrix Rev: {result.catalogValidation.sourceRevision.slice(0, 12)} · Body SHA-256:{' '}
-            {result.catalogValidation.sourceBodySha256.slice(0, 12)} · Status:{' '}
-            {result.catalogValidation.mappingFreshnessStatus}
+          <p className="text-[11px] text-text-muted">
+            {isAr
+              ? 'الوثائق الحاكمة المثبتة للمحاكي (3/3): '
+              : 'Pinned governing simulator sources (3/3): '}
+            <span className="font-mono bidi-ltr">
+              {result.catalogValidation.pinnedSources
+                .map(
+                  (s) =>
+                    `${s.documentSlug} (${(s.sourceRevision ?? 'missing').slice(0, 8)} / ${s.sourceBodySha256.slice(0, 8)})`
+                )
+                .join(' · ')}
+            </span>
+            {' · '}
+            <span
+              className={
+                result.catalogValidation.mappingFreshnessStatus === 'verified-current'
+                  ? 'font-semibold text-success'
+                  : 'font-semibold text-danger'
+              }
+            >
+              {result.catalogValidation.mappingFreshnessStatus === 'verified-current'
+                ? isAr
+                  ? 'مُراجَع ومطابق للمصادر المثبتة (توضيحي غير تشغيلي)'
+                  : 'Reviewed Against Pinned Sources (Illustrative Simulation)'
+                : isAr
+                  ? 'يتطلب مراجعة المصدر'
+                  : 'Review Required — Source Changed'}
+            </span>
           </p>
         </div>
       </InformationCallout>

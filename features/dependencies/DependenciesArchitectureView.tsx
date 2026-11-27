@@ -166,7 +166,7 @@ export function DependenciesArchitectureView({
               label={t('classification.official.label')}
             />
             <span className="rounded-sm border border-success-border bg-success-bg px-2 py-0.5 font-mono text-[11px] font-semibold text-success bidi-ltr">
-              BATCH-002 · Phase 2 Closed (2026-09-09)
+              BATCH-002 · Phase 2 Closed (2026-09-09) · Snapshot 397a94e0d82f
             </span>
           </div>
         }
@@ -177,8 +177,8 @@ export function DependenciesArchitectureView({
         }
         subtitle={
           isAr
-            ? 'المرجع المعماري الكامل المستخرج من الوثائق الرسمية الست لحوكمة الأنظمة في BATCH-002: نموذج الاعتماديات، مصفوفة 4×4 (0 HBMD)، عقود CIC الستة، اعتماديات FLD الخمس، مصفوفة PCD الـ 21، ملكية البيانات، دورة الحياة، قواعد الامتداد، ومراجعات الإغلاق.'
-            : 'Authoritative architectural explorer extracted from the six official Phase 2 governance documents in BATCH-002: Dependency Model, 4×4 Matrix (0 HBMD), 6 Core CICs, 5 Core FLDs, 21-Row PCD Matrix, Data Ownership, Lifecycle Rules, Future Extensions, and Phase 2 Review Gates.'
+            ? 'المرجع المعماري الكامل المستخرج من الوثائق الرسمية الست لحوكمة الأنظمة في BATCH-002 (خط الأساس التاريخي المثبت 397a94e0d82f بتاريخ استيراد 2026-11-26): نموذج الاعتماديات، مصفوفة 4×4 (0 HBMD)، عقود CIC الستة، اعتماديات FLD الخمس، مصفوفة PCD الـ 21، ملكية البيانات، دورة الحياة، قواعد الامتداد، ومراجعات الإغلاق.'
+            : 'Authoritative architectural explorer extracted from the six official Phase 2 governance documents in BATCH-002 (pinned historical baseline commit 397a94e0d82f, ingested 2026-11-26): Dependency Model, 4×4 Matrix (0 HBMD), 6 Core CICs, 5 Core FLDs, 21-Row PCD Matrix, Data Ownership, Lifecycle Rules, Future Extensions, and Phase 2 Review Gates.'
         }
         actions={
           <div className="flex flex-wrap items-center gap-2">
@@ -201,6 +201,14 @@ export function DependenciesArchitectureView({
           </div>
         }
       />
+
+      {/* R06 Historical Baseline Disclosure */}
+      <div className="rounded-lg border border-info-border bg-info-bg/40 px-4 py-2.5 text-xs text-text-secondary">
+        <span className="font-semibold text-text-primary">
+          {t('foundations.historicalBaseline.title')}:
+        </span>{' '}
+        {t('foundations.historicalBaseline.body')}
+      </div>
 
       {/* Authoritative Phase 2 Governance Metrics Strip */}
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-5">

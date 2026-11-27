@@ -206,61 +206,98 @@ export function CoreModuleDetailView({
         </div>
       </section>
 
-      {/* KH-028 / FIX-02-R01: Curated Projection Provenance & Source Freshness */}
-      <InformationCallout
-        className={
+      {/* KH-028 / KH-037: Curated Projection Provenance, 4 Knowledge States & Source Freshness */}
+      {(() => {
+        const isStale =
           moduleProfile.projectionMetadata.mappingFreshnessStatus ===
-          'review-required-source-changed'
-            ? 'border-danger-border bg-danger-bg'
-            : 'border-info-border bg-info-bg/50'
-        }
-        title={
-          moduleProfile.projectionMetadata.mappingFreshnessStatus ===
-          'review-required-source-changed'
-            ? isAr
-              ? 'تنبيه صلاحية التفسير المنظّم: تغيّر المصدر الرسمي ويتطلب مراجعة (Review Required)'
-              : 'Curated Projection Freshness Alert: Official Source Changed (Review Required)'
-            : isAr
-              ? 'مصدرية العرض والتمييز بين النص الرسمي والتفسير التعليمي (Verified Current)'
-              : 'Content Provenance: Deterministic Official Extraction vs. Curated Educational Projection'
-        }
-      >
-        <div className="space-y-1.5 text-xs">
-          {moduleProfile.projectionMetadata.reviewWarning ? (
-            <p className="font-semibold text-danger">
-              {resolveLocalizedText(
-                moduleProfile.projectionMetadata.reviewWarning,
-                locale
-              )}
-            </p>
-          ) : null}
-          <p className="leading-relaxed text-text-secondary">
-            {resolveLocalizedText(
-              moduleProfile.projectionMetadata.projectionDisclosure,
-              locale
-            )}
-          </p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5 font-mono text-[11px] text-text-muted bidi-ltr">
-            <span>
-              Status: {moduleProfile.projectionMetadata.mappingFreshnessStatus}
-            </span>
-            <span>·</span>
-            <span>
-              Pinned Rev:{' '}
-              {moduleProfile.projectionMetadata.mappedSourceRevision.slice(0, 12)}
-            </span>
-            <span>·</span>
-            <span>
-              Body SHA-256:{' '}
-              {moduleProfile.projectionMetadata.actualSourceBodySha256.slice(0, 12)}
-            </span>
-            <span>·</span>
-            <span>
-              Reviewed: {moduleProfile.projectionMetadata.lastCuratedReviewDate}
-            </span>
-          </div>
-        </div>
-      </InformationCallout>
+          'review-required-source-changed';
+        return (
+          <InformationCallout
+            className={
+              isStale
+                ? 'border-danger-border bg-danger-bg'
+                : 'border-info-border bg-info-bg/50'
+            }
+            title={
+              isStale
+                ? isAr
+                  ? 'تحذير صلاحية التفسير المنظّم: تغيّر المصدر الرسمي — لا يُعتمد كمعرفة حالية (Review Required)'
+                  : 'Projection Freshness Alert: Official Source Changed — Do Not Treat Curated Summaries as Current Verified Knowledge'
+                : isAr
+                  ? 'مصدرية العرض والتمييز بين النص الرسمي والتفسير التعليمي وخط الأساس التاريخي'
+                  : 'Content Provenance: Verbatim Source, Reviewed Educational Projection & Historical Baseline'
+            }
+          >
+            <div className="space-y-2 text-xs">
+              {isStale && moduleProfile.projectionMetadata.reviewWarning ? (
+                <div className="rounded-md border border-danger-border bg-surface px-3 py-2 space-y-1">
+                  <p className="font-semibold text-danger">
+                    {resolveLocalizedText(
+                      moduleProfile.projectionMetadata.reviewWarning,
+                      locale
+                    )}
+                  </p>
+                  <Link
+                    href={`/knowledge/${moduleProfile.documentSlug}`}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                  >
+                    <BookOpen className="h-3 w-3" aria-hidden="true" />
+                    <span>
+                      {isAr
+                        ? 'افتح النص الرسمي الكامل مباشرةً كمرجع أعلى'
+                        : 'Open Verbatim Official Document Directly as Authority'}
+                    </span>
+                  </Link>
+                </div>
+              ) : null}
+              <p className="leading-relaxed text-text-secondary">
+                {resolveLocalizedText(
+                  moduleProfile.projectionMetadata.projectionDisclosure,
+                  locale
+                )}
+              </p>
+              <p className="text-[11px] text-text-secondary">
+                {t('foundations.historicalBaseline.body')}
+              </p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border/70 bg-surface px-2.5 py-1.5 text-[11px] text-text-secondary">
+                <span className="font-semibold text-text-primary">
+                  {t('foundations.knowledgeStates.heading')}:
+                </span>
+                <span>{isAr ? '1. مصدر رسمي حرفي' : '1. Verbatim Official Source'}</span>
+                <span>·</span>
+                <span className={!isStale ? 'font-semibold text-success' : 'text-text-muted line-through'}>
+                  {isAr ? '2. إسقاط تعليمي مُراجع' : '2. Reviewed Educational Projection'}
+                </span>
+                <span>·</span>
+                <span className={isStale ? 'font-semibold text-danger' : 'text-text-muted'}>
+                  {isAr ? '3. إسقاط يتطلب مراجعة' : '3. Projection Requiring Review'}
+                </span>
+                <span>·</span>
+                <span>{isAr ? '4. خط أساس تاريخي (397a94e0d82f)' : '4. Historical Baseline (397a94e0d82f)'}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5 font-mono text-[11px] text-text-muted bidi-ltr">
+                <span className={isStale ? 'font-semibold text-danger' : 'font-semibold text-success'}>
+                  {isStale ? 'Review Required — Source Changed' : 'Reviewed Against Pinned Source'}
+                </span>
+                <span>·</span>
+                <span>
+                  Pinned Rev:{' '}
+                  {moduleProfile.projectionMetadata.mappedSourceRevision.slice(0, 12)}
+                </span>
+                <span>·</span>
+                <span>
+                  Body SHA-256:{' '}
+                  {moduleProfile.projectionMetadata.actualSourceBodySha256.slice(0, 12)}
+                </span>
+                <span>·</span>
+                <span>
+                  Reviewed: {moduleProfile.projectionMetadata.lastCuratedReviewDate}
+                </span>
+              </div>
+            </div>
+          </InformationCallout>
+        );
+      })()}
 
       {/* In-Page Architectural Depth Navigation */}
       <nav
